@@ -4,7 +4,7 @@ import { Controller } from '@nestjs/common';
 export class AuthController {
 
 async test(){
-    return {status:"done"}
+    return {status:"success"}
 }
 
 }

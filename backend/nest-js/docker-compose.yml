@@ -71,7 +71,7 @@ services:
     depends_on:
       - mariadb
 
-  minio:
+  minio: 
     image: minio/minio
     container_name: minio
     ports:

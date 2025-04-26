@@ -10,6 +10,7 @@ export class UserController {
   async upsertUser(@Body() body: any) {
     const { id, ...data } = body;
 console.log("ji");
+
     return this.userService.upsertUser(id, data);
   }
 }

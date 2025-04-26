@@ -1,6 +1,9 @@
+version: "3.8"
+
 services:
   mariadb:
     image: mariadb:10.6
+    platform: linux/arm64  # ensures compatibility on ARM-based systems
     container_name: mariadb
     ports:
       - "3307:3306"
@@ -12,10 +15,10 @@ services:
     volumes:
       - ./volumes/db/mysql:/var/lib/mysql
       - ./sqls/init:/docker-entrypoint-initdb.d
-
+    restart: unless-stopped
 
   phpmyadmin:
-    image: arm64v8/phpmyadmin  # use platform-compatible image
+    image: arm64v8/phpmyadmin  # platform-compatible image for ARM
     container_name: phpmyadmin
     ports:
       - "8080:80"
@@ -26,8 +29,9 @@ services:
       PMA_PASSWORD: rootpass
     depends_on:
       - mariadb
+    restart: unless-stopped
 
-  minio: 
+  minio:
     image: minio/minio
     container_name: minio
     ports:
@@ -39,3 +43,4 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server --console-address ":9001" /data
+    restart: unless-stopped

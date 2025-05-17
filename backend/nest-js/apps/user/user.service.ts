@@ -7,7 +7,7 @@ export class UserService {
   constructor(private db: DbService, private mcurdSerRef: McrudService) { }
 
 
-  async upsertUser(id: number | undefined, data: any) {
+  async upsertUser(id: any, data: any) {
     if (id) {
       return await this.mcurdSerRef.update('users', data, { id });
     } else {

@@ -1,10 +1,9 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 
-let dbConnection: any = {};
+let dbConnection: any = null;
 
 function getDb() {
 
-    console.log("<-----dbco",dbConnection);
     
     if (dbConnection) {
         return dbConnection;

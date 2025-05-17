@@ -6,21 +6,23 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
-  @Post('upsert/:id')
-  async upsertUser(@Param('id') id: string, @Body() data: any) {
-    const result = await this.userService.upsertUser(id, data);
+@Post('save')  // Create user (no id param)
+async createUser(@Body() data: any) {
+  const result = await this.userService.upsertUser(null, data);
+  return {
+    message: 'User created successfully',
+    data: result,
+  };
+}
 
-    if (id) {
-      return {
-        message: 'User updated successfully',
-        data: result,
-      };
-    } else {
-      return {
-        message: 'User created successfully',
-        data: result,
-      };
-    }
-  }
+@Post('update/:id')  // Update user by id
+async updateUser(@Param('id') id: string, @Body() data: any) {
+  const result = await this.userService.upsertUser(id, data);
+  return {
+    message: 'User updated successfully',
+    data: result,
+  };
+}
+
 
 }

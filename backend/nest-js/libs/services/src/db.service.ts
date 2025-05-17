@@ -3,6 +3,9 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 let dbConnection: any = {};
 
 function getDb() {
+
+    console.log("<-----dbco",dbConnection);
+    
     if (dbConnection) {
         return dbConnection;
     }
@@ -34,7 +37,9 @@ function getDb() {
 export class DbService {
     private _mainDbConnection: any;
 
-    constructor() { }
+    constructor() {
+        console.log("<---trigger-DbService!!!!");
+     }
 
     get() {
         return getDb();

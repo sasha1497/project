@@ -5,7 +5,10 @@ import { DbService } from './db.service';
 export class McrudService {
     constructor(
         @Inject(forwardRef(() => DbService)) private readonly db: DbService,
-    ) { }
+    ) { 
+        console.log("trigger---mcrudservices");
+        
+    }
 
     create(table, datas, primarykey) {
 

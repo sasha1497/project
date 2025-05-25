@@ -1,0 +1,58 @@
+.text-purple {
+    color: #c026d3 !important;
+}
+
+.pricing-card ul {
+    padding-left: 0;
+}
+
+.pricing-card button:hover {
+    opacity: 0.9;
+}
+
+
+.pro_text {
+    font-size: 2.0rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.flash-sale-banner {
+    position: relative;
+  }
+  
+  .scrolling-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll-left 15s linear infinite;
+    font-size: 1rem;
+  }
+  
+  @keyframes scroll-left {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+
+  .pricing-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .pricing-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 1 1 20px rgba(255, 255, 255, 0.4), 0 10px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid #fff;
+  }
+
+  .pricing-card .btn:hover {
+    background-color: #fff !important;
+    color: #0d6efd !important;
+    box-shadow: 0 0 10px #fff, 0 0 20px #fff;
+    transition: all 0.3s ease;
+  }
+  
+  

@@ -1,0 +1,78 @@
+.logo-img {
+  height: 30px;
+  margin-right: 8px;
+}
+
+.brand-text {
+  font-weight: bold;
+  font-size: 1.25rem;
+  /* background: linear-gradient(90deg, #ff4081, #ffc107, #ff4081); */
+  /* background: linear-gradient(90deg, #007bff, #3399ff, #007bff); */
+  background: linear-gradient(100deg, #2a5298, #1e3c72, black);
+
+
+
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shine 2s linear infinite;
+}
+
+.parent-right-content {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.jump-icon {
+  display: inline-block;
+  animation: jump 1.5s ease-in-out infinite;
+}
+
+/* Blinking colored dot */
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: red;
+  animation: blinkColor 1.5s infinite;
+}
+
+/* Keyframes to change colors red -> yellow -> green -> red */
+@keyframes blinkColor {
+  0% {
+    background-color: red;
+  }
+
+  33% {
+    background-color: yellow;
+  }
+
+  66% {
+    background-color: green;
+  }
+
+  100% {
+    background-color: red;
+  }
+}
+
+
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes jump {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}

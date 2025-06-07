@@ -1,5 +1,5 @@
 // user.controller.ts
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, Get } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -26,12 +26,17 @@ export class UserController {
 
   @Post('login')
   async login(@Body() data: { mobileNumber: string; password: string }) {
-    return this.userService.loginNew(data);
+    return this.userService.login(data);
   }
 
 
-   @Post('list')
+  @Post('list')
   async listUsers(@Body() payload) {
     return this.userService.listUsers(payload);
+  }
+
+  @Get('get/:id')
+  async getUser(@Param('id') id: string) {
+    return this.userService.getUserData(id);
   }
 }

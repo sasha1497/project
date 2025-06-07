@@ -25,7 +25,7 @@ export class UserService {
     }
   }
 
-  async loginNew(data: { mobileNumber: string; password: string }) {
+  async login(data: { mobileNumber: string; password: string }) {
     const { mobileNumber, password } = data;
 
     if (!mobileNumber || !password) {
@@ -33,7 +33,7 @@ export class UserService {
     }
 
     const user = await this.mcurdSerRef.get('*', 'users', {
-      phone_number: mobileNumber,
+      'phone_number': mobileNumber,
     });
 
     if (!user) {
@@ -77,5 +77,13 @@ export class UserService {
 
   async listUsers(payload) {
     return await this.userModRef.list(payload);
+  }
+
+  async getUserData(id) {
+    const user = await this.mcurdSerRef.get('*', 'users', {
+      'id': id,
+    });
+
+    return user;
   }
 }

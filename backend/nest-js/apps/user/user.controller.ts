@@ -29,4 +29,9 @@ export class UserController {
     return this.userService.loginNew(data);
   }
 
+
+   @Post('list')
+  async listUsers(@Body() payload) {
+    return this.userService.listUsers(payload);
+  }
 }

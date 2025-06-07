@@ -5,9 +5,9 @@ import { DbService } from './db.service';
 export class McrudService {
     constructor(
         @Inject(forwardRef(() => DbService)) private readonly db: DbService,
-    ) { 
+    ) {
         console.log("trigger---mcrudservices");
-        
+
     }
 
     create(table, datas, primarykey) {
@@ -34,7 +34,7 @@ export class McrudService {
     }
 
 
-    async get(select: any = "*", table, condition = null) {
+    async get(select: any = "*", table, condition = {}) {
         const result = await this.db.get().select(this.db.get().raw(select)).from(table).where(condition).first();
         return result ?? false;
     }
@@ -60,9 +60,9 @@ export class McrudService {
         return this.db.get().from(table).whereIn(primarykey, ids).del();
     }
 
-    updateBatch(table, ids,datas, primarykey){
+    updateBatch(table, ids, datas, primarykey) {
         return this.db.get().from(table).whereIn(primarykey, ids).update(datas);
     }
-    
+
 }
 

@@ -34,7 +34,7 @@ export class McrudService {
     }
 
 
-    async get(select: any = "*", table, condition = null) {
+    async get(select: any = "*", table, condition = {}) {
         const result = await this.db.get().select(this.db.get().raw(select)).from(table).where(condition).first();
         return result ?? false;
     }

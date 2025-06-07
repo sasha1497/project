@@ -62,7 +62,7 @@ export class S3Service {
         try {
             // Convert image files to buffer using Sharp
             if (["image/jpeg", "image/png", "image/heic"].includes(mimetype)) {
-                file = await sharp(file).toBuffer();
+                // file = await sharp(file).toBuffer();
             }
          
             // Construct the S3 key
@@ -122,11 +122,11 @@ export class S3Service {
 
                 data.Body.on('end', async () => {
                     const buffer = Buffer.concat(chunks);
-                    const processedImage = await sharp(buffer)
-                        // .resize({ width: 'micro', height: constants.thumbScale[thumbScale] })
-                        .toBuffer();
-                    // response = resHeader('image/jpeg', response);
-                    response.send(processedImage);
+                    // const processedImage = await sharp(buffer)
+                    //     // .resize({ width: 'micro', height: constants.thumbScale[thumbScale] })
+                    //     .toBuffer();
+                    // // response = resHeader('image/jpeg', response);
+                    // response.send(processedImage);
                 });
 
                 data.Body.on('error', err => {

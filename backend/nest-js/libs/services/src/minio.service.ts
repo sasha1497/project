@@ -84,11 +84,11 @@ export class MinioService {
 
                     dataStream.on('end', async () => {
                         const buffer = Buffer.concat(chunks);
-                        const processedImage = await sharp(buffer)
+                        // const processedImage = await sharp(buffer)
                             // .resize({ width: constants.thumbScale[thumbScale], height: constants.thumbScale[thumbScale] })
-                            .toBuffer();
-                        // response = resHeader('image/jpeg', response);
-                        response.send(processedImage);
+                        //     .toBuffer();
+                        // // response = resHeader('image/jpeg', response);
+                        // response.send(processedImage);
                     });
                 } else {
                     // response = resHeader(stat.metaData['content-type'], response);

@@ -5,9 +5,9 @@ import { DbService } from './db.service';
 export class McrudService {
     constructor(
         @Inject(forwardRef(() => DbService)) private readonly db: DbService,
-    ) { 
+    ) {
         console.log("trigger---mcrudservices");
-        
+
     }
 
     create(table, datas, primarykey) {
@@ -60,9 +60,14 @@ export class McrudService {
         return this.db.get().from(table).whereIn(primarykey, ids).del();
     }
 
-    updateBatch(table, ids,datas, primarykey){
+    updateBatch(table, ids, datas, primarykey) {
         return this.db.get().from(table).whereIn(primarykey, ids).update(datas);
     }
-    
+
+    find(table: string, where: Record<string, any>) {
+        return this.db.get().table(table).where(where);
+    }
+
+
 }
 

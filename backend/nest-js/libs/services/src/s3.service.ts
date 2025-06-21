@@ -1,5 +1,5 @@
-import {  Injectable } from '@nestjs/common';
-import {  S3Client, PutObjectCommandInput, CreateBucketCommand, HeadBucketCommand, GetObjectCommand, DeleteObjectCommand, CopyObjectCommand, PutObjectCommand, HeadObjectCommand, GetObjectCommandInput, ListBucketsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { Injectable } from '@nestjs/common';
+import { S3Client, PutObjectCommandInput, CreateBucketCommand, HeadBucketCommand, GetObjectCommand, DeleteObjectCommand, CopyObjectCommand, PutObjectCommand, HeadObjectCommand, GetObjectCommandInput, ListBucketsCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import * as sharp from 'sharp';
 import { Upload } from '@aws-sdk/lib-storage';
 // import { resHeader } from '../helpers/file';
@@ -14,23 +14,23 @@ const pipelineAsync = promisify(pipeline);
 @Injectable()
 export class S3Service {
     client: any;
-    bucket = process.env.S3_MAIN_BUCKET;
-    masterBucket = process.env.BUCKET_MASTER;
+    bucket = process.env.AWS_BUCKET_NAME;
+    // masterBucket = process.env.BUCKET_MASTER;
 
     constructor() {
         const accessKeyId = process.env.AWS_S3_KEY;
         const secretAccessKey = process.env.AWS_S3_SECRET;
-        
+
         if (!accessKeyId || !secretAccessKey) {
             throw new Error("AWS credentials are not set in environment variables");
         }
-        
+
         this.client = new S3Client({
             credentials: {
                 accessKeyId,
                 secretAccessKey,
             },
-            region: 'eu-central-1',
+            region: process.env.AWS_REGION,
         });
 
     }
@@ -57,46 +57,40 @@ export class S3Service {
         return { message: "bucket_already_exist" }
 
     }
-    
-    async upload(file: Buffer | string, companyId: string, toPath: string, filename: string, mimetype: string) {
+
+    async upload(
+        file: Buffer | string,
+        toPath: string,
+        filename: string,
+        mimetype: string,
+    ) {
         try {
-            // Convert image files to buffer using Sharp
-            if (["image/jpeg", "image/png", "image/heic"].includes(mimetype)) {
-                // file = await sharp(file).toBuffer();
-            }
-         
-            // Construct the S3 key
-            const keySource = companyId
-                ? `companies/${companyId}/${toPath}/${filename}`
-                : `${toPath}/${filename}`;
-    
-            // S3 Upload parameters
+            const key = `${toPath}/${filename}`;
+
             const params: PutObjectCommandInput = {
                 Bucket: this.bucket,
-                Key: keySource,
+                Key: key,
                 Body: file,
-                ACL: "public-read",
+                ACL: 'public-read',
                 ContentType: mimetype,
-                ContentDisposition: "inline",
+                ContentDisposition: 'inline',
             };
-    
-            // Upload to S3
+
             const upload = new Upload({
                 client: this.client,
                 params,
             });
-    
+
             const s3Response = await upload.done();
-    
-            console.log(`File uploaded successfully`);
-            
+            console.log(`File uploaded successfully to ${key}`);
             return s3Response;
         } catch (error) {
-            console.error("S3 Upload Error:", error);
-            throw new Error("File upload failed");
+            console.error('S3 Upload Error:', error);
+            throw new Error('File upload failed');
         }
     }
-    
+
+
 
 
     async getFileAsResponse(response, companyId, path, fileName, useSharp = false, thumbScale: any = false, extension = null) {

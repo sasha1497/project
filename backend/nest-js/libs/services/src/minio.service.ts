@@ -28,11 +28,10 @@ export class MinioService {
     }
 
 
-    async upload(file, companyId, toPath, fileName, mimetype) {
+    async upload(file, toPath, fileName, mimetype) {
         const metaData = { 'Content-Type': mimetype };
 
-        const bucket = companyId === 'master' ? this.masterBucket : this.bucket + companyId;
-
+        const bucket = this.bucket;
         return new Promise((resolve, reject) => {
             this.client.putObject(bucket, toPath + '/' + fileName, file, metaData, (err, etag) => {
                 if (err) return reject(err);

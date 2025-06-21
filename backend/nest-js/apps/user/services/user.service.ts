@@ -4,7 +4,7 @@ import { DbService } from 'libs/services/src/db.service';
 import { McrudService } from 'libs/services/src/mcurd.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { UserModel } from './user.model';
+import { UserModel } from '../user.model';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 

@@ -21,6 +21,9 @@ import Step9 from '../../pages/steps/step9';
 
 
 import './multi.css';
+import { useSubmitFormMutation } from '../../features/form/formApi';
+import { useRegisterUserMutation } from '../../features/auth/authApi';
+import { logout } from '../../features/auth/authSlice';
 
 const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9];
 
@@ -32,6 +35,9 @@ export default function App() {
   const formState = useSelector((state: RootState) => state.form);
   const navigate = useNavigate();
 
+  const [submitForm, { isLoading, isError, isSuccess, error }] = useSubmitFormMutation();
+
+
   const handleNext = () => {
     const values = methods.getValues();
     dispatch(updateFormData(values));
@@ -42,13 +48,39 @@ export default function App() {
     setCurrentStep((prev) => prev - 1);
   };
 
+
   const onSubmit = async (data: any) => {
-    console.log(data, 'gygyghbh')
-    dispatch(updateFormData(data));
-    dispatch(resetForm());
-    localStorage.setItem('authToken', '1');
-    navigate('/profile');
+    dispatch(updateFormData(data)); // Add final step data
+    try {
+      const result = await submitForm({ ...formState, ...data });
+      console.log('Submission success:', result);
+      if (result) {
+        localStorage.setItem('authToken', '1');
+      }
+      navigate('/profile');
+    } catch (e) {
+      console.error('Submission failed:', e);
+    }
   };
+  // const [registerUser] = useRegisterUserMutation();
+  // const onSubmit = async (data: any) => {
+  //   const fullData = { ...formState, ...data };
+  //   try {
+  //     const res = await registerUser(fullData).unwrap();
+  //     if (res?.token) {
+  //       localStorage.setItem('authToken', res.token);
+  //       navigate('/profile');
+  //     }
+  //   } catch (err) {
+  //     console.error('Register failed:', err);
+  //   }
+  // };
+
+  //   logout
+  //   const handleLogout = () => {
+  //   dispatch(logout());
+  //   navigate('/signup');
+  // };
 
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center vh-10">

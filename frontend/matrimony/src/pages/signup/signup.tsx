@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import MultiStepForm from '../multiStep/MultiStepForm';
+import { useLoginUserMutation } from '../../features/auth/authApi';
+import { useDispatch } from 'react-redux';
+import { setToken } from '../../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
+
 
 interface FormData {
   email: string;
@@ -14,6 +19,23 @@ const SignUp: React.FC = () => {
   const onSubmit = (data: FormData) => {
     console.log('Sign In Data:', data);
   };
+
+  // const [loginUser] = useLoginUserMutation();
+  // const dispatch = useDispatch();
+  // const navigate = useNavigate();
+
+
+  // const onSubmit = async (data: FormData) => {
+  //   try {
+  //     const result = await loginUser(data).unwrap();
+  //     if (result?.token) {
+  //       dispatch(setToken(result.token));
+  //       navigate('/profile');
+  //     }
+  //   } catch (error) {
+  //     console.error('Login failed', error);
+  //   }
+  // };
 
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center vh-100">

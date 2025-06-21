@@ -19,9 +19,9 @@ export class StorageService {
     }
 
     //upload file to s3 buckets
-    async upload(file, companyId, toPath, filename, mimetype) {
-        !this.isAws && this.clientSerRef.createBucketIfNotExists(companyId);
-        return await this.clientSerRef.upload(file, companyId, toPath, filename, mimetype);
+    async upload(file, toPath, filename, mimetype) {
+        // !this.isAws && this.clientSerRef.createBucketIfNotExists();
+        return await this.clientSerRef.upload(file, toPath, filename, mimetype);
     }
 
     // get file from s3 buckets to preview

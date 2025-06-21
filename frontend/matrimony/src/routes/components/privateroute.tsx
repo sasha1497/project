@@ -12,5 +12,9 @@ const PrivateRoute: React.FC<Props> = ({ children }) => {
   // Redirect to signup if no token
   return authToken == '1' ? <>{children}</> : <Navigate to="/signup" replace />;
 };
+// const PrivateRoute: React.FC<Props> = ({ children }) => {
+//   const authToken = localStorage.getItem('authToken');
+//   return authToken ? <>{children}</> : <Navigate to="/signup" replace />;
+// };
 
 export default PrivateRoute;

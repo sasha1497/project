@@ -1,14 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
-  const { register, setValue, setError, clearErrors, trigger, formState: { errors }, unregister } = methods;
+  const {
+    register,
+    setValue,
+    setError,
+    clearErrors,
+    trigger,
+    formState: { errors },
+    unregister,
+  } = methods;
 
-  useEffect(() => {
+  const [preview, setPreview] = useState<string | null>(null);
+
+  // useEffect(() => {
+  //   register("photo", { required: "Profile picture is required" });
+  // }, [register, unregister]);
+
+  //default set the image
+    useEffect(() => {
     register("photo", { required: "Profile picture is required" });
 
-    return () => unregister("photo");
-  }, [register, unregister]);
+    const savedPhoto = localStorage.getItem("uploadedPhoto");
+    const defaultPlaceholder = '/images/default-profile.jpg'; // public folder
+
+    const initialPhoto = savedPhoto || defaultPlaceholder;
+
+    setValue("photo", initialPhoto);
+    setPreview(initialPhoto);
+  }, [register, setValue]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -18,18 +39,19 @@ const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
         type: "manual",
         message: "Profile picture is required",
       });
+      setPreview(null);
       return;
     }
 
-    // Optional: Validate file type and size (e.g., max 2MB, only images)
     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024;
 
     if (!validTypes.includes(file.type)) {
       setError("photo", {
         type: "manual",
         message: "Only JPG/PNG images are allowed",
       });
+      setPreview(null);
       return;
     }
 
@@ -38,10 +60,10 @@ const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
         type: "manual",
         message: "File size must be less than 2MB",
       });
+      setPreview(null);
       return;
     }
 
-    // All validations passed
     clearErrors("photo");
 
     const reader = new FileReader();
@@ -49,6 +71,7 @@ const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
       const base64String = reader.result as string;
       localStorage.setItem("uploadedPhoto", base64String);
       setValue("photo", base64String);
+      setPreview(base64String);
       trigger("photo");
     };
     reader.readAsDataURL(file);
@@ -56,7 +79,7 @@ const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
 
   return (
     <div className="mb-3">
-      <label>Upload Profile Photo</label>
+      <label className="form-label">Upload Profile Photo</label>
       <input
         type="file"
         accept="image/*"
@@ -64,7 +87,18 @@ const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
         onChange={handleImageChange}
       />
       {errors.photo && (
-        <div className="invalid-feedback">{errors.photo.message as String}</div>
+        <div className="invalid-feedback">{errors.photo.message as string}</div>
+      )}
+
+      {preview && (
+        <div className="mt-3">
+          <p className="mb-1">Preview:</p>
+          <img
+            src={preview}
+            alt="Profile Preview"
+            style={{ maxWidth: "150px", maxHeight: "150px", borderRadius: "8px" }}
+          />
+        </div>
       )}
     </div>
   );

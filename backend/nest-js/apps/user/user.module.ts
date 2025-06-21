@@ -11,6 +11,11 @@ import { DbService } from 'libs/services/src/db.service';
 import { McrudService } from 'libs/services/src/mcurd.service';
 import { SubscriptionService } from './services/subscription.service';
 import { UserModel } from './user.model';
+import { UploadController } from './controllers/upload.controller';
+import { AssetService } from './services/asset.service';
+import { StorageService } from 'libs/services/src/storage.service';
+import { S3Service } from 'libs/services/src/s3.service';
+import { MinioService } from 'libs/services/src/minio.service';
 
 @Module({
   imports: [
@@ -18,7 +23,8 @@ import { UserModel } from './user.model';
   ],
   controllers: [
     UserController,
-    RazorpayController,  // controllers only here
+    RazorpayController,
+    UploadController  // controllers only here
   ],
   providers: [
     UserService,
@@ -26,8 +32,12 @@ import { UserModel } from './user.model';
     McrudService,
     RazorpayService,  
     UserModel,
-    SubscriptionService// services/providers here (only once)
-    
+    SubscriptionService,
+    AssetService,
+    UserModel,
+    StorageService,
+    S3Service,
+    MinioService
   ],
 })
 export class UserModule {}

@@ -10,6 +10,7 @@ import { RazorpayService } from './services/razorpay.service';
 import { DbService } from 'libs/services/src/db.service';
 import { McrudService } from 'libs/services/src/mcurd.service';
 import { SubscriptionService } from './services/subscription.service';
+import { UserModel } from './model/user.model';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { SubscriptionService } from './services/subscription.service';
     DbService,
     McrudService,
     RazorpayService,  
-    SubscriptionService// services/providers here (only once)
+    SubscriptionService,// services/providers here (only once)
+    UserModel
   ],
 })
 export class UserModule {}

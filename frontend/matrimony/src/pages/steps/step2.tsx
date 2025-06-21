@@ -16,17 +16,28 @@ const Step2: React.FC<Props> = ({ methods }) => {
             {/* country */}
             <div style={{ marginBottom: '1rem' }}>
                 <label htmlFor="country">Country</label>
-                <input
+                <select
                     id="country"
                     {...register('country', { required: 'country is required' })}
                     style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-                />
+                >
+                    <option value="">Select a country</option>
+                    <option value="India">India</option>
+                    <option value="USA">USA</option>
+                    <option value="England">England</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Ireland">Ireland</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Scotland">Scotland</option>
+                    <option value="Singapore">Singapore</option>
+                </select>
                 {errors.country && (
                     <p style={{ color: 'red', marginBottom: '10px' }}>
                         {errors.country.message as string}
                     </p>
                 )}
             </div>
+
 
             {/* state */}
             <div style={{ marginBottom: '1rem' }}>

@@ -1,0 +1,64 @@
+.image-upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.image-upload-container h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.image-item {
+  position: relative;
+}
+
+.image-item img {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.image-item button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 0, 0, 0.7);
+  border: none;
+  color: white;
+  border-radius: 50%;
+  padding: 4px 7px;
+  cursor: pointer;
+}
+
+input[type="file"] {
+  margin-top: 1rem;
+}
+
+button[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+  .image-item img {
+    width: 80px;
+    height: 80px;
+  }
+}

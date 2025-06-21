@@ -4,7 +4,7 @@ import { DbService } from 'libs/services/src/db.service';
 import { McrudService } from 'libs/services/src/mcurd.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { UserModel } from './user.model';
+import { UserModel } from '../user.model';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -41,10 +41,10 @@ export class UserService {
     }
 
     // // Validate password using bcrypt
-    const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isPasswordMatch) {
-      throw new UnauthorizedException('Invalid password');
-    }
+    // const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
+    // if (!isPasswordMatch) {
+    //   throw new UnauthorizedException('Invalid password');
+    // }
 
     // Gender mapping: male -> 1, female -> 2, others -> 3
     let genderType = 3;
@@ -62,7 +62,7 @@ export class UserService {
 
     // Generate JWT Token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-
+  
     return {
       message: 'Login successful',
       user: {

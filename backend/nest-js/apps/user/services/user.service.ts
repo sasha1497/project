@@ -4,8 +4,8 @@ import { DbService } from 'libs/services/src/db.service';
 import { McrudService } from 'libs/services/src/mcurd.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { UserModel } from '../user.model';
 import { StorageService } from 'libs/services/src/storage.service';
+import { UserModel } from '../model/user.model';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -18,14 +18,27 @@ export class UserService {
     private storageSerRef :StorageService
   ) { }
 
+
   async upsertUser(id: any, data: any) {
+    const { password, confirmPassword, ...rest } = data;
+
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+    const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : null;
+
+    const payload = {
+      ...rest,
+      ...(hashedPassword && { password: hashedPassword }),
+      ...(hashedConfirmPassword && { confirmPassword: hashedConfirmPassword })
+    };
+
     if (id) {
-      return await this.mcurdSerRef.update('users', data, { id });
+      return await this.mcurdSerRef.update('users', payload, { id });
     } else {
-      const newId = await this.mcurdSerRef.create('users', data, 'id');
-      return { id: newId, ...data };
+      const newId = await this.mcurdSerRef.create('users', payload, 'id');
+      return { id: newId, ...payload };
     }
   }
+
 
   async login(data: { mobileNumber: string; password: string }) {
     const { mobileNumber, password } = data;
@@ -34,21 +47,22 @@ export class UserService {
       throw new BadRequestException('Mobile number and password are required');
     }
 
+    // Find user by phone_number column
     const user = await this.mcurdSerRef.get('*', 'users', {
-      'phone_number': mobileNumber,
+      phone_number: mobileNumber,
     });
 
     if (!user) {
       throw new UnauthorizedException('Invalid mobile number or password');
     }
 
-    // // Validate password using bcrypt
-    // const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
-    // if (!isPasswordMatch) {
-    //   throw new UnauthorizedException('Invalid password');
-    // }
+    //  Compare raw password with hashed password in `password` column
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('Invalid mobile number or password');
+    }
 
-    // Gender mapping: male -> 1, female -> 2, others -> 3
+    // Gender mapping
     let genderType = 3;
     if (user.gender) {
       const gender = user.gender.toLowerCase();
@@ -56,21 +70,20 @@ export class UserService {
       else if (gender === 'female') genderType = 2;
     }
 
-    // JWT Payload
+    // JWT
     const payload = {
       userId: user.id,
       genderType,
     };
 
-    // Generate JWT Token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-  
+
     return {
       message: 'Login successful',
       user: {
         token,
         id: user.id,
-        name: `${user.first_name} ${user.last_name}`,
+        name: user.name,
         type: genderType,
       },
     };

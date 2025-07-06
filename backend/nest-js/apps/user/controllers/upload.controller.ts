@@ -8,23 +8,39 @@ import { Express } from 'express';
 export class UploadController {
   constructor(private readonly astSerRef:AssetService) { }
 
- @Post('user/dp/:id')
-@UseInterceptors(FilesInterceptor('dpfile', 10)) // 10 is the max count of files allowed
+@Post('user/dp/:id')
+@UseInterceptors(FilesInterceptor('dpfile', 10))
 async uploadMultipleDpFiles(
   @UploadedFiles() dpfiles: Express.Multer.File[],
   @Param('id') id: string,
 ) {
   try {
+    const unixTime = Date.now();
+    
+    const renamedFiles = dpfiles.map((file, idx) => {
+      const newFileName = `${unixTime + idx}_${file.originalname}`;
+      return { ...file, newFileName };
+    });
+
     const uploadedData = await Promise.all(
-      dpfiles.map((file) => this.astSerRef.uploadFileToS3(file, 'user')),
+      renamedFiles.map((fileObj) =>
+        this.astSerRef.uploadFileToS3(
+          { ...fileObj, originalname: fileObj.newFileName },
+          'user'
+        )
+      )
     );
+
+    const finalFileNames = renamedFiles.map((f) => f.newFileName);
+
+    console.log(id, JSON.stringify(finalFileNames));
+    
+    await this.astSerRef.updateUserImages(id, JSON.stringify(finalFileNames));
 
     return {
       status: 'success',
-      upload_data: uploadedData.map((data, index) => ({
-        data,
-        file_name: dpfiles[index].originalname,
-      })),
+      files: finalFileNames,
+      upload_data: uploadedData,
     };
   } catch (e) {
     console.error('Upload error:', e);
@@ -34,4 +50,5 @@ async uploadMultipleDpFiles(
     };
   }
 }
+
 }

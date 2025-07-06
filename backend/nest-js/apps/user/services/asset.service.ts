@@ -12,8 +12,6 @@ export class AssetService {
 
  async uploadFileToS3(file: Express.Multer.File, path = 'user') {
 
-  console.log(file,"<----------upload");
-  
     const { originalname, mimetype } = file;
     const compressedBuffer = await this.compressFile(file);
     const s3UploadData = await this.s6SerRef.upload(
@@ -22,12 +20,22 @@ export class AssetService {
       originalname,
       mimetype,
     );
+
+    
     return {
       originalname,
       s3UploadData,
     };
   }
 
+  async updateUserImages(id,fileNames){
+        const user = await this.mcurdService.update('users', { photo: JSON.stringify(fileNames) }, {
+      'id': id,
+    });
+
+  }
+
+  
   async compressFile(file: Express.Multer.File): Promise<Buffer> {
     let compressType: 'jpeg' | 'png' | 'webp';
     let compressConfig: any;

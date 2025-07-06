@@ -22,8 +22,7 @@ export class McrudService {
 
         if (table && datas) {
             return this.db.get().table(table).where(condition).update(datas);
-
-
+            
         }
     }
 

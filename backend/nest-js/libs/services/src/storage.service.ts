@@ -14,14 +14,15 @@ export class StorageService {
     }
 
 
-    get clientSerRef () {
+    get clientSerRef() {
         return process.env.ISAWS === "1" ? this.s3SerRef : this.minioSerRef;
     }
 
     //upload file to s3 buckets
-    async upload(file, toPath, filename, mimetype) {
-        // !this.isAws && this.clientSerRef.createBucketIfNotExists();
-        return await this.clientSerRef.upload(file, toPath, filename, mimetype);
+    async upload(file, toPath, filename, mimetype, id) {
+        let data = await this.clientSerRef.upload(file, toPath, filename, mimetype, id);
+        return data
+
     }
 
     // get file from s3 buckets to preview
@@ -52,7 +53,7 @@ export class StorageService {
 
     // get file url form s3 bucket
     async getFileUrl(companyId, path, file) {
-        return this.clientSerRef.getFileUrl(companyId, path, file); 
+        return this.clientSerRef.getFileUrl(companyId, path, file);
     }
 
     // remove file form s3 bucket
@@ -68,5 +69,14 @@ export class StorageService {
     async listObjects() {
         // return this.clientSerRef.bucketList();
     }
+
+    async getImageUrl(filePath: string): Promise<string> {
+        console.log("triigerstorage service");
+        console.log(filePath,"<--------filepath");
+        
+        
+        return this.clientSerRef.getSignedUrl(filePath)
+    }
+
 
 }

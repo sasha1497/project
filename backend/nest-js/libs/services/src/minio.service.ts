@@ -24,21 +24,37 @@ export class MinioService {
         if (!value) {
             minioClient['port'] = 9000;
         }
+
         this.client = new Minio.Client(minioClient);
     }
 
 
-    async upload(file, toPath, fileName, mimetype) {
+    async upload(file, toPath, fileName, mimetype, id) {
+
         const metaData = { 'Content-Type': mimetype };
 
         const bucket = this.bucket;
+
         return new Promise((resolve, reject) => {
-            this.client.putObject(bucket, toPath + '/' + fileName, file, metaData, (err, etag) => {
+            this.client.putObject(bucket, toPath + '/' + id + '/' + fileName, file, metaData, (err, etag) => {
                 if (err) return reject(err);
                 resolve(toPath + '/' + fileName);
             });
         });
     }
+
+    async getSignedUrl(filePath: string): Promise<string> {
+        console.log(filePath,"<---file path");
+        
+        const bucket = this.bucket;
+        return new Promise((resolve, reject) => {
+            this.client.presignedGetObject(bucket, filePath, 24 * 60 * 60, (err, url) => {
+                if (err) return reject(err);
+                resolve(url);
+            });
+        });
+    }
+
 
 
     async createBucketIfNotExists(companyId) {
@@ -52,7 +68,7 @@ export class MinioService {
     async getFileAsResponse(response, companyId, path, fileName, useSharp = false, thumbScale: any = false, extension = null) {
 
         try {
-            
+
             let key = `${String(path)}/${fileName}`;
             let bucket = companyId === 'master' ? this.masterBucket : this.bucket + companyId;
             const stat = await this.client.statObject(bucket, key);
@@ -84,7 +100,7 @@ export class MinioService {
                     dataStream.on('end', async () => {
                         const buffer = Buffer.concat(chunks);
                         // const processedImage = await sharp(buffer)
-                            // .resize({ width: constants.thumbScale[thumbScale], height: constants.thumbScale[thumbScale] })
+                        // .resize({ width: constants.thumbScale[thumbScale], height: constants.thumbScale[thumbScale] })
                         //     .toBuffer();
                         // // response = resHeader('image/jpeg', response);
                         // response.send(processedImage);

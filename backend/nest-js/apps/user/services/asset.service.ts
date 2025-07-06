@@ -10,7 +10,7 @@ export class AssetService {
   constructor(private readonly mcurdService: McrudService, private readonly s6SerRef:StorageService) { }
 
 
- async uploadFileToS3(file: Express.Multer.File, path = 'user') {
+ async uploadFileToS3(file: Express.Multer.File, id, path = 'users') {
 
     const { originalname, mimetype } = file;
     const compressedBuffer = await this.compressFile(file);
@@ -19,6 +19,7 @@ export class AssetService {
       path,
       originalname,
       mimetype,
+      id
     );
 
     

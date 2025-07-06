@@ -26,7 +26,7 @@ async uploadMultipleDpFiles(
       renamedFiles.map((fileObj) =>
         this.astSerRef.uploadFileToS3(
           { ...fileObj, originalname: fileObj.newFileName },
-          'user'
+          id, 'users'
         )
       )
     );

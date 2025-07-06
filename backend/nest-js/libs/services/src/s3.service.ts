@@ -63,9 +63,12 @@ export class S3Service {
         toPath: string,
         filename: string,
         mimetype: string,
+        id
     ) {
         try {
-            const key = `${toPath}/${filename}`;
+            const key = `${toPath}/${id}${filename}`;
+            console.log("triiger upload s3 service");
+
 
             const params: PutObjectCommandInput = {
                 Bucket: this.bucket,
@@ -89,6 +92,17 @@ export class S3Service {
             throw new Error('File upload failed');
         }
     }
+
+    async getSignedUrl(filePath: string): Promise<string> {
+        const params = {
+            Bucket: this.bucket,
+            Key: filePath,
+            Expires: 24 * 60 * 60,
+        };
+
+        return this.client.getSignedUrlPromise('getObject', params);
+    }
+
 
 
 
@@ -225,11 +239,11 @@ export class S3Service {
     }
 
 
-    async getFileUrl(companyId: string, path: string, filename: string): Promise<string> {
+    async getFileUrl(path: string, filename: string): Promise<string> {
         try {
             const params: GetObjectCommandInput = {
                 Bucket: this.bucket,
-                Key: `companies/${companyId}/${path}/${filename}`,
+                Key: `${path}/${filename}`,
             };
 
             const command = new GetObjectCommand(params);

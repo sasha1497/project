@@ -5,6 +5,7 @@ import { McrudService } from 'libs/services/src/mcurd.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { UserModel } from '../user.model';
+import { StorageService } from 'libs/services/src/storage.service';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -13,7 +14,8 @@ export class UserService {
   constructor(
     private db: DbService,
     private mcurdSerRef: McrudService,
-    private userModRef: UserModel
+    private userModRef: UserModel,
+    private storageSerRef :StorageService
   ) { }
 
   async upsertUser(id: any, data: any) {
@@ -79,11 +81,62 @@ export class UserService {
     return await this.userModRef.list(payload);
   }
 
-  async getUserData(id) {
-    const user = await this.mcurdSerRef.get('*', 'users', {
-      'id': id,
-    });
+async getUserData(id: string) {
+  const user = await this.mcurdSerRef.get('*', 'users', { id });
+  console.log(user.photo, '<---------- user.photo (raw from DB)');
 
-    return user;
+  let imageKeys: string[] = [];
+
+  try {
+    let raw = user.photo;
+
+    // First level: parse string
+    if (typeof raw === 'string') {
+      raw = JSON.parse(raw);
+
+      // If still string (double-stringified), parse again
+      if (typeof raw === 'string') {
+        raw = JSON.parse(raw);
+      }
+    }
+
+    // If array, assign to imageKeys
+    if (Array.isArray(raw)) {
+      imageKeys = raw;
+    } else {
+      console.warn('Photo is not an array after parsing:', raw);
+    }
+  } catch (err) {
+    console.error('Error parsing user.photo:', err);
   }
+
+  console.log(imageKeys, '<--- imageKeys after parsing');
+
+  // Build image metadata list
+  const imageData = await Promise.all(
+    imageKeys.map(async (fileName) => {
+      const filePath = `users/${id}/${fileName}`;
+      const url = await this.storageSerRef.getImageUrl(filePath);
+
+      // Extract date from filename like "2025-06-07"
+      const dateMatch = fileName.match(/\d{4}-\d{2}-\d{2}/);
+      const date = dateMatch ? dateMatch[0] : null;
+
+      return {
+        name: fileName,
+        url,
+        date,
+      };
+    })
+  );
+
+  return {
+    ...user,
+    imageData,
+  };
+}
+
+
+
+
 }

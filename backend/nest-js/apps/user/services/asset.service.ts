@@ -11,6 +11,9 @@ export class AssetService {
 
 
  async uploadFileToS3(file: Express.Multer.File, path = 'user') {
+
+  console.log(file,"<----------upload");
+  
     const { originalname, mimetype } = file;
     const compressedBuffer = await this.compressFile(file);
     const s3UploadData = await this.s6SerRef.upload(

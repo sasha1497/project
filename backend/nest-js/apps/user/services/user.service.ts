@@ -47,7 +47,7 @@ export class UserService {
 
     // Find user by phone_number column
     const user = await this.mcurdSerRef.get('*', 'users', {
-      phone_number: mobileNumber, // ← correct DB field
+      phone_number: mobileNumber, 
     });
 
     if (!user) {

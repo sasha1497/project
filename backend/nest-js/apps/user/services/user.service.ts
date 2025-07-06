@@ -47,7 +47,7 @@ export class UserService {
 
     // Find user by phone_number column
     const user = await this.mcurdSerRef.get('*', 'users', {
-      phone_number: mobileNumber, 
+      phone_number: mobileNumber,
     });
 
     if (!user) {
@@ -92,11 +92,9 @@ export class UserService {
     return await this.userModRef.list(payload);
   }
 
-  async getUserData(id) {
-    const user = await this.mcurdSerRef.get('*', 'users', {
-      'id': id,
-    });
 
-    return user;
+  async getUserData(id) {
+    return await this.mcurdSerRef.get('*', 'users', { 'id': id });
   }
+
 }

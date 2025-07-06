@@ -9,29 +9,34 @@ export class UserModel {
 
 
     async list(payload) {
-
         const { page = 1, limit = 10, filter = {}, search = "" } = payload;
-
         const offset = (page - 1) * limit;
 
-        const query = this.db.get().select('id', 'first_name', 'last_name', 'email', 'gender', 'date_of_birth', 'height_cm', 'weight_kg', 'religion',
-            'caste', 'mother_tongue', 'country', 'state', 'city', 'marital_status', 'is_active'
-        )
+        const query = this.db.get()
+            .select(
+                'id', 'name', 'email', 'phone_number', 'gender', 'date_of_birth', 'age',
+                'person', 'height', 'job', 'mobile', 'whatsapp', 'monthlySalary', 'weight',
+                'religion', 'caste', 'mother_tongue', 'country', 'district', 'state', 'city',
+                'marital_status', 'education', 'occupation', 'income', 'about_me', 'photo', 'is_active'
+            )
             .from('users');
 
         if (filter.id) query.where('id', filter.id);
-        if (filter.first_name) query.where('first_name', 'like', `%${filter.first_name}%`);
-        if (filter.last_name) query.where('last_name', 'like', `%${filter.last_name}%`);
+        if (filter.name) query.where('name', 'like', `%${filter.name}%`);
         if (filter.gender) query.where('gender', filter.gender);
+        if (filter.age) query.where('age', filter.age);
+        if (filter.religion) query.where('religion', filter.religion);
 
         if (search) {
             query.where(builder => {
                 builder
                     .orWhere('id', 'like', `%${search}%`)
-                    .orWhere('first_name', 'like', `%${search}%`)
-                    .orWhere('last_name', 'like', `%${search}%`);
+                    .orWhere('name', 'like', `%${search}%`)
+                    .orWhere('phone_number', 'like', `%${search}%`)
+                    .orWhere('email', 'like', `%${search}%`);
             });
         }
+
         query.limit(limit).offset(offset);
 
         const users = await query;

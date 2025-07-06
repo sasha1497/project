@@ -20,8 +20,8 @@ export class UserService {
   async upsertUser(id: any, data: any) {
     const { password, confirmPassword, ...rest } = data;
 
-    const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
-    const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : undefined;
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+    const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : null;
 
     const payload = {
       ...rest,

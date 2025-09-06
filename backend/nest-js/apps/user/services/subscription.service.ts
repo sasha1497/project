@@ -1,5 +1,5 @@
+import { McrudService } from '@app/main/services/mcurd.service';
 import { Injectable } from '@nestjs/common';
-import { McrudService } from 'libs/services/src/mcurd.service';
 
 @Injectable()
 export class SubscriptionService {

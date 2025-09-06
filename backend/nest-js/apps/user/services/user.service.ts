@@ -1,11 +1,11 @@
 // user.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException, } from '@nestjs/common';
-import { DbService } from 'libs/services/src/db.service';
-import { McrudService } from 'libs/services/src/mcurd.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { StorageService } from 'libs/services/src/storage.service';
 import { UserModel } from '../model/user.model';
+import { DbService } from '@app/main/services/db.service';
+import { McrudService } from '@app/main/services/mcurd.service';
+import { StorageService } from '@app/main/services/storage.service';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 

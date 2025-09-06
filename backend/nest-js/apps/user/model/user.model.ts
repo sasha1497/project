@@ -1,5 +1,5 @@
+import { DbService } from '@app/main/services/db.service';
 import { Injectable } from '@nestjs/common';
-import { DbService } from 'libs/services/src/db.service';
 
 @Injectable()
 export class UserModel {

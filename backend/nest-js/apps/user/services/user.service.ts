@@ -41,6 +41,7 @@ export class UserService {
 
 
   async login(data: { mobileNumber: string; password: string }) {
+    console.log(data,'dat');
     const { mobileNumber, password } = data;
 
     if (!mobileNumber || !password) {
@@ -49,7 +50,7 @@ export class UserService {
 
     // Find user by phone_number column
     const user = await this.mcurdSerRef.get('*', 'users', {
-      phone_number: mobileNumber,
+      mobile: mobileNumber,
     });
 
     if (!user) {

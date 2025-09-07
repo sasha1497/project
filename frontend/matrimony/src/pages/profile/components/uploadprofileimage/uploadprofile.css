@@ -1,11 +1,41 @@
-.image-upload-container {
+/* .upload-card {
   max-width: 600px;
-  margin: 0 auto;
-  padding: 1rem;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 3px solid #007bff;
+  border-radius: 12px;
   text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: #fff;
+  transition: border-color 0.3s ease-in-out;
+} */
+
+.upload-card {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 3px solid #007bff; /* Animated via framer-motion */
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.6);
+  background-color: #fff;
+  animation: shadowPulse 2s infinite alternate; /* Added Animation */
 }
 
-.image-upload-container h3 {
+/* Box Shadow Pulse Animation */
+@keyframes shadowPulse {
+  0% {
+    box-shadow: 0 0 10px black(0, 123, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.6);
+  }
+}
+
+.upload-card h3 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -54,6 +84,16 @@ button[type="submit"] {
   color: white;
   border-radius: 5px;
   cursor: pointer;
+}
+
+button[type="submit"]:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: red;
+  margin-top: 0.5rem;
 }
 
 @media screen and (max-width: 600px) {

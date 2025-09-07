@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
 
 const Footer = () => {
   return (
@@ -8,13 +10,12 @@ const Footer = () => {
 
           {/* Services */}
           <div className="col-md-4 mb-4">
-            <h5 className="text-uppercase mb-3">Services</h5>
+            <h5 className="text-uppercase mb-3">Matrimony Services</h5>
             <ul className="list-unstyled">
-              <li><a href="#" className="text-light text-decoration-none">Lorem Ipsum</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Dummy Text</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Printing & Typesetting</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Standard Dummy Text</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Specimen Book</a></li>
+              <li><a href="#" className="text-light text-decoration-none">Profile Creation</a></li>
+              <li><a href="#" className="text-light text-decoration-none">Matchmaking Services</a></li>
+              <li><a href="#" className="text-light text-decoration-none">Personalized Matches</a></li>
+              <li><a href="#" className="text-light text-decoration-none">Premium Member Assistance</a></li>
             </ul>
           </div>
 
@@ -22,11 +23,10 @@ const Footer = () => {
           <div className="col-md-4 mb-4">
             <h5 className="text-uppercase mb-3">Page Links</h5>
             <ul className="list-unstyled">
-              <li><a href="#" className="text-light text-decoration-none">Home</a></li>
-              <li><a href="#" className="text-light text-decoration-none">About</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Services</a></li>
+              <li><Link to="/about" className="text-light text-decoration-none">About</Link></li>
+              <li><Link to="/terms" className="text-light text-decoration-none">The rules and directions </Link></li>
               <li><a href="#" className="text-light text-decoration-none">Contact</a></li>
-              <li><a href="#" className="text-light text-decoration-none">FAQ</a></li>
+              <li><Link to="/conclusion"  className="text-light text-decoration-none">Conclusion</Link></li>
             </ul>
           </div>
 

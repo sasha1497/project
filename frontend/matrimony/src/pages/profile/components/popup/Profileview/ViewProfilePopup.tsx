@@ -1,0 +1,392 @@
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { useGetUserProfileQuery } from "../../../../../features/profile/profileApi";
+import { closeViewPopup } from "../../../../../features/profileui/profileUISlice";
+import { RootState } from "../../../../../app/store";
+import "./ViewProfilePopup.css";
+import { editFailure, editSuccess, startEdit } from "../../../../../features/editform/editFormSlice";
+import { toast } from "react-toastify";
+import { useEditFormMutation } from "../../../../../features/editform/editFormApi";
+// import {
+//   startEdit,
+//   editSuccess,
+//   editFailure,
+// } from "../../features/editForm/editFormSlice";
+
+const ViewProfilePopup = () => {
+  const dispatch = useDispatch();
+  const showPopup = useSelector((state: RootState) => state.profileUi.showViewPopup);
+  const userId = useSelector((state: RootState) => state.auth.user?.id);
+
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // ✅ Fetch user profile
+  const { data, isLoading, refetch } = useGetUserProfileQuery(userId, {
+    skip: !userId,
+    refetchOnMountOrArgChange: false,
+  });
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      age: "",
+      gender: "",
+      height: "",
+      weight: "",
+      caste: "",
+      religion: "",
+      district: "",
+      state: "",
+      country: "",
+      mobile: "",
+      whatsapp: "",
+      job: "",
+      monthlySalary: "",
+      count: "",
+      person: "",
+    },
+  });
+
+    const [editForm] = useEditFormMutation();
+
+
+  // ✅ Prefill form when profile data is fetched
+  useEffect(() => {
+    if (data) {
+      reset(data);
+    }
+  }, [data, reset]);
+ 
+   const onSubmit = async (formData: any) => {
+    try {
+      dispatch(startEdit());
+
+      const { password, confirmPassword, imageData, ...cleanedData } = formData;
+
+      await editForm({ id: userId, ...cleanedData }).unwrap();
+
+      dispatch(editSuccess());
+      toast.success("Profile updated successfully!");
+      refetch();
+      setIsEditMode(false);
+    } catch (error: any) {
+      dispatch(editFailure(error?.data?.message || "Failed to update profile"));
+      toast.error(error?.data?.message || "Update failed!");
+      console.error("Update failed:", error);
+    }
+  };
+
+
+  if (!showPopup) return null;
+
+  return (
+    <motion.div className="popup-overlay mt-5" onClick={() => dispatch(closeViewPopup())}>
+      <motion.div
+        className="popup-content"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+      >
+        {/* Close Icon */}
+        <div className="close-icon" onClick={() => dispatch(closeViewPopup())}>
+          ×
+        </div>
+
+        <h4>{isEditMode ? "Edit Profile" : "View Profile"}</h4>
+
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : isEditMode ? (
+          // ✅ EDIT MODE FORM
+          <div className="view-profile-content">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-4">
+
+              {/* Name */}
+              <div className="mb-3">
+                <label className="form-label">Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  {...register("name", { required: "Name is required" })}
+                />
+                {errors.name && <small className="text-danger">{errors.name.message}</small>}
+              </div>
+
+              {/* Age */}
+              <div className="mb-3">
+                <label className="form-label">Age</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  {...register("age", { required: "Age is required" })}
+                />
+                {errors.age && <small className="text-danger">{errors.age.message}</small>}
+              </div>
+
+              {/* Gender */}
+              <div className="mb-3">
+                <label className="form-label">Gender</label>
+                <select className="form-select" {...register("gender", { required: "Gender is required" })}>
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                {errors.gender && <small className="text-danger">{errors.gender.message}</small>}
+              </div>
+
+              {/* Height */}
+              <div className="mb-3">
+                <label className="form-label">Height (cm)</label>
+                <input type="text" className="form-control" {...register("height",  { required: "height is required" })} />
+                {errors.height && <small className="text-danger">{errors.height.message}</small>}
+
+              </div>
+
+              {/* Weight */}
+              <div className="mb-3">
+                <label className="form-label">Weight (kg)</label>
+                <input type="text" className="form-control" {...register("weight", {required: "weight is required" })} />
+                {errors.weight && <small className="text-danger">{errors.weight.message}</small>}
+
+              </div>
+
+              {/* Job */}
+              <div className="mb-3">
+                <label className="form-label">Job</label>
+                <input type="text" className="form-control" {...register("job", {required: "job is required" })} />
+                {errors.job && <small className="text-danger">{errors.job.message}</small>}
+
+              </div>
+
+              {/* Monthly Salary */}
+              <div className="mb-3">
+                <label className="form-label">Monthly Salary</label>
+                <input type="text" className="form-control" {...register("monthlySalary", {required: "monthlySalary is required"})} />
+                {errors.monthlySalary && <small className="text-danger">{errors.monthlySalary.message}</small>}
+
+              </div>
+
+              {/* {caste} */}
+              <div className="mb-3">
+                <label className="form-label">Caste</label>
+                <select className="form-select" {...register("caste", { required: "caste is required" })}>
+                  <option value="">Select Caste</option>
+                  <option value="General">General</option>
+                  <option value="OBC">OBC</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="No Caste">No Caste</option>
+                </select>
+                {errors.caste && <small className="text-danger">{errors.caste.message}</small>}
+              </div>
+
+              {/* Religion */}
+              <div className="mb-3">
+                <label className="form-label">Religion</label>
+                <select className="form-select" {...register("religion", { required: "religion is required" })}>
+                  <option value="">Select Religion</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Muslim">Muslim</option>
+                  <option value="Christian">Christian</option>
+                  <option value="Sikh">Sikh</option>
+                  <option value="Other">Other</option>
+                  <option value="No Religion">No Religion</option>
+                </select>
+                {errors.religion && <small className="text-danger">{errors.religion.message}</small>}
+              </div>
+
+              {/* Mobile */}
+              <div className="mb-3">
+                <label className="form-label">Mobile</label>
+                <input
+                  type="tel"
+                  className="form-control"
+                  {...register("mobile", {
+                    required: "Mobile number is required",
+                    pattern: { value: /^[0-9]{10}$/, message: "Enter a valid 10-digit number" },
+                  })}
+                />
+                {errors.mobile && <small className="text-danger">{errors.mobile.message}</small>}
+              </div>
+
+              {/* {WA} */}
+              <div className="mb-3">
+                <label className="form-label">Whatsapp Number</label>
+                <input
+                  type="tel"
+                  className="form-control"
+                  {...register("whatsapp", {
+                    required: "whatsapp number is required",
+                    pattern: { value: /^[0-9]{10}$/, message: "Enter a valid 10-digit number" },
+                  })}
+                />
+                {errors.whatsapp && <small className="text-danger">{errors.whatsapp.message}</small>}
+              </div>
+
+              {/* {district} */}
+              <div className="mb-3">
+                <label className="form-label">District</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  {...register("district", { required: "district is required" })}
+                />
+                {errors.district && <small className="text-danger">{errors.district.message}</small>}
+              </div>
+
+              {/* State */}
+              <div className="mb-3">
+                <label className="form-label">State</label>
+                <input type="text" className="form-control" {...register("state", { required: "state is required" })} />
+                {errors.state && <small className="text-danger">{errors.state.message}</small>}
+              </div>
+
+
+              {/* Country */}
+              <div className="mb-3">
+                <label className="form-label">Country</label>
+                <select className="form-select" {...register("country", { required: "country is required" })}>
+                  <option value="">You can select your interest country to get Bride / Groom </option>
+                  <option value="India">India</option>
+                  <option value="USA">USA</option>
+                  <option value="England">England</option>
+                  <option value="Australia">Australia</option>
+                  <option value="Canada">Canada</option>
+                  <option value="New Zealand">New Zealand</option>
+                  <option value="Scotland">Scotland</option>
+                  <option value="Netherlands">Netherlands</option>
+                  <option value="Switzerland">Switzerland</option>
+                  <option value="Ireland">Ireland</option>
+                  <option value="Bahrain">Bahrain</option>
+                  <option value="Kuwait">Kuwait</option>
+                  <option value="Oman">Oman</option>
+                  <option value="Qatar">Qatar</option>
+                  <option value="Saudi Arabia">Saudi Arabia</option>
+                  <option value="Dubai">Dubai</option>
+                  <option value="Malta">Malta</option>
+                  <option value="Bermuda">Bermuda</option>
+                  <option value="Malaysia">Malaysia</option>
+                  <option value="Singapore">Singapore</option>
+                  <option value="Germany">Germany</option>
+                  <option value="Sharjah">Sharjah</option>
+                  <option value="Abhudhabi">Abhu Dhabi</option>
+                  <option value="Brunei">Brunei</option>
+                  <option value="Mauritius">Mauritius</option>
+                  <option value="Philippine">Philippine</option>
+                  <option value="Israel">Israel</option>
+                  <option value="srilanka">Sri Lanka</option>
+                  <option value="walves">walves</option>
+                  <option value="Finland">Finland</option>
+                  <option value="Bahamas">Bahamas</option>
+                  <option value="Fiji">Fiji</option>
+                  <option value="Solomonisland">Solomon Island</option>
+                  <option value="Barbados">Barbados</option>
+                  <option value="Saintlucia">Saint Lucia</option>
+                  <option value="Zambia">Zambia</option>
+                  <option value="Botswana">Botswana</option>
+                  <option value="Egypt">Egypt</option>
+                  <option value="Mexico">Mexico</option>
+                  <option value="Thailand">Thailand</option>
+                  <option value="Colombia">Colombia</option>
+                  <option value="Greece">Greece</option>
+                  <option value="Ghana">Ghana</option>
+                  <option value="Norway">Norway</option>
+                </select>
+                {errors.country && <small className="text-danger">{errors.country.message}</small>}
+              </div>
+
+              {/* {count} */}
+              <div className="mb-3">
+                <label className="form-label">which Marraige this for you ?</label>
+                <select className="form-select" {...register("count", { required: "count is required" })}>
+                  <option value="">Select number of marraige</option>
+                  <option value="first">First</option>
+                  <option value="second">Second</option>
+                  <option value="third">Third</option>
+                </select>
+                {errors.count && <small className="text-danger">{errors.count.message}</small>}
+              </div>
+
+              {/* {person} */}
+              <div className="mb-3">
+                <label className="form-label">Who are you going to marry ?</label>
+                <select className="form-select" {...register("person", { required: "person is required" })}>
+                  <option value="">Select your person</option>
+                  <option value="me">me</option>
+                  <option value="sister">sister</option>
+                  <option value="brother">brother</option>
+                  <option value="son">son</option>
+                  <option value="daughter">daughter</option>
+
+                </select>
+                {errors.person && <small className="text-danger">{errors.person.message}</small>}
+              </div>
+
+              {/* Submit + Cancel */}
+              <div className="d-flex justify-content-end mt-4 gap-2">
+
+                <button type="submit" className="btn btn-primary px-4" >
+                  Save Changes
+                </button>
+                <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          // ✅ VIEW MODE CONTENT
+          <>
+            <div className="view-profile-content">
+              <p><strong>Name :</strong> {data?.name}</p>
+              <p><strong>Age :</strong> {data?.age}</p>
+              <p><strong>Gender :</strong> {data?.gender}</p>
+              <p><strong>Height:</strong> {data?.height}</p>
+              <p><strong>Weight:</strong> {data?.weight}</p>
+              <p><strong>Caste:</strong> {data?.caste}</p>
+              <p><strong>Religion:</strong> {data?.religion}</p>
+              <p><strong>District:</strong> {data?.district}</p>
+              <p><strong>State:</strong> {data?.state}</p>
+              <p><strong>Country:</strong> {data?.country}</p>
+              <p><strong>Mobile:</strong> {data?.mobile}</p>
+              <p><strong>Whatsapp:</strong> {data?.whatsapp}</p>
+              <p><strong>Job:</strong> {data?.job}</p>
+              <p><strong>Salary:</strong> {data?.monthlySalary}</p>
+              <p><strong>Marriage status:</strong> {data?.count}</p>
+              <p><strong>Whose marriage:</strong> {data?.person}</p>
+            </div>
+            <div className="d-flex justify-content-end mt-3 gap-2">
+              <button
+                type="button"
+                className="btn btn-primary px-4"
+                onClick={() => setIsEditMode(true)}
+              >
+                Edit Profile
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-danger px-4"
+                onClick={() => dispatch(closeViewPopup())}
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default ViewProfilePopup;

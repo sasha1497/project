@@ -1,106 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+// components/Step5.tsx
+import React from "react";
+import { UseFormReturn } from "react-hook-form";
 
-const Step8 = ({ methods }: { methods: UseFormReturn<any> }) => {
-  const {
-    register,
-    setValue,
-    setError,
-    clearErrors,
-    trigger,
-    formState: { errors },
-    unregister,
-  } = methods;
+type Props = {
+  methods: UseFormReturn<any>;
+};
 
-  const [preview, setPreview] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   register("photo", { required: "Profile picture is required" });
-  // }, [register, unregister]);
-
-  //default set the image
-    useEffect(() => {
-    register("photo", { required: "Profile picture is required" });
-
-    const savedPhoto = localStorage.getItem("uploadedPhoto");
-    const defaultPlaceholder = '/images/default-profile.jpg'; // public folder
-
-    const initialPhoto = savedPhoto || defaultPlaceholder;
-
-    setValue("photo", initialPhoto);
-    setPreview(initialPhoto);
-  }, [register, setValue]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
-      setError("photo", {
-        type: "manual",
-        message: "Profile picture is required",
-      });
-      setPreview(null);
-      return;
-    }
-
-    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-    const maxSize = 2 * 1024 * 1024;
-
-    if (!validTypes.includes(file.type)) {
-      setError("photo", {
-        type: "manual",
-        message: "Only JPG/PNG images are allowed",
-      });
-      setPreview(null);
-      return;
-    }
-
-    if (file.size > maxSize) {
-      setError("photo", {
-        type: "manual",
-        message: "File size must be less than 2MB",
-      });
-      setPreview(null);
-      return;
-    }
-
-    clearErrors("photo");
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      localStorage.setItem("uploadedPhoto", base64String);
-      setValue("photo", base64String);
-      setPreview(base64String);
-      trigger("photo");
-    };
-    reader.readAsDataURL(file);
-  };
+const Step8: React.FC<Props> = ({ methods }) => {
+  const { register , formState: { errors }} = methods;
 
   return (
     <div className="mb-3">
-      <label className="form-label">Upload Profile Photo</label>
-      <input
-        type="file"
-        accept="image/*"
-        className={`form-control ${errors.photo ? 'is-invalid' : ''}`}
-        onChange={handleImageChange}
-      />
-      {errors.photo && (
-        <div className="invalid-feedback">{errors.photo.message as string}</div>
-      )}
+        <label className="form-label">Who are you going to marry ?</label>
+        <select
+          className={`form-control ${errors.person ? 'is-invalid' : ''}`}
+          {...register("person", { required: "marrige person is required" })}
+        >
+          <option value="">Select your person</option>
+          <option value="me">me</option>
+          <option value="sister">sister</option>
+          <option value="brother">brother</option>
+          <option value="son">son</option>
+          <option value="daughter">daughter</option>
 
-      {preview && (
-        <div className="mt-3">
-          <p className="mb-1">Preview:</p>
-          <img
-            src={preview}
-            alt="Profile Preview"
-            style={{ maxWidth: "150px", maxHeight: "150px", borderRadius: "8px" }}
-          />
-        </div>
-      )}
-    </div>
+        </select>
+        {errors.person && <div className="invalid-feedback">{errors.person.message as string}</div>}
+      </div>
   );
 };
 

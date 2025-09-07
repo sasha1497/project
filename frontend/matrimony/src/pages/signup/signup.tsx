@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import MultiStepForm from '../multiStep/MultiStepForm';
 import { useLoginUserMutation } from '../../features/auth/authApi';
-import { useDispatch } from 'react-redux';
-import { setToken } from '../../features/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setToken, setUser } from '../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+
 
 
 interface FormData {
-  email: string;
+  mobileNumber: string;
   password: string;
 }
 
@@ -16,26 +19,31 @@ const SignUp: React.FC = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [isSignUp, setIsSignUp] = useState(true); // true means sign-up (MultiStepForm), false means sign-in
 
-  const onSubmit = (data: FormData) => {
-    console.log('Sign In Data:', data);
-  };
-
-  // const [loginUser] = useLoginUserMutation();
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
+  const [loginUser] = useLoginUserMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
 
-  // const onSubmit = async (data: FormData) => {
-  //   try {
-  //     const result = await loginUser(data).unwrap();
-  //     if (result?.token) {
-  //       dispatch(setToken(result.token));
-  //       navigate('/profile');
-  //     }
-  //   } catch (error) {
-  //     console.error('Login failed', error);
-  //   }
-  // };
+ const onSubmit = async (data: FormData) => {
+  try {
+    const result = await loginUser(data).unwrap();
+    if (result?.user?.token) {
+      const { token, ...userData } = result?.user;
+      dispatch(setToken(token));
+      dispatch(setUser(userData));
+
+      toast.success(result.message || 'Login successful!', {
+        autoClose: 1000,
+        onClose: () => navigate('/profile'),
+      });
+    } else {
+      toast.error('Login failed.');
+    }
+  } catch (error: any) {
+    console.error('Login failed', error);
+    toast.error(error?.data?.message || 'Login failed. Please try again.');
+  }
+};
 
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center vh-100">
@@ -57,19 +65,19 @@ const SignUp: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-3">
                 <input
-                  type="email"
-                  className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                  placeholder="📧 Email"
-                  {...register('email', { required: 'Email is required' })}
+                  type="number"
+                  className={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
+                  placeholder="Mobile number"
+                  {...register('mobileNumber', { required: 'Email is required' })}
                 />
-                {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
+                {errors.mobileNumber && <div className="invalid-feedback">{errors.mobileNumber.message}</div>}
               </div>
 
               <div className="mb-3">
                 <input
                   type="password"
                   className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                  placeholder="🔒 Password"
+                  placeholder="Password"
                   {...register('password', { required: 'Password is required' })}
                 />
                 {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}

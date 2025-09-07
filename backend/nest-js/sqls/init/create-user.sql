@@ -1,0 +1,4 @@
+CREATE USER 'myuser'@'%' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON mydb.* TO 'myuser'@'%';
+FLUSH PRIVILEGES;
+

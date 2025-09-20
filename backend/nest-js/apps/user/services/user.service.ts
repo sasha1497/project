@@ -1,25 +1,18 @@
-// user.service.ts
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException, } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { UserModel } from '../model/user.model';
-import dayjs from 'dayjs';
-import { Twilio } from 'twilio';
-import { DbService } from '@app/main/services/db.service';
 import { McrudService } from '@app/main/services/mcurd.service';
 import { StorageService } from '@app/main/services/storage.service';
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
 
 @Injectable()
 export class UserService {
   constructor(
     private mcurdSerRef: McrudService,
     private userModRef: UserModel,
-    private storageSerRef: StorageService
+    private storageSerRef: StorageService,
   ) { }
 
-
+  /******************** CREATE AND UPDATE USER ****************************/
   async upsertUser(id: any, data: any) {
     const { password, confirmPassword, ...rest } = data;
 
@@ -29,192 +22,44 @@ export class UserService {
     const payload = {
       ...rest,
       ...(hashedPassword && { password: hashedPassword }),
-      ...(hashedConfirmPassword && { confirmPassword: hashedConfirmPassword })
+      ...(hashedConfirmPassword && { confirmPassword: hashedConfirmPassword }),
     };
 
     if (id) {
+      // Update existing user
       return await this.mcurdSerRef.update('users', payload, { id });
     } else {
+      // Create new user
       const newId = await this.mcurdSerRef.create('users', payload, 'id');
       return { id: newId, ...payload };
     }
   }
 
-
-  async login(data: { mobileNumber: string; password: string }) {
-    console.log(data,'dat');
-    const { mobileNumber, password } = data;
-
-    if (!mobileNumber || !password) {
-      throw new BadRequestException('Mobile number and password are required');
-    }
-
-    // Find user by phone_number column
-    const user = await this.mcurdSerRef.get('*', 'users', {
-      mobile: mobileNumber,
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid mobile number or password');
-    }
-
-    //  Compare raw password with hashed password in `password` column
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-      throw new UnauthorizedException('Invalid mobile number or password');
-    }
-
-    // Gender mapping
-    let genderType = 3;
-    if (user.gender) {
-      const gender = user.gender.toLowerCase();
-      if (gender === 'male') genderType = 1;
-      else if (gender === 'female') genderType = 2;
-    }
-
-    // JWT
-    const payload = {
-      userId: user.id,
-      genderType,
-    };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-
-    return {
-      message: 'Login successful',
-      user: {
-        token,
-        id: user.id,
-        name: user.name,
-        type: genderType,
-      },
-    };
-  }
-
-
-  async sendOtp(data: { mobileNumber: string }) {
-    const { mobileNumber } = data;
-
-    if (!mobileNumber) {
-      throw new BadRequestException('Mobile number is required');
-    }
-
-    const user = await this.mcurdSerRef.get('*', 'users', { mobile: mobileNumber });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // 1. Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = dayjs().add(5, 'minute').toDate();
-
-    // 2. Save OTP to DB
-    await this.mcurdSerRef.create('user_otps', {
-      mobile: mobileNumber,
-      otp,
-      expires_at: expiresAt,
-    }, 'id');
-
-    // 3. Send SMS using Twilio
-    const client = new Twilio(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN,
-    );
-
-    try {
-      await client.messages.create({
-        body: `Your OTP is ${otp}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: mobileNumber,  // use your verified number (e.g., +919876543210)
-      });
-
-      return {
-        message: 'OTP sent successfully',
-      };
-    } catch (err) {
-      console.error('Twilio send error:', err.message);
-      throw new InternalServerErrorException('Failed to send OTP');
-    }
-  }
-
-
-  async verifyOtp(data: { mobileNumber: string; otp: string }) {
-    const { mobileNumber, otp } = data;
-
-    const record = await this.mcurdSerRef.get('*', 'otps', {
-      mobile: mobileNumber,
-      otp,
-    });
-
-    if (!record) {
-      throw new UnauthorizedException('Invalid OTP');
-    }
-
-    const now = new Date();
-    if (new Date(record.expires_at) < now) {
-      throw new UnauthorizedException('OTP expired');
-    }
-
-    return { message: 'OTP verified successfully' };
-  }
-
-
-  async resetPassword(data: { mobileNumber: string; otp: string; newPassword: string }) {
-    const { mobileNumber, otp, newPassword } = data;
-
-    // Verify OTP again (optional if already verified recently)
-    const record = await this.mcurdSerRef.get('*', 'otps', {
-      mobile: mobileNumber,
-      otp,
-    });
-
-    if (!record) {
-      throw new UnauthorizedException('Invalid OTP');
-    }
-
-    if (new Date(record.expires_at) < new Date()) {
-      throw new UnauthorizedException('OTP expired');
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.mcurdSerRef.update('users', { password: hashedPassword }, { mobile: mobileNumber });
-
-    // Optionally delete the OTP record after use
-    await this.mcurdSerRef.delete('otps', { mobile: mobileNumber });
-
-    return {
-      message: 'Password reset successfully',
-    };
-  }
-
-
-
-
-
-  async listUsers(payload) {
+  /******************** USER LIST ****************************/
+  async listUsers(payload: any) {
     return await this.userModRef.list(payload);
   }
 
+  /******************** GET USER DATA ****************************/
   async getUserData(id: string) {
     const user = await this.mcurdSerRef.get('*', 'users', { id });
-    console.log(user.photo, '<---------- user.photo (raw from DB)');
+    console.log(user.photo, '<--- user.photo (raw from DB)');
 
     let imageKeys: string[] = [];
 
     try {
       let raw = user.photo;
 
-      // First level: parse string
+      // Parse JSON string (first level)
       if (typeof raw === 'string') {
         raw = JSON.parse(raw);
 
-        // If still string (double-stringified), parse again
+        // If double-stringified
         if (typeof raw === 'string') {
           raw = JSON.parse(raw);
         }
       }
 
-      // If array, assign to imageKeys
       if (Array.isArray(raw)) {
         imageKeys = raw;
       } else {
@@ -232,7 +77,7 @@ export class UserService {
         const filePath = `users/${id}/${fileName}`;
         const url = await this.storageSerRef.getImageUrl(filePath);
 
-        // Extract date from filename like "2025-06-07"
+        // Extract date from filename (like "2025-06-07")
         const dateMatch = fileName.match(/\d{4}-\d{2}-\d{2}/);
         const date = dateMatch ? dateMatch[0] : null;
 
@@ -241,7 +86,7 @@ export class UserService {
           url,
           date,
         };
-      })
+      }),
     );
 
     return {
@@ -249,8 +94,4 @@ export class UserService {
       imageData,
     };
   }
-
-
-
-
 }

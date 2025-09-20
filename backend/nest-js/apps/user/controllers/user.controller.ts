@@ -29,6 +29,24 @@ export class UserController {
     return this.userService.login(data);
   }
 
+  @Post('send_otp')
+  async sendOtp(@Body() data: { mobileNumber: string }) {
+    return this.userService.sendOtp(data);
+  }
+
+
+  @Post('verify_otp')
+  async verifyOtp(@Body() data: { mobileNumber: string; otp: string }) {
+    return this.userService.verifyOtp(data);
+  }
+
+
+  @Post('reset_password')
+  async resetPassword(@Body() data: { mobileNumber: string; otp: string; newPassword: string }) {
+    return this.userService.resetPassword(data);
+  }
+
+
 
   @Post('list')
   async listUsers(@Body() payload) {

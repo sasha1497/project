@@ -1,46 +1,76 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import './uploadprofile.css';
+import { useUploadImagesMutation } from '../../../../features/image/imageApi';
+import { useDispatch } from 'react-redux';
+import { resetImages, addImage } from '../../../../features/image/imageslice';
 
 const UploadProfile: React.FC = () => {
-  const [images, setImages] = useState<File[]>([]); // State to store selected images
-  const [error, setError] = useState<string>(''); // For showing error if less than 3 images are uploaded
+  const [images, setImages] = useState<File[]>([]);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+  const dispatch = useDispatch();
+  const [uploadImages, { isLoading }] = useUploadImagesMutation();
 
-  // Handle image selection
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      // Convert FileList to array and check for more than 3 images
       if (files.length + images.length <= 3) {
         setImages((prevImages) => [...prevImages, ...Array.from(files)]);
-        setError(''); // Clear error when more images are added
+        setError('');
       } else {
         setError('You can upload a maximum of 3 images only.');
       }
     }
   };
 
-  // Handle remove image
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  // Handle form submission (optional)
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     if (images.length < 3) {
       setError('You must upload at least 3 images.');
-    } else {
-      // Process the images (e.g., upload to server)
-      console.log('Images submitted:', images);
+      return;
+    }
+
+    const formData = new FormData();
+    images.forEach((image) => {
+      formData.append('dpfile', image);
+    });
+
+    try {
+      const result = await uploadImages(formData).unwrap();
+
+      // Assuming the API returns uploaded image URLs
+      if (result?.uploadedUrls && Array.isArray(result.uploadedUrls)) {
+        dispatch(resetImages());
+        result.uploadedUrls.forEach((url: string) => {
+          dispatch(addImage(url));
+        });
+      }
+
+      setSuccess('Images uploaded successfully!');
+      console.log('Upload success:', result);
+      setImages([]);
+    } catch (err: any) {
+      console.error('Upload failed', err);
+      setError('Upload failed. Please try again.');
     }
   };
 
   return (
-    <div className="image-upload-container">
+    <motion.div
+      className="upload-card"
+      initial={{ borderColor: '#007bff' }}
+      animate={{ borderColor: images.length === 3 ? '#28a745' : '#007bff' }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+    >
       <h3>Upload Images (Minimum 3)</h3>
-      
+
       <form onSubmit={handleSubmit}>
-        {/* Image upload input */}
         <input
           type="file"
           accept="image/*"
@@ -48,33 +78,37 @@ const UploadProfile: React.FC = () => {
           onChange={handleImageChange}
         />
 
-        {/* Display selected images */}
         <div className="image-preview">
           {images.map((image, index) => (
-            <div key={index} className="image-item">
+            <motion.div
+              key={index}
+              className="image-item"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
               <img
                 src={URL.createObjectURL(image)}
                 alt={`Uploaded ${index + 1}`}
-                width="100"
-                height="100"
               />
               <button type="button" onClick={() => removeImage(index)}>
-                Remove
+                &times;
               </button>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Error message */}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p className="error-message">{error}</p>}
+        {success && <p className="success-message">{success}</p>}
 
-        {/* Submit button */}
-        <button type="submit" disabled={images.length < 3}>
-          Submit
+        <button type="submit" disabled={images.length < 3 || isLoading}>
+          {isLoading ? 'Uploading...' : 'Submit'}
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 
-export default UploadProfile;
+// export default UploadProfile;
+export default React.memo(UploadProfile); // ✅ Prevent re-renders
+

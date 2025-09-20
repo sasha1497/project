@@ -1,6 +1,6 @@
+import { McrudService } from '@app/main/services/mcurd.service';
+import { StorageService } from '@app/main/services/storage.service';
 import { Injectable } from '@nestjs/common';
-import { McrudService } from 'libs/services/src/mcurd.service';
-import { StorageService } from 'libs/services/src/storage.service';
 import { Express } from 'express';
 import sharp from 'sharp';
 const convert = require('heic-convert');

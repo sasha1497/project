@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import Banner from "../banner/banner";
 import "./section.css";
 import { motion } from "framer-motion";
+import Couples from "../couples/couples";
+import { useNavigate } from "react-router-dom";
+
 
 const Section = () => {
+  const navigate = useNavigate(); // initialize it
+
 
   // const [imageSrc, setImageSrc] = useState<string | null>(null);
 
@@ -53,6 +58,7 @@ const Section = () => {
                   className="btn bsb-btn-2xl btn-outline-light"
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 1, repeat: Infinity, repeatType: "loop" }}
+                  onClick={() => navigate("/signup")}
                 >
                   🎉 Register Now
                 </motion.button>
@@ -77,6 +83,7 @@ const Section = () => {
           </div>
         </div>
       </div> */}
+        <Couples />
         <Banner />
       </div>
     </div>

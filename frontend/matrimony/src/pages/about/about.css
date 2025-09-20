@@ -1,0 +1,44 @@
+.about-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
+
+.about-card {
+  max-width: 800px;
+  padding: 2rem;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background-color: white;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #333;
+  animation: borderAnimation 3s linear infinite;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes borderAnimation {
+  0% {
+    border-color: #007bff;
+  }
+  50% {
+    border-color: #3399ff;
+  }
+  100% {
+    border-color: #007bff;
+  }
+}
+
+.typewriter-text {
+  white-space: pre-line; /* Preserve new lines in text */
+}
+
+@media (max-width: 768px) {
+  .about-card {
+    padding: 1.5rem;
+    font-size: 1rem;
+  }
+}

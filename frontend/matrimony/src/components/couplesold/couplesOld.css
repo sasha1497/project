@@ -1,0 +1,30 @@
+.carousel-img {
+    width: 100%;
+    height: 500px;         
+    object-fit: contain;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.container-fluid {
+    padding: 0 15px;
+}
+
+.custom-arrow {
+    filter: invert(1) !important; 
+}
+
+.hero{
+     font-family:'Cinzel Decorative', cursive;
+}
+
+
+@media (max-width: 768px) {
+    .carousel-img {
+        height: auto;          
+        max-height: 350px;      
+        object-fit: cover; 
+        background-color: transparent;
+    }
+}

@@ -1,15 +1,13 @@
 // user.service.ts
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException, } from '@nestjs/common';
-import { DbService } from 'libs/services/src/db.service';
-import { McrudService } from 'libs/services/src/mcurd.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { StorageService } from 'libs/services/src/storage.service';
 import { UserModel } from '../model/user.model';
 import dayjs from 'dayjs';
-import axios from 'axios';
 import { Twilio } from 'twilio';
-
+import { DbService } from '@app/main/services/db.service';
+import { McrudService } from '@app/main/services/mcurd.service';
+import { StorageService } from '@app/main/services/storage.service';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -44,6 +42,7 @@ export class UserService {
 
 
   async login(data: { mobileNumber: string; password: string }) {
+    console.log(data,'dat');
     const { mobileNumber, password } = data;
 
     if (!mobileNumber || !password) {

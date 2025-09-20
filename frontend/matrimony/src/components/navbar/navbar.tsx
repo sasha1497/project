@@ -2,10 +2,13 @@ import { motion } from "framer-motion";
 import logo from "../../asset/bajollogo.jpeg";
 import './navbar.css';
 import { useLocation } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
 
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { logout } from "../../features/auth/authSlice";
+import { openViewPopup } from "../../features/profileui/profileUISlice";
 
 const Navbar = () => {
   const navigate = useNavigate(); // initialize it
@@ -14,15 +17,15 @@ const Navbar = () => {
   const isSignupPage = location.pathname === '/signup';
   const isProfilePage = location.pathname === '/profile'
 
+  const { user } = useSelector((state: any) => state.auth);
 
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const storedImage = localStorage.getItem("uploadedPhoto");
-    if (storedImage) {
-      setImageSrc(storedImage);
-    }
-  }, []);
+  const handleLogout = () => {
+  dispatch(logout()); // Clear Redux state
+  localStorage.removeItem('authToken'); // Remove token
+  navigate('/dashboard'); // Redirect
+};
 
 
 
@@ -49,48 +52,6 @@ const Navbar = () => {
             />
             <span className="brand-text">Bajol Matrimony</span>
           </motion.a>
-          {/* {(isSignupPage || isProfilePage) ? (
-            <div className="d-flex align-items-center justify-content-end parent-right-content">
-              {isSignupPage ? (
-                <span className="dot"></span>
-              ) : (
-                imageSrc && (
-                  <img
-                    src={imageSrc}
-                    alt="Uploaded"
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                    }}
-                  />
-                )
-              )}
-               <span className="mx-2">
-                {isSignupPage ? 'Welcome to Signup Page' : 'Welcome to Nattu'}
-              </span>
-            </div>
-          ) : (
-            <div className="d-flex align-items-center justify-content-end parent-right-content">
-              <span className="me-2">Already a member?</span>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => navigate("/signup")}
-              >
-                Login
-              </button>
-              <span className="mx-2">|</span>
-              <a
-                href="#"
-                className="text-dark text-decoration-none d-inline-flex align-items-center"
-              >
-                Help
-                <span className="material-icons me-2 ml-5 jump-icon">contact_support</span>
-              </a>
-            </div>
-          )} */}
 
           {(isSignupPage || isProfilePage) ? (
             <div className="d-flex align-items-center justify-content-end parent-right-content">
@@ -100,9 +61,7 @@ const Navbar = () => {
                   <span className="mx-2">Welcome to Signup Page</span>
                 </>
               ) : (
-                imageSrc && (
                   <div className="dropdown">
-                    {/* Trigger (image + text) */}
                     <button
                       className="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent"
                       type="button"
@@ -110,27 +69,17 @@ const Navbar = () => {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
                     >
-                      <img
-                        src={imageSrc}
-                        alt="Profile"
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <span className="mx-2 d-none d-sm-inline">Welcome to Nattu</span>
+                      <span className="mx-2 d-none d-sm-inline">{user && <span>Welcome, {user?.name}</span>}</span>
                     </button>
 
-                    {/* Dropdown menu */}
                     <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                      <li><button className="dropdown-item">Edit</button></li>
+                      <li><button className="dropdown-item">Edit Profile</button></li>
+                      <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
                       <li><button className="dropdown-item">Delete Account</button></li>
-                      <li><button className="dropdown-item">Logout</button></li>
+                      <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                     </ul>
                   </div>
-                )
+                // )
               )}
             </div>
           ) : (

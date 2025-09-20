@@ -1,0 +1,33 @@
+/* Default Desktop Styling */
+.carousel-img {
+    width: 100%;
+    height: 500px;           /* Default height for larger screens */
+    object-fit: contain;     /* Show full image on desktop */
+    background-color: white; /* Set background for empty space */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Make carousel full width */
+.container-fluid {
+    padding: 0 15px;
+}
+
+/* Custom arrow color */
+.custom-arrow {
+    filter: invert(1) !important; /* Change arrow color to black */
+}
+
+.hero{
+     font-family:'Cinzel Decorative', cursive;
+}
+
+/* Responsive for Mobile Screens */
+@media (max-width: 768px) {
+    .carousel-img {
+        height: auto;           /* Auto adjust height */
+        max-height: 350px;      /* Optional: prevent huge images */
+        object-fit: cover;      /* Remove extra white spaces */
+        background-color: transparent;
+    }
+}

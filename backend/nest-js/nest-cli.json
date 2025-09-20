@@ -11,6 +11,15 @@
         "tsConfigPath": "tsconfig.build.json"
       }
     },
+    "main": {
+      "type": "library",
+      "root": "libs/main",
+      "entryFile": "index",
+      "sourceRoot": "libs/main/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/main/tsconfig.lib.json"
+      }
+    },
     "user": {
       "type": "application",
       "root": "apps/user",
@@ -20,5 +29,8 @@
         "tsConfigPath": "tsconfig.build.json"
       }
     }
+  },
+  "compilerOptions": {
+    "webpack": true
   }
 }

@@ -14,33 +14,74 @@ export class UserModel {
 
         const query = this.db.get()
             .select(
-                'id', 'name', 'email', 'phone_number', 'gender', 'date_of_birth', 'age',
-                'person', 'height', 'job', 'mobile', 'whatsapp', 'monthlySalary', 'weight',
-                'religion', 'caste', 'mother_tongue', 'country', 'district', 'state', 'city',
-                'marital_status', 'education', 'occupation', 'income', 'about_me', 'photo', 'is_active'
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.phone_number',
+                'users.gender',
+                'users.date_of_birth',
+                'users.age',
+                'users.person',
+                'users.height',
+                'users.job',
+                'users.mobile',
+                'users.whatsapp',
+                'users.monthlySalary',
+                'users.weight',
+                'users.religion',
+                'users.caste',
+                'users.mother_tongue',
+                'users.country',
+                'users.district',
+                'users.state',
+                'users.city',
+                'users.marital_status',
+                'users.education',
+                'users.occupation',
+                'users.income',
+                'users.about_me',
+                'users.photo',
+                'users.is_active'
             )
             .from('users');
 
-        if (filter.id) query.where('id', filter.id);
-        if (filter.name) query.where('name', 'like', `%${filter.name}%`);
-        if (filter.gender) query.where('gender', filter.gender);
-        if (filter.age) query.where('age', filter.age);
-        if (filter.religion) query.where('religion', filter.religion);
+        // Filters
+        if (filter.id) query.where('users.id', filter.id);
+        if (filter.name) query.where('users.name', 'like', `%${filter.name}%`);
+        if (filter.gender) query.where('users.gender', filter.gender);
+        if (filter.age) query.where('users.age', filter.age);
+        if (filter.religion) query.where('users.religion', filter.religion);
 
+        // Global search
         if (search) {
             query.where(builder => {
                 builder
-                    .orWhere('id', 'like', `%${search}%`)
-                    .orWhere('name', 'like', `%${search}%`)
-                    .orWhere('phone_number', 'like', `%${search}%`)
-                    .orWhere('email', 'like', `%${search}%`);
+                    .orWhere('users.id', 'like', `%${search}%`)
+                    .orWhere('users.name', 'like', `%${search}%`)
+                    .orWhere('users.phone_number', 'like', `%${search}%`)
+                    .orWhere('users.email', 'like', `%${search}%`);
             });
         }
 
+        // Pagination
         query.limit(limit).offset(offset);
 
         const users = await query;
-        return users;
+
+        const totalUsers = await this.db.get()('users').count({ count: 'id' }).first();
+
+        const currencyTotals = await this.db.get()('payments')
+            .select('currency')
+            .count({ total_transactions: 'id' })
+            .sum({ total_amount: 'amount' })
+            .groupBy('currency');
+
+        return {
+            data: users,
+            total_users: totalUsers?.count || 0,
+            currencyTotals
+        };
     }
+
 
 }

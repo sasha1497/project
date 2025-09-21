@@ -7,54 +7,54 @@ export class RazorpayController {
   constructor(
     private readonly razorpayService: RazorpayService,
     private readonly subscriptionService: SubscriptionService
-  ) { }
+  ) {}
 
   @Post('create-subscription-order')
   async createSubscriptionOrder(
     @Body() body: {
       user_id: string;
       plan_id: string;
-      // email: string;
-      // contact: string;
-      currency?: string;
+      country?: string;
+      currency: string;   // frontend sends currency (USD, AED, INR etc.)
+      amount: number;     // frontend sends correct localized price
       receipt?: string;
     }
   ) {
-    const currency = body.currency || 'INR';
-
-    // 1. Get the plan details (to get price)
+    // 1. Validate plan
     const [plan] = await this.subscriptionService.getPlanById(body.plan_id);
     if (!plan) throw new Error('Invalid plan selected');
 
-    const amount = plan.price; // Assuming this is in paise
+    // 2. Use frontend provided amount + currency
+    const amount = body.amount;
+    const currency = body.currency;
 
-    // 2. Create Razorpay order
+    // 3. Create Razorpay order
     const order = await this.razorpayService.createOrder(amount, currency, body.receipt);
 
-    // 3. Insert a pending payment record (status = 1)
+    // 4. Insert a pending payment
     const payment = await this.subscriptionService.createPendingPayment({
       user_id: body.user_id,
       plan_id: body.plan_id,
       razorpay_order_id: order.id,
       amount,
       currency,
-      // email: body.email,
-      // contact: body.contact
     });
 
+    // 5. Create subscription record
     const subscriptionEndDate = new Date();
-    subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1); // 1 month from now
+    subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
 
     await this.subscriptionService.createUserSubscription({
       user_id: body.user_id,
       plan_id: body.plan_id,
-      payment_id: payment.id, // local payment id from your earlier payment creation
+      payment_id: payment.id,
       end_date: subscriptionEndDate,
     });
 
     return {
       razorpay_order: order,
       local_payment_id: payment.id,
+      final_price: { amount, currency },
     };
   }
 }

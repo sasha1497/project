@@ -66,15 +66,23 @@ export class UserService {
   }
 
   /******************** GET USER DATA ****************************/
-
   async getUserData(id: string) {
     // Get user info
     const user = await this.mcurdSerRef.get('*', 'users', { id });
+    if (!user) {
+      return {
+        success: false,
+        message: 'User not found',
+      };
+    }
 
     // Get payments
     const payments = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
     const paymentsData = Array.isArray(payments) ? payments : payments ? [payments] : [];
     const hasPayments = paymentsData.length > 0;
+
+    let paymentAlert = false;
+    let paymentExpired = false;
 
     if (hasPayments) {
       const latestPayment = paymentsData.sort(
@@ -82,22 +90,43 @@ export class UserService {
       )[0];
 
       const createdAt = new Date(latestPayment.created_at);
-      const now = new Date();
-      const diffMinutes = (now.getTime() - createdAt.getTime()) / 1000 / 60;
 
-      if (diffMinutes > 5) {
-        throw new BadRequestException('Your payment expired');
+      // Calculate expiry date (90 days after created_at)
+      const expiryDate = new Date(createdAt);
+      expiryDate.setDate(expiryDate.getDate() + 90);
+
+      // Calculate alert date (4 days before expiry)
+      const alertDate = new Date(expiryDate);
+      alertDate.setDate(alertDate.getDate() - 4);
+
+      const now = new Date();
+
+      // Alert check
+      if (now >= alertDate && now < expiryDate) {
+        paymentAlert = true;
+      }
+
+      // Expiry check
+      if (now >= expiryDate) {
+        paymentExpired = true;
       }
     }
 
     const imageData = await this.parseUserImages(id, user.photo);
 
     return {
-      ...user,
-      hasPayments,
-      imageData,
+      success: true,
+      message: paymentExpired ? 'Your payment expired' : 'User data fetched successfully',
+      data: {
+        ...user,
+        hasPayments,
+        paymentAlert,
+        paymentExpired,
+        imageData,
+      },
     };
   }
+
 
 
   // ---------------- Private function ----------------

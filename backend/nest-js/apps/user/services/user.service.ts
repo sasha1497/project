@@ -66,20 +66,49 @@ export class UserService {
   }
 
   /******************** GET USER DATA ****************************/
-  async getUserData(id: string) {
-    const user = await this.mcurdSerRef.get('*', 'users', { id });
-    console.log(user.photo, '<--- user.photo (raw from DB)');
 
+  async getUserData(id: string) {
+    // Get user info
+    const user = await this.mcurdSerRef.get('*', 'users', { id });
+
+    // Get payments
+    const payments = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
+    const paymentsData = Array.isArray(payments) ? payments : payments ? [payments] : [];
+    const hasPayments = paymentsData.length > 0;
+
+    if (hasPayments) {
+      const latestPayment = paymentsData.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )[0];
+
+      const createdAt = new Date(latestPayment.created_at);
+      const now = new Date();
+      const diffMinutes = (now.getTime() - createdAt.getTime()) / 1000 / 60;
+
+      if (diffMinutes > 5) {
+        throw new BadRequestException('Your payment expired');
+      }
+    }
+
+    const imageData = await this.parseUserImages(id, user.photo);
+
+    return {
+      ...user,
+      hasPayments,
+      imageData,
+    };
+  }
+
+
+  // ---------------- Private function ----------------
+  private async parseUserImages(userId: string, rawPhotoData: any) {
     let imageKeys: string[] = [];
 
     try {
-      let raw = user.photo;
+      let raw = rawPhotoData;
 
-      // Parse JSON string (first level)
       if (typeof raw === 'string') {
         raw = JSON.parse(raw);
-
-        // If double-stringified
         if (typeof raw === 'string') {
           raw = JSON.parse(raw);
         }
@@ -94,15 +123,12 @@ export class UserService {
       console.error('Error parsing user.photo:', err);
     }
 
-    console.log(imageKeys, '<--- imageKeys after parsing');
-
     // Build image metadata list
-    const imageData = await Promise.all(
+    return await Promise.all(
       imageKeys.map(async (fileName) => {
-        const filePath = `users/${id}/${fileName}`;
+        const filePath = `users/${userId}/${fileName}`;
         const url = await this.storageSerRef.getImageUrl(filePath);
 
-        // Extract date from filename (like "2025-06-07")
         const dateMatch = fileName.match(/\d{4}-\d{2}-\d{2}/);
         const date = dateMatch ? dateMatch[0] : null;
 
@@ -113,11 +139,6 @@ export class UserService {
         };
       }),
     );
-
-    return {
-      ...user,
-      imageData,
-    };
   }
 
 

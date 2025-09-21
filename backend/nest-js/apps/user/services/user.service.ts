@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '../model/user.model';
 import { McrudService } from '@app/main/services/mcurd.service';
@@ -26,30 +26,23 @@ export class UserService {
       ...(mobile && { phone_number: mobile }),
     };
 
-    try {
-      if (id) {
-        // Update existing user
-        return await this.mcurdSerRef.update('users', payload, { id });
-      } else {
-        // Create new user
-        const newId = await this.mcurdSerRef.create('users', payload, 'id');
-        return { id: newId, ...payload };
+    if (mobile) {
+      const existingUser = await this.mcurdSerRef.find('users', { phone_number: mobile });
+      if (existingUser && existingUser.length > 0) {
+        // If creating new user OR updating to a different user's number
+        if (!id || existingUser[0].id !== +id) {
+          throw new BadRequestException('Mobile number already exists. Please use a new number.');
+        }
       }
-    } catch (err: any) {
-      // Check for duplicate phone_number error
-      if (err.code === 'ER_DUP_ENTRY' && err.sqlMessage.includes('phone_number')) {
-        throw {
-          success: false,
-          toast: {
-            type: 'error',
-            title: 'Mobile Number Exists',
-            message: 'This phone number is already registered. Please use a different number.'
-          }
-        };
-      }
+    }
 
-      // Re-throw other errors
-      throw err;
+    if (id) {
+      // Update existing user
+      return await this.mcurdSerRef.update('users', payload, { id });
+    } else {
+      // Create new user
+      const newId = await this.mcurdSerRef.create('users', payload, 'id');
+      return { id: newId, ...payload };
     }
   }
 

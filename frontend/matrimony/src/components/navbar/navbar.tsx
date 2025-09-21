@@ -73,7 +73,6 @@ const Navbar = () => {
                     </button>
 
                     <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                      <li><button className="dropdown-item">Edit Profile</button></li>
                       <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
                       <li><button className="dropdown-item">Delete Account</button></li>
                       <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>

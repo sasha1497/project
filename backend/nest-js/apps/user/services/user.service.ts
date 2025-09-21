@@ -16,7 +16,7 @@ export class UserService {
 
   /******************** CREATE AND UPDATE USER ****************************/
   async upsertUser(id: any, data: any) {
-    const { password, confirmPassword, mobile, name, ...rest } = data;
+    const { password, confirmPassword, mobile, ...rest } = data;
 
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
     const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : null;

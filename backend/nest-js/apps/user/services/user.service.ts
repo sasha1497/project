@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '../model/user.model';
 import { McrudService } from '@app/main/services/mcurd.service';
@@ -16,11 +16,9 @@ export class UserService {
   async upsertUser(id: any, data: any) {
     const { password, confirmPassword, mobile, ...rest } = data;
 
-    // Hash passwords
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
     const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : null;
 
-    // Prepare payload
     const payload = {
       ...rest,
       ...(hashedPassword && { password: hashedPassword }),
@@ -28,49 +26,25 @@ export class UserService {
       ...(mobile && { phone_number: mobile }),
     };
 
-    // Check mobile duplicate when creating new user
-    if (!id && mobile) {
+    if (mobile) {
       const existingUser = await this.mcurdSerRef.find('users', { phone_number: mobile });
       if (existingUser && existingUser.length > 0) {
-        return {
-          success: false,
-          data: null,
-          toast: {
-            type: 'error',
-            title: 'Mobile Number Exists',
-            message: 'This phone number is already registered. Please use a different number.',
-          },
-        };
+        // If creating new user OR updating to a different user's number
+        if (!id || existingUser[0].id !== +id) {
+          throw new BadRequestException('Mobile number already exists. Please use a new number.');
+        }
       }
     }
 
     if (id) {
       // Update existing user
-      const updatedUser = await this.mcurdSerRef.update('users', payload, { id });
-      return {
-        success: true,
-        data: updatedUser,
-        toast: {
-          type: 'success',
-          title: 'User Updated',
-          message: 'User updated successfully.',
-        },
-      };
+      return await this.mcurdSerRef.update('users', payload, { id });
     } else {
       // Create new user
       const newId = await this.mcurdSerRef.create('users', payload, 'id');
-      return {
-        success: true,
-        data: { id: newId, ...payload },
-        toast: {
-          type: 'success',
-          title: 'User Created',
-          message: 'User created successfully.',
-        },
-      };
+      return { id: newId, ...payload };
     }
   }
-
 
 
   /******************** USER LIST ****************************/

@@ -26,15 +26,33 @@ export class UserService {
       ...(mobile && { phone_number: mobile }),
     };
 
-    if (id) {
-      // Update existing user
-      return await this.mcurdSerRef.update('users', payload, { id });
-    } else {
-      // Create new user
-      const newId = await this.mcurdSerRef.create('users', payload, 'id');
-      return { id: newId, ...payload };
+    try {
+      if (id) {
+        // Update existing user
+        return await this.mcurdSerRef.update('users', payload, { id });
+      } else {
+        // Create new user
+        const newId = await this.mcurdSerRef.create('users', payload, 'id');
+        return { id: newId, ...payload };
+      }
+    } catch (err: any) {
+      // Check for duplicate phone_number error
+      if (err.code === 'ER_DUP_ENTRY' && err.sqlMessage.includes('phone_number')) {
+        throw {
+          success: false,
+          toast: {
+            type: 'error',
+            title: 'Mobile Number Exists',
+            message: 'This phone number is already registered. Please use a different number.'
+          }
+        };
+      }
+
+      // Re-throw other errors
+      throw err;
     }
   }
+
 
   /******************** USER LIST ****************************/
   async listUsers(payload: any) {

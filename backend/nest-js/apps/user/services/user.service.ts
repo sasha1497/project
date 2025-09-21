@@ -66,112 +66,123 @@ export class UserService {
   }
 
   /******************** GET USER DATA ****************************/
+
   // async getUserData(id: string) {
   //   // Get user info
-  //   const user = await this.mcurdSerRef.get('*', 'users', { id });
+  //   const user: any = await this.mcurdSerRef.get('*', 'users', { id });
   //   if (!user) throw new BadRequestException('User not found');
 
   //   // Get payments
-  //   const payments = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
+  //   const payments: any = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
   //   const paymentsData = Array.isArray(payments) ? payments : payments ? [payments] : [];
   //   const hasPayments = paymentsData.length > 0;
 
-  //   let paymentAlert = false; // Default no alert
+  //   // Payment expiry info (can be null if no payments)
+  //   let paymentExpiryInfo: {
+  //     message: string;
+  //     remainingDays: number;
+  //     expired: boolean;
+  //   } | null = null;
 
   //   if (hasPayments) {
+  //     // Get latest payment
   //     const latestPayment = paymentsData.sort(
   //       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   //     )[0];
 
   //     const createdAt = new Date(latestPayment.created_at);
-
-  //     // Calculate expiry date (90 days after created_at)
-  //     const expiryDate = new Date(createdAt);
-  //     expiryDate.setDate(expiryDate.getDate() + 90);
-
-  //     // Calculate alert date (4 days before expiry)
-  //     const alertDate = new Date(expiryDate);
-  //     alertDate.setDate(alertDate.getDate() - 4);
-
   //     const now = new Date();
 
-  //     // Alert check
-  //     if (now >= alertDate && now < expiryDate) {
-  //       paymentAlert = true;
-  //     }
+  //     // Calculate difference in days
+  //     const diffDays = Math.floor((now.getTime() - createdAt.getTime()) / 1000 / 60 / 60 / 24);
+  //     const totalValidityDays = 90; // total expiry days
+  //     const remainingDays = totalValidityDays - diffDays;
 
-  //     // Expiry check
-  //     if (now >= expiryDate) {
-  //       // Instead of generic error, send code for frontend to handle logout
-  //       throw new BadRequestException({
-  //         code: 'PAYMENT_EXPIRED',
-  //         message: 'Your payment expired. Please renew to continue.',
-  //       });
+  //     if (remainingDays > 0) {
+  //       paymentExpiryInfo = {
+  //         message: `Your payment will expire in ${remainingDays} day(s)`,
+  //         remainingDays,
+  //         expired: false,
+  //       };
+  //     } else {
+  //       paymentExpiryInfo = {
+  //         message: `Your payment has expired`,
+  //         remainingDays: 0,
+  //         expired: true,
+  //       };
   //     }
   //   }
 
+  //   // Get user images
   //   const imageData = await this.parseUserImages(id, user.photo);
 
+  //   // Return full user data
   //   return {
   //     ...user,
   //     hasPayments,
-  //     paymentAlert,
+  //     paymentExpiryInfo,
   //     imageData,
   //   };
   // }
 
   async getUserData(id: string) {
     // Get user info
-    const user = await this.mcurdSerRef.get('*', 'users', { id });
+    const user: any = await this.mcurdSerRef.get('*', 'users', { id });
     if (!user) throw new BadRequestException('User not found');
 
     // Get payments
-    const payments = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
+    const payments: any = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
     const paymentsData = Array.isArray(payments) ? payments : payments ? [payments] : [];
     const hasPayments = paymentsData.length > 0;
 
-    let paymentAlert = false;
+    // Payment expiry info (can be null if no payments)
+    let paymentExpiryInfo: {
+      message: string;
+      remainingMinutes: number;
+      expired: boolean;
+    } | null = null;
 
     if (hasPayments) {
+      // Get latest payment
       const latestPayment = paymentsData.sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )[0];
 
       const createdAt = new Date(latestPayment.created_at);
-
-      // ✅ TEST MODE: 5 minutes expiry
-      const expiryDate = new Date(createdAt);
-      expiryDate.setMinutes(expiryDate.getMinutes() + 5);
-
-      // ✅ TEST MODE: Alert 2 minutes before expiry
-      const alertDate = new Date(expiryDate);
-      alertDate.setMinutes(alertDate.getMinutes() - 2);
-
       const now = new Date();
 
-      // Alert check (show alert only in last 2 mins)
-      if (now >= alertDate && now < expiryDate) {
-        paymentAlert = true;
-      }
+      // For testing: total validity = 5 minutes
+      const totalValidityMinutes = 5;
+      const diffMinutes = Math.floor((now.getTime() - createdAt.getTime()) / 1000 / 60);
+      const remainingMinutes = totalValidityMinutes - diffMinutes;
 
-      // Expiry check (after 5 mins)
-      if (now >= expiryDate) {
-        throw new BadRequestException({
-          code: 'PAYMENT_EXPIRED',
-          message: 'Your payment expired (Test Mode)',
-        });
+      if (remainingMinutes > 0) {
+        paymentExpiryInfo = {
+          message: `Your payment will expire in ${remainingMinutes} minute(s)`,
+          remainingMinutes,
+          expired: false,
+        };
+      } else {
+        paymentExpiryInfo = {
+          message: `Your payment has expired`,
+          remainingMinutes: 0,
+          expired: true,
+        };
       }
     }
 
+    // Get user images
     const imageData = await this.parseUserImages(id, user.photo);
 
+    // Return full user data
     return {
       ...user,
       hasPayments,
-      paymentAlert,
+      paymentExpiryInfo,
       imageData,
     };
   }
+
 
 
   // ---------------- Private function ----------------

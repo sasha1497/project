@@ -107,7 +107,7 @@ const Banner = () => {
                     </div>
                     <div className='container'>
                         <p className='text-justify'>
-                            Bajol.com, one of world's best known brands and the world's largest matrimonial service was founded with a simple objective - to help people find happiness. The company pioneered online matrimonials in 1996 and continues to lead the exciting matrimony category after more than a decade. By redefining the way Indian brides and grooms meet for marriage, Shaadi.com has created a world-renowned service that has touched over 20,000+ people.
+                            Bajol.com, one of world's best known brands and the world's largest matrimonial service was founded with a simple objective - to help people find happiness. The company pioneered online matrimonials in 1996 and continues to lead the exciting matrimony category after more than a decade. By redefining the way Indian brides and grooms meet for marriage, bajolmatrimony.com has created a world-renowned service that has touched over 20,000+ people.
                         </p>
                         <div>
                             <p className='text-primary'>India | USA | Canada | UK | Singapore | Australia | UAE | NRI Matrimonials</p>

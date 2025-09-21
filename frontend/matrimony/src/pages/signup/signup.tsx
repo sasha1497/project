@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import MultiStepForm from '../multiStep/MultiStepForm';
 import { useLoginUserMutation } from '../../features/auth/authApi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setToken, setUser } from '../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import './signup.css';
+import { useSendOtpMutation, useVerifyOtpMutation } from '../../features/otp/otpApi';
+import {
+  setOtpLoading,
+  setOtpSent,
+  setOtpVerified,
+  setOtpError,
+  resetOtp,
+} from '../../features/otp/otpSlice';
+import { RootState } from '../../app/store';
+
+import { useAppSelector, useAppDispatch } from '../../app/hooks';
+
+
+
+
 
 interface FormData {
   mobileNumber: string;
@@ -14,10 +31,10 @@ interface FormData {
 }
 
 const SignUp: React.FC = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
-  const [isSignUp, setIsSignUp] = useState(true); 
+  const { control, register, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const [isSignUp, setIsSignUp] = useState(true);
   const [loginUser] = useLoginUserMutation();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // Forgot password state
@@ -39,8 +56,22 @@ const SignUp: React.FC = () => {
     return () => clearInterval(interval);
   }, [timer]);
 
+  const dispatch = useAppDispatch();
+const { otpSent, otpVerified, loading, error } = useAppSelector((state) => state.otp);
+
+  // const { otpSent, otpVerified, loading, error } = useSelector((state: RootState) => state.otp);
+
+  const [sendOtp] = useSendOtpMutation();
+  const [verifyOtp] = useVerifyOtpMutation();
+
   const onSubmit = async (data: FormData) => {
     try {
+      // Ensure mobile number has +
+      // if (!/^\+[1-9]\d{6,14}$/.test(data.mobileNumber)) {
+      //   toast.error("Enter valid mobile number with country code");
+      //   return;
+      // }
+
       const result = await loginUser(data).unwrap();
       if (result?.user?.token) {
         const { token, ...userData } = result?.user;
@@ -61,29 +92,64 @@ const SignUp: React.FC = () => {
   };
 
   // Forgot password handlers
-  const handleMobileSubmit = () => {
-    if (!mobile) {
-      toast.error("Please enter mobile number");
-      return;
+  // const handleMobileSubmit = () => {
+  //   if (!/^\+[1-9]\d{6,14}$/.test(mobile)) {
+  //     toast.error("Enter valid mobile number with country code");
+  //     return;
+  //   }
+  //   // Call API to send OTP
+  //   toast.success("OTP sent to " + mobile);
+  //   setStep("otp");
+  //   setTimer(30); // Start 30s countdown
+  // };
+
+  // const handleOtpSubmit = () => {
+  //   if (otp.length !== 4) {
+  //     toast.error("Enter valid 4-digit OTP");
+  //     return;
+  //   }
+  //   // Call API to verify OTP
+  //   toast.success("OTP verified successfully!");
+  //   setShowForgotPopup(false);
+  //   setStep("mobile");
+  //   setMobile("");
+  //   setOtp("");
+  //   setTimer(0);
+  // };
+
+   const handleMobileSubmit = async () => {
+    try {
+      dispatch(setOtpLoading(true));
+      await sendOtp({ mobileNumber: mobile }).unwrap();
+      dispatch(setOtpSent(mobile));
+      toast.success("OTP sent to " + mobile);
+      setStep("otp");
+      setTimer(30);
+    } catch (err: any) {
+      dispatch(setOtpError(err?.data?.message || "Failed to send OTP"));
+      toast.error(err?.data?.message || "Failed to send OTP");
+    } finally {
+      dispatch(setOtpLoading(false));
     }
-    // Call API to send OTP
-    toast.success("OTP sent to " + mobile);
-    setStep("otp");
-    setTimer(30); // Start 30s countdown
   };
 
-  const handleOtpSubmit = () => {
-    if (otp.length !== 4) {
-      toast.error("Enter valid 4-digit OTP");
-      return;
+  const handleOtpSubmit = async () => {
+    try {
+      dispatch(setOtpLoading(true));
+      await verifyOtp({ mobileNumber: mobile, otp }).unwrap();
+      dispatch(setOtpVerified());
+      toast.success("OTP verified successfully!");
+      setShowForgotPopup(false);
+      setStep("mobile");
+      setMobile("");
+      setOtp("");
+      setTimer(0);
+    } catch (err: any) {
+      dispatch(setOtpError(err?.data?.message || "OTP verification failed"));
+      toast.error(err?.data?.message || "OTP verification failed");
+    } finally {
+      dispatch(setOtpLoading(false));
     }
-    // Call API to verify OTP
-    toast.success("OTP verified successfully!");
-    setShowForgotPopup(false);
-    setStep("mobile");
-    setMobile("");
-    setOtp("");
-    setTimer(0);
   };
 
   const handleResendOtp = () => {
@@ -110,16 +176,39 @@ const SignUp: React.FC = () => {
             <h2 className="card-title text-center mb-4">Sign In 👋</h2>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-3">
-                <input
-                  type="number"
-                  className={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
-                  placeholder="Mobile number"
-                  {...register('mobileNumber', { required: 'Mobile number is required' })}
+              {/* Mobile number with country code */}
+              {/* <div className="mb-3">
+                <Controller
+                  name="mobileNumber"
+                  control={control}
+                  rules={{ required: "Mobile number is required" }}
+                  render={({ field }) => (
+                    <PhoneInput
+                      {...field}
+                      country={'in'}
+                      value={field.value}
+                      onChange={(value) => field.onChange("+" + value)}
+                      inputClass={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
+                      inputStyle={{ width: "100%" }}
+                      placeholder="Enter mobile number"
+                    />
+                  )}
                 />
-                {errors.mobileNumber && <div className="invalid-feedback">{errors.mobileNumber.message}</div>}
-              </div>
+                {errors.mobileNumber && (
+                  <div className="invalid-feedback">{errors.mobileNumber.message}</div>
+                )}
+              </div> */}
+               <div className="mb-3">
+                <input
+                   type="number"
+                   className={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
+                   placeholder="Mobile number"
+                   {...register('mobileNumber', { required: 'Mobile number is required' })}
+                 />
+                 {errors.mobileNumber && <div className="invalid-feedback">{errors.mobileNumber.message}</div>}
+               </div>
 
+              {/* Password */}
               <div className="mb-3">
                 <input
                   type="password"
@@ -127,7 +216,9 @@ const SignUp: React.FC = () => {
                   placeholder="Password"
                   {...register('password', { required: 'Password is required' })}
                 />
-                {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
+                {errors.password && (
+                  <div className="invalid-feedback">{errors.password.message}</div>
+                )}
               </div>
 
               <button type="submit" className="btn btn-primary w-100 mb-2">
@@ -163,14 +254,15 @@ const SignUp: React.FC = () => {
 
             {step === "mobile" && (
               <>
-                <input
-                  type="number"
-                  className="form-control mb-3"
-                  placeholder="Enter Mobile Number"
+                <PhoneInput
+                  country={'in'}
                   value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
+                  onChange={(phone) => setMobile("+" + phone)}
+                  inputClass="form-control mb-3"
+                  inputStyle={{ width: "100%" }}
+                  placeholder="Enter mobile number"
                 />
-                <button className="btn btn-primary w-100" onClick={handleMobileSubmit}>
+                <button className="btn btn-primary w-100 mt-3" onClick={handleMobileSubmit}>
                   Send OTP
                 </button>
               </>
@@ -195,10 +287,7 @@ const SignUp: React.FC = () => {
                     Resend OTP in <strong>{timer}s</strong>
                   </p>
                 ) : (
-                  <button
-                    className="btn btn-link w-100"
-                    onClick={handleResendOtp}
-                  >
+                  <button className="btn btn-link w-100" onClick={handleResendOtp}>
                     Resend OTP
                   </button>
                 )}

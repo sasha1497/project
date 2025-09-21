@@ -1,6 +1,8 @@
 import React from 'react';
 import './plan.css';
 import { motion } from 'framer-motion';
+import axios from "axios";
+
 
 interface Plan {
   name: string;
@@ -59,6 +61,12 @@ const plans: Plan[] = [
 
 interface PlanProps {
   country?: string;
+}
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
 }
 
 // ✅ Function to show price labels based on country & currency
@@ -151,15 +159,68 @@ const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
 };
 
 // ✅ Handle plan selection
-const handleSelectPlan = (planName: string, country?: string, priceUSD?: number) => {
-  const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
-  const payload = {
-    country: country ?? 'Not selected',
-    plan: planName,
-    price: finalPrice,
-  };
-  console.log('Selected Plan Payload:', payload);
+// const handleSelectPlan = (planName: string, country?: string, priceUSD?: number) => {
+//   const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
+//   const payload = {
+//     country: country ?? 'Not selected',
+//     plan: planName,
+//     price: finalPrice,
+//   };
+//   console.log('Selected Plan Payload:', payload);
+// };
+
+
+
+
+const handleSelectPlan = async (planName: string, country?: string, priceUSD?: number) => {
+  try {
+    const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
+
+    // Step 1: Create order on backend
+    const { data: order } = await axios.post("http://localhost:3002/razorpay/create-subscription-order", {
+      amount: finalPrice,
+      currency: "INR", // 🔹 you can make this dynamic based on country
+    });
+
+    // Step 2: Open Razorpay checkout
+    const options = {
+      key: "YOUR_RAZORPAY_KEY_ID", // 🔹 Replace with your Razorpay Test Key
+      amount: order.amount,
+      currency: order.currency,
+      name: "Bajol Matrimony",
+      description: `${planName} Plan Subscription`,
+      order_id: order.id,
+      handler: async function (response: any) {
+        // Step 3: Verify payment with backend
+        const verifyRes = await axios.post("http://localhost:3002/razorpay/create-subscription-order", response);
+        if (verifyRes.data.success) {
+          alert("✅ Payment Successful! Plan Activated");
+          console.log({
+            country: country ?? "Not selected",
+            plan: planName,
+            price: finalPrice,
+          });
+        } else {
+          alert("❌ Payment Verification Failed");
+        }
+      },
+      prefill: {
+        name: "User Name",
+        email: "user@example.com",
+        contact: "9876543210",
+      },
+      theme: {
+        color: "#0d6efd",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (error) {
+    console.error("Payment Error:", error);
+  }
 };
+
 
 const Plan: React.FC<PlanProps> = ({ country }) => {
   return (

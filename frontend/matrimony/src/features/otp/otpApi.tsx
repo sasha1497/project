@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const otpApi = createApi({
   reducerPath: 'otpApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_BASE_URL, // from .env
+    baseUrl: process.env.REACT_APP_API_BASE_URL,
   }),
   endpoints: (builder) => ({
     sendOtp: builder.mutation<any, { mobileNumber: string }>({
@@ -20,7 +20,14 @@ export const otpApi = createApi({
         body,
       }),
     }),
+     resetPassword: builder.mutation<any, { mobileNumber: string; password: string; confirm_password: string }>({
+      query: (body) => ({
+        url: 'user/reset_password',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useSendOtpMutation, useVerifyOtpMutation } = otpApi;
+export const { useSendOtpMutation, useVerifyOtpMutation, useResetPasswordMutation } = otpApi;

@@ -66,15 +66,64 @@ export class UserService {
   }
 
   /******************** GET USER DATA ****************************/
+  // async getUserData(id: string) {
+  //   // Get user info
+  //   const user = await this.mcurdSerRef.get('*', 'users', { id });
+  //   if (!user) throw new BadRequestException('User not found');
+
+  //   // Get payments
+  //   const payments = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
+  //   const paymentsData = Array.isArray(payments) ? payments : payments ? [payments] : [];
+  //   const hasPayments = paymentsData.length > 0;
+
+  //   let paymentAlert = false; // Default no alert
+
+  //   if (hasPayments) {
+  //     const latestPayment = paymentsData.sort(
+  //       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  //     )[0];
+
+  //     const createdAt = new Date(latestPayment.created_at);
+
+  //     // Calculate expiry date (90 days after created_at)
+  //     const expiryDate = new Date(createdAt);
+  //     expiryDate.setDate(expiryDate.getDate() + 90);
+
+  //     // Calculate alert date (4 days before expiry)
+  //     const alertDate = new Date(expiryDate);
+  //     alertDate.setDate(alertDate.getDate() - 4);
+
+  //     const now = new Date();
+
+  //     // Alert check
+  //     if (now >= alertDate && now < expiryDate) {
+  //       paymentAlert = true;
+  //     }
+
+  //     // Expiry check
+  //     if (now >= expiryDate) {
+  //       // Instead of generic error, send code for frontend to handle logout
+  //       throw new BadRequestException({
+  //         code: 'PAYMENT_EXPIRED',
+  //         message: 'Your payment expired. Please renew to continue.',
+  //       });
+  //     }
+  //   }
+
+  //   const imageData = await this.parseUserImages(id, user.photo);
+
+  //   return {
+  //     ...user,
+  //     hasPayments,
+  //     paymentAlert,
+  //     imageData,
+  //   };
+  // }
+
   async getUserData(id: string) {
     // Get user info
     const user = await this.mcurdSerRef.get('*', 'users', { id });
-    if (!user) {
-      return {
-        success: false,
-        message: 'User not found',
-      };
-    }
+    if (!user) throw new BadRequestException('User not found');
 
     // Get payments
     const payments = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
@@ -82,7 +131,6 @@ export class UserService {
     const hasPayments = paymentsData.length > 0;
 
     let paymentAlert = false;
-    let paymentExpired = false;
 
     if (hasPayments) {
       const latestPayment = paymentsData.sort(
@@ -91,42 +139,39 @@ export class UserService {
 
       const createdAt = new Date(latestPayment.created_at);
 
-      // Calculate expiry date (90 days after created_at)
+      // ✅ TEST MODE: 5 minutes expiry
       const expiryDate = new Date(createdAt);
-      expiryDate.setDate(expiryDate.getDate() + 90);
+      expiryDate.setMinutes(expiryDate.getMinutes() + 5);
 
-      // Calculate alert date (4 days before expiry)
+      // ✅ TEST MODE: Alert 2 minutes before expiry
       const alertDate = new Date(expiryDate);
-      alertDate.setDate(alertDate.getDate() - 4);
+      alertDate.setMinutes(alertDate.getMinutes() - 2);
 
       const now = new Date();
 
-      // Alert check
+      // Alert check (show alert only in last 2 mins)
       if (now >= alertDate && now < expiryDate) {
         paymentAlert = true;
       }
 
-      // Expiry check
+      // Expiry check (after 5 mins)
       if (now >= expiryDate) {
-        paymentExpired = true;
+        throw new BadRequestException({
+          code: 'PAYMENT_EXPIRED',
+          message: 'Your payment expired (Test Mode)',
+        });
       }
     }
 
     const imageData = await this.parseUserImages(id, user.photo);
 
     return {
-      success: true,
-      message: paymentExpired ? 'Your payment expired' : 'User data fetched successfully',
-      data: {
-        ...user,
-        hasPayments,
-        paymentAlert,
-        paymentExpired,
-        imageData,
-      },
+      ...user,
+      hasPayments,
+      paymentAlert,
+      imageData,
     };
   }
-
 
 
   // ---------------- Private function ----------------

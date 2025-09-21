@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { UserModel } from '../model/user.model';
 import { McrudService } from '@app/main/services/mcurd.service';
 import { StorageService } from '@app/main/services/storage.service';
+import { MailService } from './mail.service';
 
 @Injectable()
 export class UserService {
@@ -10,11 +11,12 @@ export class UserService {
     private mcurdSerRef: McrudService,
     private userModRef: UserModel,
     private storageSerRef: StorageService,
+    private mailSerRef: MailService
   ) { }
 
   /******************** CREATE AND UPDATE USER ****************************/
   async upsertUser(id: any, data: any) {
-    const { password, confirmPassword, mobile, ...rest } = data;
+    const { password, confirmPassword, mobile, name, ...rest } = data;
 
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
     const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : null;
@@ -24,27 +26,38 @@ export class UserService {
       ...(hashedPassword && { password: hashedPassword }),
       ...(hashedConfirmPassword && { confirmPassword: hashedConfirmPassword }),
       ...(mobile && { phone_number: mobile }),
+      // ...(email && { email }),
     };
 
+    // Mobile uniqueness check
     if (mobile) {
       const existingUser = await this.mcurdSerRef.find('users', { phone_number: mobile });
       if (existingUser && existingUser.length > 0) {
-        // If creating new user OR updating to a different user's number
         if (!id || existingUser[0].id !== +id) {
           throw new BadRequestException('Mobile number already exists. Please use a new number.');
         }
       }
     }
 
+    let result;
     if (id) {
       // Update existing user
-      return await this.mcurdSerRef.update('users', payload, { id });
+      result = await this.mcurdSerRef.update('users', payload, { id });
     } else {
       // Create new user
       const newId = await this.mcurdSerRef.create('users', payload, 'id');
-      return { id: newId, ...payload };
+      result = { id: newId, ...payload };
+
+      // if (email && name) {
+      //   this.mailSerRef.sendUserCreationMail(email, name).catch(err => {
+      //     console.error('Error sending user creation email:', err);
+      //   });
+      // }
     }
+
+    return result;
   }
+
 
 
   /******************** USER LIST ****************************/

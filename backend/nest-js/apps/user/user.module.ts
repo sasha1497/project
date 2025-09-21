@@ -14,6 +14,7 @@ import { UserModel } from './model/user.model';
 import { MainModule } from '@app/main/main.module';
 import { SMSService } from './services/sms.service';
 import { RegisterService } from './services/register.service';
+import { MailService } from './services/mail.service';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { RegisterService } from './services/register.service';
     SubscriptionService,
     AssetService,
     SMSService,
-    RegisterService
+    RegisterService,
+    MailService
   ],
 })
 export class UserModule {}

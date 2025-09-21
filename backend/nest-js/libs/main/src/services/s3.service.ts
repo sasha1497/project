@@ -14,6 +14,9 @@ export class S3Service {
         const accessKeyId = process.env.AWS_S3_KEY;
         const secretAccessKey = process.env.AWS_S3_SECRET;
 
+        console.log(accessKeyId, secretAccessKey, 'access+++++');
+        
+
         if (!accessKeyId || !secretAccessKey) {
             throw new Error("AWS credentials are not set in environment variables");
         }
@@ -22,6 +25,8 @@ export class S3Service {
             credentials: { accessKeyId, secretAccessKey },
             region: process.env.AWS_REGION,
         });
+
+        console.log('hiiiijihib')
     }
 
     async upload(file: Buffer | string, toPath: string, filename: string, mimetype: string, userId: string) {
@@ -30,7 +35,7 @@ export class S3Service {
             Bucket: this.bucket,
             Key: key,
             Body: file,
-            ACL: 'public-read',
+            // ACL: 'public-read',
             ContentType: mimetype,
             ContentDisposition: 'inline',
         };
@@ -38,10 +43,19 @@ export class S3Service {
         return await upload.done();
     }
 
-    async getSignedUrl(filePath: string): Promise<string> {
-        const params = { Bucket: this.bucket, Key: filePath, Expires: 24 * 60 * 60 };
-        return this.client.getSignedUrlPromise('getObject', params);
-    }
+    // async getSignedUrl(filePath: string): Promise<string> {
+    //     const params = { Bucket: this.bucket, Key: filePath, Expires: 24 * 60 * 60 };
+    //     return this.client.getSignedUrlPromise('getObject', params);
+    // }
+
+     async getSignedUrl(filePath: string): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: filePath,
+    });
+
+    return getSignedUrl(this.client, command, { expiresIn: 24 * 60 * 60 });
+  }
 
     async getFileAsResponse(response, userId, path, fileName, useSharp = false, thumbScale: any = false, extension = null) {
         const key = `${userId}/${path}/${fileName}`;

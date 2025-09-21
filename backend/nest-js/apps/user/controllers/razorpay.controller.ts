@@ -10,47 +10,39 @@ export class RazorpayController {
   ) {}
 
   @Post('create-subscription-order')
-  async createSubscriptionOrder(
-    @Body() body: {
-      user_id: string;
-      plan_id: string;
-      country?: string;
-      currency: string;   // frontend sends currency (USD, AED, INR etc.)
-      amount: number;     // frontend sends correct localized price
-      receipt?: string;
-    }
-  ) {
-    // 1. Validate plan
-    const [plan] = await this.subscriptionService.getPlanById(body.plan_id);
-    if (!plan) throw new Error('Invalid plan selected');
+  async createSubscriptionOrder(@Body() data: any) {
+    // Destructure incoming request
+    const { user_id, plan_id, country, currency, amount, receipt } = data;
 
-    // 2. Use frontend provided amount + currency
-    const amount = body.amount;
-    const currency = body.currency;
+    console.log('📥 Request:', { user_id, plan_id, country, currency, amount, receipt });
 
-    // 3. Create Razorpay order
-    const order = await this.razorpayService.createOrder(amount, currency, body.receipt);
+    // 1. Create Razorpay order using frontend-provided amount and currency
+    const order = await this.razorpayService.createOrder(amount, currency, receipt);
+    console.log('✅ Razorpay order created:', order);
 
-    // 4. Insert a pending payment
+    // 2. Insert a pending payment in your DB
     const payment = await this.subscriptionService.createPendingPayment({
-      user_id: body.user_id,
-      plan_id: body.plan_id,
+      user_id,
+      plan_id,
       razorpay_order_id: order.id,
       amount,
       currency,
     });
+    console.log('✅ Pending payment saved:', payment);
 
-    // 5. Create subscription record
+    // 3. Create subscription record (1 month from now)
     const subscriptionEndDate = new Date();
     subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
 
     await this.subscriptionService.createUserSubscription({
-      user_id: body.user_id,
-      plan_id: body.plan_id,
+      user_id,
+      plan_id,
       payment_id: payment.id,
       end_date: subscriptionEndDate,
     });
+    console.log('✅ User subscription created');
 
+    // 4. Return response
     return {
       razorpay_order: order,
       local_payment_id: payment.id,

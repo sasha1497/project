@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '../model/user.model';
 import { McrudService } from '@app/main/services/mcurd.service';
@@ -26,6 +26,16 @@ export class UserService {
       ...(mobile && { phone_number: mobile }),
     };
 
+    if (mobile) {
+      const existingUser = await this.mcurdSerRef.find('users', { phone_number: mobile });
+      if (existingUser && existingUser.length > 0) {
+        // If creating new user OR updating to a different user's number
+        if (!id || existingUser[0].id !== +id) {
+          throw new BadRequestException('Mobile number already exists. Please use a new number.');
+        }
+      }
+    }
+
     if (id) {
       // Update existing user
       return await this.mcurdSerRef.update('users', payload, { id });
@@ -35,6 +45,7 @@ export class UserService {
       return { id: newId, ...payload };
     }
   }
+
 
   /******************** USER LIST ****************************/
   async listUsers(payload: any) {

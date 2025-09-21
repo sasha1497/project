@@ -67,19 +67,41 @@ export class RegisterService {
     }
 
     /******************** RESET PASSWORD ****************************/
-    async resetPassword(data: { mobileNumber: string; otp: string; newPassword: string }) {
-        const { mobileNumber, otp, newPassword } = data;
+    async resetPassword(data) {
+        const { password, confirm_password, mobileNumber } = data;
 
-        // Verify OTP
-        const otpResult = this.smsService.verifyOTP(mobileNumber, otp);
-        if (!otpResult.success) throw new UnauthorizedException(otpResult.message);
+        // 1. Validate passwords
+        if (!password || !confirm_password) {
+            throw new Error('Password and confirm password are required');
+        }
 
-        // Hash new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        if (password !== confirm_password) {
+            throw new Error('Password and confirm password do not match');
+        }
 
-        // Update DB
-        await this.mcurdSerRef.update('users', { password: hashedPassword }, { phone_number: mobileNumber });
+        // 2. Hash new password
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        return { message: 'Password has been successfully changed' };
+        // 3. Update DB
+        const result = await this.mcurdSerRef.update(
+            'users',
+            { password: hashedPassword, confirmPassword: hashedPassword },
+            { phone_number: mobileNumber }
+        );
+
+        if (result.affectedRows === 0) {
+            throw new Error('User not found or password update failed');
+        }
+
+        return {
+            "success": true,
+            "toast": {
+                "type": "success",
+                "title": "Password Changed",
+                "message": "Your password was updated successfully. Please log in with your new password."
+            }
+
+        };
     }
+
 }

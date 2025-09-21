@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { RegisterService } from '../services/register.service';
 
@@ -64,4 +64,23 @@ export class UserController {
   async getUser(@Param('id') id: string) {
     return this.userService.getUserData(id);
   }
+
+
+  @Delete('delete/:id')
+  async deleteUser(@Param('id') id: string) {
+    const deleted = await this.userService.deleteUser(id);
+
+    if (deleted) {
+      return {
+        success: true,
+        message: 'User deleted successfully',
+      };
+    } else {
+      return {
+        success: false,
+        message: 'User not found or could not be deleted',
+      };
+    }
+  }
+
 }

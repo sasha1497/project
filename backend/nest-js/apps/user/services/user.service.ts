@@ -106,4 +106,14 @@ export class UserService {
       imageData,
     };
   }
+
+
+  /******************** DELETE USER ****************************/
+
+  async deleteUser(id) {
+
+    return await this.mcurdSerRef.delete('users', { id: id });
+
+  }
+
 }

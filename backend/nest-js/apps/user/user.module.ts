@@ -12,6 +12,8 @@ import { UploadController } from './controllers/upload.controller';
 import { AssetService } from './services/asset.service';
 import { UserModel } from './model/user.model';
 import { MainModule } from '@app/main/main.module';
+import { SMSService } from './services/sms.service';
+import { RegisterService } from './services/register.service';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { MainModule } from '@app/main/main.module';
     UserModel,
     SubscriptionService,
     AssetService,
+    SMSService,
+    RegisterService
   ],
 })
 export class UserModule {}

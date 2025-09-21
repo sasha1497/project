@@ -10,10 +10,12 @@ interface Plan {
   price: number; // base USD
   features: string[];
   colorClass: string;
+  plan_id:any
 }
 
 const plans: Plan[] = [
-  {
+  { 
+    plan_id : 1,
     name: 'SILVER',
     description: 'Best for exploring the platform',
     price: 1,
@@ -27,6 +29,7 @@ const plans: Plan[] = [
     colorClass: 'text-white',
   },
   {
+     plan_id : 2,
     name: 'GOLD',
     description: 'For serious users looking for quick matches',
     price: 1,
@@ -41,8 +44,9 @@ const plans: Plan[] = [
     ],
     colorClass: 'text-white',
   },
-  {
-    name: 'PREMIUM',
+  { 
+    plan_id : 3,
+    name: 'PLATINUM',
     description: 'For those who want maximum reach and priority',
     price: 1,
     features: [
@@ -158,68 +162,130 @@ const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
   }
 };
 
+// {
+//   "user_id": "1",
+//   "plan_id": "1",
+//   "country": "india",
+//   "currency": "INR",
+//   "amount": 1,
+//   "receipt": "receipt_india_001"
+// }
+
 // ✅ Handle plan selection
 // const handleSelectPlan = (planName: string, country?: string, priceUSD?: number) => {
 //   const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
 //   const payload = {
 //     country: country ?? 'Not selected',
-//     plan: planName,
-//     price: finalPrice,
+//     plan_id: planName,
+//     amount: finalPrice,
+//     receipt : "BAJOL MATRIMONY",
+//     currency : 'INR',
+//     user_id : 11
 //   };
 //   console.log('Selected Plan Payload:', payload);
 // };
 
+// const handleSelectPlan = async (planName: string, country?: string, priceUSD?: number) => {
+//   const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
 
+//   const payload = {
+//     country: country ?? 'Not selected',
+//     plan_id: planName,
+//     amount: finalPrice,
+//     receipt: "BAJOL MATRIMONY",
+//     currency: 'INR',
+//     user_id: 11
+//   };
 
+//   try {
+//     const response = await axios.post('https://usrapi.bajolmatrimony.com/razorpay/create-subscription-order', payload);
+//     console.log('API Response:', response.data);
+   
+//     openRazorpayCheckout(response?.data);
+//   } catch (error: any) {
+//     console.error('API Error:', error.response?.data || error.message);
+//   }
+// };
+
+// // Razorpay Checkout function
+// const openRazorpayCheckout = (orderData: any) => {
+//   const options = {
+//     key: orderData.key,
+//     subscription_id: orderData.subscription_id,
+//     amount: orderData.amount,
+//     currency: orderData.currency,
+//     name: "BAJOL MATRIMONY",
+//     description: "Subscription Payment",
+//     order_id: orderData.id,
+//     handler: function (response: any) {
+//       console.log('Payment Success:', response);
+//       alert("Payment Successful!");
+//     },
+//     modal: {
+//       ondismiss: function () {
+//         console.log('Checkout closed by user');
+//       }
+//     },
+//     theme: {
+//       color: "#4CAF50"
+//     }
+//   };
+
+//   const rzp = new (window as any).Razorpay(options);
+//   rzp.open();
+// };
 
 const handleSelectPlan = async (planName: string, country?: string, priceUSD?: number) => {
+  const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
+
+  const payload = {
+    country: country ?? 'Not selected',
+    plan_id: planName,
+    amount: finalPrice,
+    receipt: "BAJOL MATRIMONY",
+    currency: 'INR',
+    user_id: 11
+  };
+
   try {
-    const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
+    const response = await axios.post('https://usrapi.bajolmatrimony.com/razorpay/create-subscription-order', payload);
+    console.log('API Response:', response.data);
 
-    // Step 1: Create order on backend
-    const { data: order } = await axios.post("http://localhost:3002/razorpay/create-subscription-order", {
-      amount: finalPrice,
-      currency: "INR", // 🔹 you can make this dynamic based on country
-    });
-
-    // Step 2: Open Razorpay checkout
-    const options = {
-      key: "YOUR_RAZORPAY_KEY_ID", // 🔹 Replace with your Razorpay Test Key
-      amount: order.amount,
-      currency: order.currency,
-      name: "Bajol Matrimony",
-      description: `${planName} Plan Subscription`,
-      order_id: order.id,
-      handler: async function (response: any) {
-        // Step 3: Verify payment with backend
-        const verifyRes = await axios.post("http://localhost:3002/razorpay/create-subscription-order", response);
-        if (verifyRes.data.success) {
-          alert("✅ Payment Successful! Plan Activated");
-          console.log({
-            country: country ?? "Not selected",
-            plan: planName,
-            price: finalPrice,
-          });
-        } else {
-          alert("❌ Payment Verification Failed");
-        }
-      },
-      prefill: {
-        name: "User Name",
-        email: "user@example.com",
-        contact: "9876543210",
-      },
-      theme: {
-        color: "#0d6efd",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  } catch (error) {
-    console.error("Payment Error:", error);
+    // Pass razorpay_order object to checkout
+    openRazorpayCheckout(response.data.razorpay_order);
+  } catch (error: any) {
+    console.error('API Error:', error.response?.data || error.message);
   }
 };
+
+// Razorpay Checkout function
+const openRazorpayCheckout = (orderData: any) => {
+  const options = {
+    key: "YOUR_RAZORPAY_KEY_ID", // Put your Razorpay key here
+    amount: orderData.amount, // in paise (e.g., 19400 = ₹194)
+    currency: orderData.currency,
+    name: "BAJOL MATRIMONY",
+    description: "Subscription Payment",
+    order_id: orderData.id, // Order ID from backend
+    handler: function (response: any) {
+      // Called on successful payment
+      console.log('Payment Success:', response);
+      alert("Payment Successful!");
+    },
+    modal: {
+      ondismiss: function () {
+        console.log('Checkout closed by user');
+      }
+    },
+    theme: {
+      color: "#4CAF50"
+    }
+  };
+
+  const rzp = new (window as any).Razorpay(options);
+  rzp.open();
+};
+
 
 
 const Plan: React.FC<PlanProps> = ({ country }) => {
@@ -255,7 +321,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                 </ul>
                 <button
                   className="btn mt-4 w-100 fw-bold bg-success text-white border-0"
-                  onClick={() => handleSelectPlan(plan.name, country, plan.price)}
+                  onClick={() => handleSelectPlan(plan.plan_id, country, plan.price)}
                 >
                   SELECT
                 </button>
@@ -275,3 +341,54 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
 };
 
 export default React.memo(Plan);
+
+
+
+// const handleSelectPlan = async (planName: string, country?: string, priceUSD?: number) => {
+//   try {
+//     const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
+
+//     // Step 1: Create order on backend
+//     const { data: order } = await axios.post("http://localhost:3002/razorpay/create-subscription-order", {
+//       amount: finalPrice,
+//       currency: "INR", // 🔹 you can make this dynamic based on country
+//     });
+
+//     // Step 2: Open Razorpay checkout
+//     const options = {
+//       key: "YOUR_RAZORPAY_KEY_ID", // 🔹 Replace with your Razorpay Test Key
+//       amount: order.amount,
+//       currency: order.currency,
+//       name: "Bajol Matrimony",
+//       description: `${planName} Plan Subscription`,
+//       order_id: order.id,
+//       handler: async function (response: any) {
+//         // Step 3: Verify payment with backend
+//         const verifyRes = await axios.post("http://localhost:3002/razorpay/create-subscription-order", response);
+//         if (verifyRes.data.success) {
+//           alert("✅ Payment Successful! Plan Activated");
+//           console.log({
+//             country: country ?? "Not selected",
+//             plan: planName,
+//             price: finalPrice,
+//           });
+//         } else {
+//           alert("❌ Payment Verification Failed");
+//         }
+//       },
+//       prefill: {
+//         name: "User Name",
+//         email: "user@example.com",
+//         contact: "9876543210",
+//       },
+//       theme: {
+//         color: "#0d6efd",
+//       },
+//     };
+
+//     const rzp = new window.Razorpay(options);
+//     rzp.open();
+//   } catch (error) {
+//     console.error("Payment Error:", error);
+//   }
+// };

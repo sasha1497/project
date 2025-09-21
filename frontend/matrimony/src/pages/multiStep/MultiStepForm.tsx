@@ -45,29 +45,58 @@ export default function App() {
     setCurrentStep((prev) => prev - 1);
   };
 
+  // const onSubmit = async (data: any) => {
+  //   dispatch(updateFormData(data)); // Save latest step data
+
+  //   try {
+  //     const result = await submitForm({ ...formState, ...data });
+
+  //     console.log('Submission success:', result);
+
+  //     if (result) {
+  //       toast.success(result?.data?.message, {
+  //         autoClose: 500, // Toast duration
+  //         onClose: () => navigate('/'), // Navigate after toast disappears
+  //       });
+  //     } else {
+  //       toast.error('Something went wrong. Please try again.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Submission failed:', error);
+  //     toast.error('Registration failed. Please try again later.');
+  //   }
+  // };
+
   const onSubmit = async (data: any) => {
-    dispatch(updateFormData(data)); // Save latest step data
+  dispatch(updateFormData(data)); // Save latest step data
 
-    try {
-      const result = await submitForm({ ...formState, ...data });
+  try {
+    const result = await submitForm({ ...formState, ...data });
 
-      console.log('Submission success:', result);
+    console.log('Submission success:', result);
 
-      if (result) {
-        toast.success(result?.data?.message, {
-          autoClose: 500, // Toast duration
-          onClose: () => navigate('/'), // Navigate after toast disappears
-        });
-      } else {
-        toast.error('Something went wrong. Please try again.');
-      }
-    } catch (error) {
-      console.error('Submission failed:', error);
-      toast.error('Registration failed. Please try again later.');
+    if (result?.data?.message) {
+      toast.success(result.data.message, {
+        autoClose: 500,
+        onClose: () => navigate('/'),
+      });
+    } else {
+      toast.error('Mobile number already exists. Please use a new number');
     }
-  };
+  } catch (error: any) {
+    console.error('Submission failed:', error);
 
+    // Extract error message safely from API response
+    const errorMessage =
+      error?.response?.data?.message || // from axios-like response
+      error?.message ||                // fallback
+      'Registration failed. Please try again later.';
 
+    toast.error(errorMessage, {
+      autoClose: 2000,
+    });
+  }
+};
 
   //   logout
   //   const handleLogout = () => {
@@ -86,8 +115,8 @@ export default function App() {
               <CurrentComponent methods={methods} />
               <div className="d-flex justify-content-between mt-4">
                 {currentStep > 0 && (
-                  <button type="button" className="btn btn-secondary" onClick={handleBack}>
-                    Back
+                  <button type="button" className="btn btn-secondary px-4 mt-3 mx-0" onClick={handleBack}>
+                   ← Back
                   </button>
                 )}
                 <button type="submit" className="btn btn-primary ms-auto">

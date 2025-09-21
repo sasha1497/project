@@ -21,7 +21,8 @@ const Step2: React.FC<Props> = ({ methods }) => {
                     {...register('country', { required: 'country is required' })}
                     style={{ width: '100%', padding: '8px', marginTop: '4px' }}
                 >
-                    <option value="">You can select your interest country to get Bride / Groom </option>
+                    {/* <option value="">You can select your interest country to get Bride / Groom </option> */}
+                    <option value="">select your country</option>
                     <option value="India">India</option>
                     <option value="USA">USA</option>
                     <option value="England">England</option>

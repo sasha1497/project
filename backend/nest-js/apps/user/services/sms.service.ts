@@ -28,7 +28,7 @@ export class SMSService {
         const otp = this.generateOTP();
         otpStore[mobile] = {
             otp,
-            expiry: Date.now() + 30 * 1000, // 30 seconds expiry
+            expiry: Date.now() + 60 * 1000, // 1 minute expiry
         };
 
         const messageText = `Your Bajol OTP is - ${otp}`;

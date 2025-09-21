@@ -65,6 +65,9 @@ import otpReducer from '../features/otp/otpSlice'
 
 // ✅ New import
 import { otpApi } from '../features/otp/otpApi';
+import viewReducer from '../features/view/viewSlice';
+import { viewApi } from '../features/view/viewApi';
+
 
 export const store = configureStore({
   reducer: {
@@ -76,13 +79,16 @@ export const store = configureStore({
     profileUIEdit: profileUIEditReducer,
     editForm: editFormReducer,
     otp: otpReducer,
+    view: viewReducer,
 
     [authApi.reducerPath]: authApi.reducer,
     [formApi.reducerPath]: formApi.reducer,
     [imageApi.reducerPath]: imageApi.reducer,
     [profileApi.reducerPath]: profileApi.reducer,
     [editFormApi.reducerPath]: editFormApi.reducer,
-    [otpApi.reducerPath]: otpApi.reducer, // ✅ Add here
+    [otpApi.reducerPath]: otpApi.reducer,
+    [viewApi.reducerPath]: viewApi.reducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -91,7 +97,8 @@ export const store = configureStore({
       imageApi.middleware,
       profileApi.middleware,
       editFormApi.middleware,
-      otpApi.middleware // ✅ Add here
+      otpApi.middleware,
+      viewApi.middleware,
     ),
 });
 

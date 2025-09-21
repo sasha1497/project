@@ -13,33 +13,36 @@ import ViewProfilePopup from "./components/popup/Profileview/ViewProfilePopup";
 
 const Profile = () => {
 
-    const userId = useSelector((state:any) => state.auth.user?.id);
-    const { data, isLoading, error } = useGetUserProfileQuery(userId);
+  const userId = useSelector((state: any) => state.auth.user?.id);
+  const { data, isLoading, error } = useGetUserProfileQuery(userId);
 
-      const showPopup = useSelector((state: any) => state.profileUi.showViewPopup);
+  const showPopup = useSelector((state: any) => state.profileUi.showViewPopup);
 
 
-    if (isLoading) return <Loader/>;
-   
-    
-    console.log(data,'data+++');
+  if (isLoading) return <Loader />;
 
-    return (
-        <>  
-          {
-            showPopup && <ViewProfilePopup/>
-          }
-          
-            <div className="container-fluid">
-                 {/* <h2>Welcome, {data?.name}</h2> */}
-                {/* <p className="mt-3 profile_text">New Profile Matches</p> */}
-                {/* <ProfileImageCarousel /> */}
-                <Plan country={data?.country} />
-                <UploadProfile />
-                <ViewProfile />
-            </div>
-        </>
-    )
+
+  console.log(data, 'data+++');
+
+  return (
+    <>
+      {
+        showPopup && <ViewProfilePopup />
+      }
+
+      <div className="container-fluid">
+        {data?.hasPayments ? (
+          data?.imageData.length > 0 ? (
+            <>
+              <ViewProfile />
+            </>
+          ) : <UploadProfile />
+        ) : (
+          <Plan country={data?.country} />
+        )}
+      </div>
+    </>
+  )
 }
 
 export default React.memo(Profile);

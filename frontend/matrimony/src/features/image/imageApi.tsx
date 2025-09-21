@@ -4,16 +4,23 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const imageApi = createApi({
   reducerPath: 'imageApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:3002',
+    baseUrl: process.env.REACT_APP_API_BASE_URL,
   }),
   endpoints: (builder) => ({
-    uploadImages: builder.mutation<any, FormData>({
-      query: (formData) => ({
-        url: '/upload/user/dp/1', // Adjust endpoint if needed
-        method: 'POST',
-        body: formData,
-      }),
-    }),
+    // uploadImages: builder.mutation<any, any>({
+    //   query: ({ formData, userId }) => ({
+    //     url: `/upload/user/dp/${userId}`,
+    //     method: 'POST',
+    //     body: formData,
+    //   }),
+    // }),
+    uploadImages: builder.mutation<any, { formData: FormData; userId: string }>({
+  query: ({ formData, userId }) => ({
+    url: `/upload/user/dp/${userId}`,
+    method: 'POST',
+    body: formData,
+  }),
+}),
   }),
 });
 

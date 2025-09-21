@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import './uploadprofile.css';
 import { useUploadImagesMutation } from '../../../../features/image/imageApi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { resetImages, addImage } from '../../../../features/image/imageslice';
 
 const UploadProfile: React.FC = () => {
@@ -28,6 +28,9 @@ const UploadProfile: React.FC = () => {
     setImages(images.filter((_, i) => i !== index));
   };
 
+   const userId = useSelector((state:any) => state.auth.user?.id);
+   console.log(userId,'ioioioioioi');
+   
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -42,7 +45,7 @@ const UploadProfile: React.FC = () => {
     });
 
     try {
-      const result = await uploadImages(formData).unwrap();
+      const result = await uploadImages({ formData, userId }).unwrap();
 
       // Assuming the API returns uploaded image URLs
       if (result?.uploadedUrls && Array.isArray(result.uploadedUrls)) {

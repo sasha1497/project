@@ -26,44 +26,44 @@ export class StorageService {
     }
 
     // get file from s3 buckets to preview
-    async getFileAsResponse(response, companyId, path, fileName, useSharp = false, thumbScale: any = false, extension = null, isAws = false) {
+    async getFileAsResponse(response, userId, path, fileName, useSharp = false, thumbScale: any = false, extension = null, isAws = false) {
         const clientSerRef = isAws ? this.s3SerRef : this.clientSerRef;
-        await clientSerRef.getFileAsResponse(response, companyId, path, fileName, useSharp, thumbScale, extension);
+        await clientSerRef.getFileAsResponse(response, userId, path, fileName, useSharp, thumbScale, extension);
     }
 
     // copy file from s3 buckets to actual paths
-    async copyToCompanyBucket(companyId: string, fromPath: string, filename: string, toPath: string) {
-        return this.clientSerRef.copyFile(companyId, fromPath, filename, toPath);
+    async copyToCompanyBucket(userId: string, fromPath: string, filename: string, toPath: string) {
+        return this.clientSerRef.copyFile(userId, fromPath, filename, toPath);
     }
 
     // delete file from s3 buckets
-    async deleteFile(companyId, path, fileName) {
-        return this.clientSerRef.deleteFile(companyId, path, fileName);
+    async deleteFile(userId, path, fileName) {
+        return this.clientSerRef.deleteFile(userId, path, fileName);
     }
 
     // move file from s3 buckets to actual paths
-    async movetoCompanyBucket(companyId, fromPath, value, actualPath) {
-        return this.clientSerRef.putFile(companyId, fromPath, value, actualPath);
+    async movetoCompanyBucket(userId, fromPath, value, actualPath) {
+        return this.clientSerRef.putFile(userId, fromPath, value, actualPath);
     }
 
     // get object form s3 bucket
-    async getObjectFromS3(companyId, path, filename) {
-        return this.clientSerRef.getObjectFromS3(companyId, path, filename);
+    async getObjectFromS3(userId, path, filename) {
+        return this.clientSerRef.getObjectFromS3(userId, path, filename);
     }
 
     // get file url form s3 bucket
-    async getFileUrl(companyId, path, file) {
-        return this.clientSerRef.getFileUrl(companyId, path, file);
+    async getFileUrl(userId, path, file) {
+        return this.clientSerRef.getFileUrl(userId, path, file);
     }
 
     // remove file form s3 bucket
-    async removeFromCompanyBucket(companyId, path, file) {
-        return this.clientSerRef.removeFromCompanyBucket(companyId, path, file);
+    async removeFromCompanyBucket(userId, path, file) {
+        return this.clientSerRef.removeFromCompanyBucket(userId, path, file);
     }
 
     //check file exits in s3 bucket
-    async isFileExists(companyId, key) {
-        return this.clientSerRef.isFileExists(companyId, key);
+    async isFileExists(userId, key) {
+        return this.clientSerRef.isFileExists(userId, key);
     }
 
     async listObjects() {

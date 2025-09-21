@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import * as sharp from 'sharp';
-// import { isSupportedFormat, resHeader } from '../helpers/file';
-const Minio = require('minio');
+import * as Minio from 'minio';
+import * as fs from 'fs';
 
 @Injectable()
 export class MinioService {
@@ -9,229 +8,93 @@ export class MinioService {
     bucket = process.env.BUCKET_PREFIX;
     masterBucket = process.env.BUCKET_MASTER;
 
-
-
     constructor() {
+        const useSSL = process.env.S3_SSL === "1";
 
-        const Minio = require('minio')
-        let value = process.env.S3_SSL == "1";
-        let minioClient = {
-            endPoint: process.env.MINIO_S3_ENDPOINT,
-            useSSL: value,
-            accessKey: process.env.MINIO_S3_KEY,
-            secretKey: process.env.MINIO_S3_SECRET
-        }
-        if (!value) {
-            minioClient['port'] = 9000;
+        if (!process.env.MINIO_S3_ENDPOINT) {
+            throw new Error("MINIO_S3_ENDPOINT environment variable is not set");
         }
 
-        this.client = new Minio.Client(minioClient);
+        this.client = new Minio.Client({
+            endPoint: process.env.MINIO_S3_ENDPOINT, // guaranteed string
+            port: useSSL ? undefined : 9000,
+            useSSL,
+            accessKey: process.env.MINIO_S3_KEY || "",
+            secretKey: process.env.MINIO_S3_SECRET || ""
+        });
+
     }
 
-
-    async upload(file, toPath, fileName, mimetype, id) {
-
+    async upload(file, toPath, fileName, mimetype, userId) {
         const metaData = { 'Content-Type': mimetype };
-
-        const bucket = this.bucket;
-
         return new Promise((resolve, reject) => {
-            this.client.putObject(bucket, toPath + '/' + id + '/' + fileName, file, metaData, (err, etag) => {
+            this.client.putObject(this.bucket, `${userId}/${toPath}/${fileName}`, file, metaData, (err, etag) => {
                 if (err) return reject(err);
-                resolve(toPath + '/' + fileName);
+                resolve(`${userId}/${toPath}/${fileName}`);
             });
         });
     }
 
     async getSignedUrl(filePath: string): Promise<string> {
-        console.log(filePath,"<---file path");
-        
-        const bucket = this.bucket;
         return new Promise((resolve, reject) => {
-            this.client.presignedGetObject(bucket, filePath, 24 * 60 * 60, (err, url) => {
+            this.client.presignedGetObject(this.bucket, filePath, 24 * 60 * 60, (err, url) => {
                 if (err) return reject(err);
                 resolve(url);
             });
         });
     }
 
-
-
-    async createBucketIfNotExists(companyId) {
-        const bucketName = this.bucket + companyId;
-        const exists = await this.client.bucketExists(bucketName);
-        if (!exists) {
-            await this.client.makeBucket(bucketName);
-        }
+    async getFileAsResponse(response, userId, path, fileName) {
+        const key = `${userId}/${path}/${fileName}`;
+        this.client.getObject(this.bucket, key, (err, stream) => {
+            if (err) return response.status(404).send('Not found');
+            stream.pipe(response);
+        });
     }
 
-    async getFileAsResponse(response, companyId, path, fileName, useSharp = false, thumbScale: any = false, extension = null) {
+    async copyFile(userId: string, fromPath: string, filename: string, toPath: string) {
+        const copySource = `${this.bucket}/${userId}/${fromPath}/${filename}`;
+        const key = `${userId}/${toPath}/${filename}`;
+        await this.client.copyObject(this.bucket, key, copySource);
+        return filename;
+    }
 
+    async putFile(userId: string, fromPath: string, filename: string, toPath: string) {
+        await this.client.fPutObject(this.bucket, `${userId}/${toPath}/${filename}`, `${fromPath}${filename}`);
+        return filename;
+    }
+
+    async deleteFile(userId: string, path: string, fileName: string) {
+        await this.client.removeObject(this.bucket, `${userId}/${path}/${fileName}`);
+    }
+
+    async getFileUrl(userId: string, path: string, filename: string) {
+        return await this.getSignedUrl(`${userId}/${path}/${filename}`);
+    }
+
+    async removeFromCompanyBucket(userId: string, path: string, oldValue: string) {
+        await this.client.removeObject(this.bucket, `${userId}/${path}${oldValue}`);
+        return { status: "success", message: "removed_successfully" };
+    }
+
+    async isFileExists(userId: string, key) {
         try {
-
-            let key = `${String(path)}/${fileName}`;
-            let bucket = companyId === 'master' ? this.masterBucket : this.bucket + companyId;
-            const stat = await this.client.statObject(bucket, key);
-
-            this.client.getObject(bucket, key, async (err, dataStream) => {
-                if (err) {
-                    console.error(err.message);
-                    response.status(404).send('Error: 404 - Not found');
-                    return;
-                }
-
-                dataStream.on('error', (streamErr) => {
-                    console.error(streamErr.message);
-                    response.status(500).send('Error: 500 - Internal Server Error');
-                });
-
-                if (!extension) {
-                    const fileNameStr = fileName ? String(fileName) : "";
-                    // extension = fileNameStr.split('.').pop()?.toLowerCase() || null;
-                }
-                // useSharp = extension ? isSupportedFormat(extension) : false;
-
-                if (useSharp) {
-                    const chunks = [];
-                    dataStream.on('data', chunk => {
-                        // chunks.push(chunk);
-                    });
-
-                    dataStream.on('end', async () => {
-                        const buffer = Buffer.concat(chunks);
-                        // const processedImage = await sharp(buffer)
-                        // .resize({ width: constants.thumbScale[thumbScale], height: constants.thumbScale[thumbScale] })
-                        //     .toBuffer();
-                        // // response = resHeader('image/jpeg', response);
-                        // response.send(processedImage);
-                    });
-                } else {
-                    // response = resHeader(stat.metaData['content-type'], response);
-                    dataStream.pipe(response);
-                }
-            });
-        } catch (err) {
-            console.error(err.message);
-            response.status(404).send('Error: 404 - Not found');
-        }
-    }
-
-    async copyFile(companyId: string, fromPath: string, filename: string, toPath: string) {
-        const bucketName = companyId === 'master' ? this.masterBucket : this.bucket + companyId;
-        await this.createBucketIfNotExists(bucketName);
-        const uniqueFileName = await this.getUniqueFileName(bucketName, toPath, filename);
-        const copySource = bucketName + '/' + fromPath + '/' + filename;
-        toPath = toPath.replace(/\/+/g, "/");
-        fromPath = fromPath.replace(/\/+/g, "/");
-        await this.client.copyObject(bucketName, toPath + '/' + uniqueFileName, copySource);
-
-        return uniqueFileName;
-    }
-
-    async getUniqueFileName(companyId, path, filename, i = 0) {
-        const bucket = this.bucket + companyId
-        // isFileExists - checks if the file already exists at s3 bucket
-        let isFileExists = await this.isFileExists(bucket, path + filename);
-        if (!isFileExists) {
-            return filename;
-        } else {
-            filename = i + '_' + filename;
-            return await this.getUniqueFileName(bucket, path, filename, i++);
-        }
-    }
-
-
-    async isFileExists(companyId, key) {
-        try {
-            const stat = await this.client.statObject(this.bucket + companyId, key)
-            return stat;
+            await this.client.statObject(this.bucket, `${userId}/${key}`);
+            return true;
         } catch (e) {
             return false;
         }
     }
 
-    public async deleteFile(companyId: string, path: string, fileName: string): Promise<void> {
-        try {
-            const bucket = companyId === 'master' ? this.masterBucket : this.bucket + companyId;
-            await this.client.removeObject(bucket, path + '/' + fileName);
-        } catch (error) {
-            console.error('Error deleting file:', error);
-            throw error;
-        }
-    }
-
-    async putFile(companyId: string, fromPath: string, filename: string, toPath: string) {
-
-        const bucketName = this.bucket + companyId;
-        // S3 Bucket Creation
-        await this.createBucketIfNotExists(bucketName);
-        // getUniqueFileName - checks for the file has unique name
-        let uniqueFileName = await this.getUniqueFileName(bucketName, toPath, filename);
-        // fPutObject - move the object to the s3 bucket 
-        await this.client.fPutObject(bucketName, toPath + uniqueFileName, fromPath + filename);
-
-        return uniqueFileName;
-
-    }
-
-    async getFileUrl(companyId, path, filename) {
-        let fileUrl = await this.client.presignedUrl('GET', this.bucket + companyId, path + '/' + filename);
-        return fileUrl;
-    }
-
-    async removeFromCompanyBucket(companyId, actualPath, oldValue) {
-        try {
-            await this.client.removeObject(this.bucket + companyId, actualPath + oldValue)
-            return {
-                status: "success",
-                message: "removed_successfully",
-            }
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
-    public async getObjectFromS3(companyId: string, path: string, fileName: string) {
-        try {
-            let size = 0;
-            const chunks = [];
-
-            const bucket = companyId === 'master' ? this.masterBucket : this.bucket + companyId;
-
-            return new Promise(async (resolve, reject) => {
-                try {
-                    // Downloads an object as a stream from s3
-                    const dataStream = await this.client.getObject(bucket, path + fileName);
-
-                    dataStream.on('data', function (chunk) {
-                        size += chunk.length;
-                        // chunks.push(chunk);
-                    });
-
-                    dataStream.on('end', function () {
-                        console.log('End. Total size = ' + size);
-                        const buffer = Buffer.concat(chunks, size);
-                        resolve(buffer);
-                    });
-
-                    //handles the error
-                    dataStream.on('error', function (err) {
-                        console.log(err);
-                        reject(err);
-                    });
-
-                    return resolve;
-                } catch (error) {
-                    console.log('Error downloading file:', error);
-                    reject(error);
-                }
+    public async getObjectFromS3(userId: string, path: string, fileName: string): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            this.client.getObject(this.bucket, `${userId}/${path}${fileName}`, (err, stream) => {
+                if (err) return reject(err);
+                const chunks: Buffer[] = [];
+                stream.on('data', chunk => chunks.push(chunk));
+                stream.on('end', () => resolve(Buffer.concat(chunks)));
+                stream.on('error', e => reject(e));
             });
-        } catch (error) {
-            throw error;
-        }
+        });
     }
-
-
-
 }

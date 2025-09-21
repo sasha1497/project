@@ -12,22 +12,15 @@ export class UserController {
   /******************** CREATE USER ****************************/
   @Post('save')
   async createUser(@Body() data: any) {
-    const result = await this.userService.upsertUser(null, data);
-    return {
-      message: 'User created successfully',
-      data: result,
-    };
+    return await this.userService.upsertUser(null, data);
   }
 
   /******************** UPDATE USER ****************************/
   @Post('update/:id')
   async updateUser(@Param('id') id: string, @Body() data: any) {
-    const result = await this.userService.upsertUser(id, data);
-    return {
-      message: 'User updated successfully',
-      data: result,
-    };
+    return await this.userService.upsertUser(id, data);
   }
+
 
   /******************** LOGIN ****************************/
   @Post('login')

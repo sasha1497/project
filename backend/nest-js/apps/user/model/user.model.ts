@@ -51,6 +51,8 @@ export class UserModel {
         if (filter.gender) query.where('users.gender', filter.gender);
         if (filter.age) query.where('users.age', filter.age);
         if (filter.religion) query.where('users.religion', filter.religion);
+        if (filter.country) query.where('users.country', filter.country);
+
 
         // Global search
         if (search) {
@@ -59,6 +61,7 @@ export class UserModel {
                     .orWhere('users.id', 'like', `%${search}%`)
                     .orWhere('users.name', 'like', `%${search}%`)
                     .orWhere('users.phone_number', 'like', `%${search}%`)
+                    .orWhere('users.state', 'like', `%${search}%`)
                     .orWhere('users.email', 'like', `%${search}%`);
             });
         }

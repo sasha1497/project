@@ -73,8 +73,6 @@ export class UserService {
       })
     );
 
-    console.log(detailedData, "detailedData");
-
     return detailedData;
   }
 

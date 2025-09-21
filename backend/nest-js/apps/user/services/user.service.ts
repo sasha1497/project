@@ -211,7 +211,7 @@ export class UserService {
     // Build image metadata list
     return await Promise.all(
       imageKeys.map(async (fileName) => {
-        const filePath = `users/${userId}/${fileName}`;
+        const filePath = `${userId}/users/${fileName}`;
         const url = await this.storageSerRef.getImageUrl(filePath);
 
         const dateMatch = fileName.match(/\d{4}-\d{2}-\d{2}/);

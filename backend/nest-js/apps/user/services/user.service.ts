@@ -78,65 +78,6 @@ export class UserService {
 
 
   /******************** GET USER DATA ****************************/
-
-  // async getUserData(id: string) {
-  //   // Get user info
-  //   const user: any = await this.mcurdSerRef.get('*', 'users', { id });
-  //   if (!user) throw new BadRequestException('User not found');
-
-  //   // Get payments
-  //   const payments: any = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
-  //   const paymentsData = Array.isArray(payments) ? payments : payments ? [payments] : [];
-  //   const hasPayments = paymentsData.length > 0;
-
-  //   // Payment expiry info (can be null if no payments)
-  //   let paymentExpiryInfo: {
-  //     message: string;
-  //     remainingDays: number;
-  //     expired: boolean;
-  //   } | null = null;
-
-  //   if (hasPayments) {
-  //     // Get latest payment
-  //     const latestPayment = paymentsData.sort(
-  //       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  //     )[0];
-
-  //     const createdAt = new Date(latestPayment.created_at);
-  //     const now = new Date();
-
-  //     // Calculate difference in days
-  //     const diffDays = Math.floor((now.getTime() - createdAt.getTime()) / 1000 / 60 / 60 / 24);
-  //     const totalValidityDays = 90; // total expiry days
-  //     const remainingDays = totalValidityDays - diffDays;
-
-  //     if (remainingDays > 0) {
-  //       paymentExpiryInfo = {
-  //         message: `Your payment will expire in ${remainingDays} day(s)`,
-  //         remainingDays,
-  //         expired: false,
-  //       };
-  //     } else {
-  //       paymentExpiryInfo = {
-  //         message: `Your payment has expired`,
-  //         remainingDays: 0,
-  //         expired: true,
-  //       };
-  //     }
-  //   }
-
-  //   // Get user images
-  //   const imageData = await this.parseUserImages(id, user.photo);
-
-  //   // Return full user data
-  //   return {
-  //     ...user,
-  //     hasPayments,
-  //     paymentExpiryInfo,
-  //     imageData,
-  //   };
-  // }
-
   async getUserData(id: string) {
     // Get user info
     const user: any = await this.mcurdSerRef.get('*', 'users', { id });
@@ -150,7 +91,7 @@ export class UserService {
     // Payment expiry info (can be null if no payments)
     let paymentExpiryInfo: {
       message: string;
-      remainingMinutes: number;
+      remainingDays: number;
       expired: boolean;
     } | null = null;
 
@@ -163,21 +104,21 @@ export class UserService {
       const createdAt = new Date(latestPayment.created_at);
       const now = new Date();
 
-      // For testing: total validity = 5 minutes
-      const totalValidityMinutes = 5;
-      const diffMinutes = Math.floor((now.getTime() - createdAt.getTime()) / 1000 / 60);
-      const remainingMinutes = totalValidityMinutes - diffMinutes;
+      // Calculate difference in days
+      const diffDays = Math.floor((now.getTime() - createdAt.getTime()) / 1000 / 60 / 60 / 24);
+      const totalValidityDays = 90; // total expiry days
+      const remainingDays = totalValidityDays - diffDays;
 
-      if (remainingMinutes > 0) {
+      if (remainingDays > 0) {
         paymentExpiryInfo = {
-          message: `Your payment will expire in ${remainingMinutes} minute(s)`,
-          remainingMinutes,
+          message: `Your payment will expire in ${remainingDays} day(s)`,
+          remainingDays,
           expired: false,
         };
       } else {
         paymentExpiryInfo = {
           message: `Your payment has expired`,
-          remainingMinutes: 0,
+          remainingDays: 0,
           expired: true,
         };
       }
@@ -194,8 +135,6 @@ export class UserService {
       imageData,
     };
   }
-
-
 
   // ---------------- Private function ----------------
   private async parseUserImages(userId: string, rawPhotoData: any) {

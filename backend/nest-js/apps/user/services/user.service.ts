@@ -62,8 +62,22 @@ export class UserService {
 
   /******************** USER LIST ****************************/
   async listUsers(payload: any) {
-    return await this.userModRef.list(payload);
+    // Get initial list of users
+    const { data }: any = await this.userModRef.list(payload);
+
+    // Fetch additional data for each user
+    const detailedData = await Promise.all(
+      data.map(async (user: any) => {
+        const userDetails = await this.getUserData(user.id);
+        return { ...user, userDetails }; // merge user info with additional details
+      })
+    );
+
+    console.log(detailedData, "detailedData");
+
+    return detailedData;
   }
+
 
   /******************** GET USER DATA ****************************/
 

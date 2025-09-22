@@ -22,7 +22,7 @@ const Couples = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
-             ❤️ Alliances for Every Age | Bajol Matrimony ❤️
+                ❤️ Alliances for Every Age | Bajol Matrimony ❤️
             </motion.h2>
 
             <motion.div
@@ -55,7 +55,7 @@ const Couples = () => {
                     </div>
 
                     {/* Carousel Controls */}
-                    <button
+                    {/* <button
                         className="carousel-control-prev"
                         type="button"
                         data-bs-target="#couplesCarousel"
@@ -72,8 +72,24 @@ const Couples = () => {
                     >
                         <span className="carousel-control-next-icon custom-arrow" aria-hidden="true"></span>
                         <span className="visually-hidden">Next</span>
+                    </button> */}
+                    <button className="carousel-control-prev" type="button" data-bs-target="#couplesCarousel" data-bs-slide="prev">
+                        <i className="fa fa-chevron-left fs-1 text-primary"></i>
+                        <span className="visually-hidden">Previous</span>
+                    </button>
+                    <button className="carousel-control-next" type="button" data-bs-target="#couplesCarousel" data-bs-slide="next">
+                        <i className="fa fa-chevron-right fs-1 text-primary"></i>
+                        <span className="visually-hidden">Next</span>
                     </button>
                 </div>
+                <motion.h2
+                    className="text-center mb-2 fw-bold hero"
+                    initial={{ opacity: 0, y: -30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                >
+                    see more image
+                </motion.h2>
             </motion.div>
         </div>
     );

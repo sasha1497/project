@@ -83,12 +83,12 @@ const Couples = () => {
                     </button>
                 </div>
                 <motion.h2
-                    className="text-center mb-2 fw-bold hero"
+                    className="text-center mb-2 fw-bold hero mt-2"
                     initial={{ opacity: 0, y: -30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    see more image
+                    See more photos touch on the photo more see
                 </motion.h2>
             </motion.div>
         </div>

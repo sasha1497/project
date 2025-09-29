@@ -22,6 +22,9 @@ import { useSubmitFormMutation } from '../../features/form/formApi';
 import { logout } from '../../features/auth/authSlice';
 import Loader from '../../components/loader/loader';
 
+import logo from '../../asset/bajollogo.jpeg';
+
+
 const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9];
 
 export default function App() {
@@ -45,82 +48,60 @@ export default function App() {
     setCurrentStep((prev) => prev - 1);
   };
 
-  // const onSubmit = async (data: any) => {
-  //   dispatch(updateFormData(data)); // Save latest step data
-
-  //   try {
-  //     const result = await submitForm({ ...formState, ...data });
-
-  //     console.log('Submission success:', result);
-
-  //     if (result) {
-  //       toast.success(result?.data?.message, {
-  //         autoClose: 500, // Toast duration
-  //         onClose: () => navigate('/'), // Navigate after toast disappears
-  //       });
-  //     } else {
-  //       toast.error('Something went wrong. Please try again.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Submission failed:', error);
-  //     toast.error('Registration failed. Please try again later.');
-  //   }
-  // };
-
   const onSubmit = async (data: any) => {
-  dispatch(updateFormData(data)); // Save latest step data
+    dispatch(updateFormData(data)); // Save latest step data
 
-  try {
-    const result = await submitForm({ ...formState, ...data });
+    try {
+      const result = await submitForm({ ...formState, ...data });
 
-    console.log('Submission success:', result);
+      console.log('Submission success:', result);
 
-    if (result?.data?.message) {
-      toast.success(result.data.message, {
-        autoClose: 500,
-        onClose: () => navigate('/'),
+      if (result?.data?.message) {
+        toast.success(result.data.message, {
+          autoClose: 500,
+          onClose: () => navigate('/'),
+        });
+      } else {
+        toast.error('Mobile number already exists. Please use a new number');
+      }
+    } catch (error: any) {
+      console.error('Submission failed:', error);
+
+      // Extract error message safely from API response
+      const errorMessage =
+        error?.response?.data?.message || // from axios-like response
+        error?.message ||                // fallback
+        'Registration failed. Please try again later.';
+
+      toast.error(errorMessage, {
+        autoClose: 2000,
       });
-    } else {
-      toast.error('Mobile number already exists. Please use a new number');
     }
-  } catch (error: any) {
-    console.error('Submission failed:', error);
-
-    // Extract error message safely from API response
-    const errorMessage =
-      error?.response?.data?.message || // from axios-like response
-      error?.message ||                // fallback
-      'Registration failed. Please try again later.';
-
-    toast.error(errorMessage, {
-      autoClose: 2000,
-    });
-  }
-};
-
-  //   logout
-  //   const handleLogout = () => {
-  //   dispatch(logout());
-  //   navigate('/signup');
-  // };
+  };
 
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center vh-10">
-       {isLoading && <Loader />} {/* Show Loader when API is loading */}
+      {isLoading && <Loader />} {/* Show Loader when API is loading */}
       <div className="card shadow" style={{ width: '400px' }}>
         <div className="card-body">
-          <h2 className="card-title text-center mb-4">Sign Up 👋</h2>
+          {/* <h2 className="card-title text-center mb-4">Sign Up 👋</h2> */}
+          <img
+            src={logo}
+            alt="Company Logo"
+            style={{ width: '120px' }}
+            className="d-block mx-auto"
+          />
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(currentStep === steps.length - 1 ? onSubmit : handleNext)}>
               <CurrentComponent methods={methods} />
               <div className="d-flex justify-content-between mt-4">
                 {currentStep > 0 && (
                   <button type="button" className="btn btn-secondary px-4 mt-3 mx-0" onClick={handleBack}>
-                   ← Back
+                    ← Back
                   </button>
                 )}
-                <button type="submit" className="btn btn-primary ms-auto">
-                  {currentStep === steps.length - 1 ? 'Submit' : 'Next'}
+                <button type="submit" className="btn btn-primary ms-auto blinking-btn">
+                  {currentStep === steps.length - 1 ? 'Now Submit →' : 'Next →'}
                 </button>
               </div>
             </form>

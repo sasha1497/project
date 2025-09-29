@@ -13,6 +13,9 @@ import { openViewPopup } from "../../features/profileui/profileUISlice";
 const Navbar = () => {
   const navigate = useNavigate(); // initialize it
 
+  const [showHelpTooltip, setShowHelpTooltip] = useState(false);
+
+
   const location = useLocation();
   const isSignupPage = location.pathname === '/signup';
   const isProfilePage = location.pathname === '/profile'
@@ -22,10 +25,16 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-  dispatch(logout()); // Clear Redux state
-  localStorage.removeItem('authToken'); // Remove token
-  navigate('/dashboard'); // Redirect
-};
+    dispatch(logout()); // Clear Redux state
+    localStorage.removeItem('authToken'); // Remove token
+    navigate('/dashboard'); // Redirect
+  };
+
+  const toggleHelpTooltip = () => {
+    setShowHelpTooltip(!showHelpTooltip);
+  };
+
+
 
 
 
@@ -61,23 +70,23 @@ const Navbar = () => {
                   <span className="mx-2">Welcome to Signup Page</span>
                 </>
               ) : (
-                  <div className="dropdown">
-                    <button
-                      className="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent"
-                      type="button"
-                      id="profileDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      <span className="mx-2 d-none d-sm-inline">{user && <span>Welcome, {user?.name}</span>}</span>
-                    </button>
+                <div className="dropdown">
+                  <button
+                    className="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent"
+                    type="button"
+                    id="profileDropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <span className="mx-2 d-none d-sm-inline">{user && <span>Welcome, {user?.name}</span>}</span>
+                  </button>
 
-                    <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                      <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
-                      <li><button className="dropdown-item">Delete Account</button></li>
-                      <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
-                    </ul>
-                  </div>
+                  <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                    <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
+                    <li><button className="dropdown-item">Delete Account</button></li>
+                    <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
+                  </ul>
+                </div>
                 // )
               )}
             </div>
@@ -86,19 +95,36 @@ const Navbar = () => {
               <span className="me-2">Already a member?</span>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-primary blinking-btn"
                 onClick={() => navigate("/signup")}
               >
-                Login
+                Now Login
               </button>
               <span className="mx-2">|</span>
-              <a
+              {/* <a
                 href="#"
                 className="text-dark text-decoration-none d-inline-flex align-items-center"
               >
                 Help
                 <span className="material-icons me-2 ml-5 jump-icon">contact_support</span>
-              </a>
+              </a> */}
+              <div className="position-relative">
+                <button
+                  type="button"
+                  className="btn btn-link text-dark text-decoration-none d-inline-flex align-items-center"
+                  onClick={toggleHelpTooltip}
+                >
+                  Help
+                  <span className="material-icons me-2 ms-1 jump-icon">contact_support</span>
+                </button>
+
+                {showHelpTooltip && (
+                  <div className="help-tooltip shadow-sm bg-white border rounded px-3 py-2 position-absolute" style={{ top: '120%', right: 0, zIndex: 999, border:'10px solid blue'}}>
+                    <div><strong>Support : 24 x 5</strong></div>
+                    <div>Email: <a href="mailto:support@bajolmatrimony.com">bajolonlinematrimony@gmail.com</a></div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

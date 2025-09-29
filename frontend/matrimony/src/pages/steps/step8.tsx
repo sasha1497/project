@@ -22,7 +22,7 @@ const Step8: React.FC<Props> = ({ methods }) => {
           <option value="brother">brother</option>
           <option value="son">son</option>
           <option value="daughter">daughter</option>
-
+          <option value="other">other</option>
         </select>
         {errors.person && <div className="invalid-feedback">{errors.person.message as string}</div>}
       </div>

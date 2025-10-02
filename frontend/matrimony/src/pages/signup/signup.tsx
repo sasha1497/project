@@ -506,11 +506,11 @@ const SignUp: React.FC = () => {
     <div className="container d-flex flex-column align-items-center justify-content-center vh-100">
       {isSignUp ? (
         <>
-          <MultiStepForm />
-          <div className="text-center mt-3 mb-3">
+        <div className="text-center mt-4 mb-3 bg-primary text-white p-2">
             <span>Already have an account? </span>
-            <button className="btn btn-link p-0" onClick={() => setIsSignUp(false)}>Sign In</button>
+            <button className="btn btn-link p-0 blinking-btn text-white" onClick={() => setIsSignUp(false)}>Sign In</button>
           </div>
+          <MultiStepForm />
         </>
       ) : (
         <div className="card shadow" style={{ width: '400px' }}>
@@ -544,7 +544,7 @@ const SignUp: React.FC = () => {
                 {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
               </div>
 
-              <button type="submit" className="btn btn-primary w-100 mb-2">Sign In</button>
+              <button type="submit" className="btn btn-primary w-100 mb-2 blinking-btn">Sign In</button>
             </form>
 
             <div className="text-center">

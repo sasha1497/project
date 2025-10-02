@@ -40,6 +40,8 @@ import Conclusion from '../pages/conclusion/conclusion';
 const AppRoutes = () => {
   const { pathname } = useLocation();
   const showLayout = ['/', '/dashboard', '/signup', '/profile' ].includes(pathname);
+  const showLayoutFooter = ['/', '/dashboard', '/signup' ].includes(pathname);
+
 
   return (
     <>
@@ -62,7 +64,7 @@ const AppRoutes = () => {
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {showLayout && <Footer />}
+      {showLayoutFooter && <Footer />}
     </>
   );
 };

@@ -72,13 +72,14 @@ const Navbar = () => {
               ) : (
                 <div className="dropdown">
                   <button
-                    className="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent"
+                    // className="btn btn-lg dropdown-toggle d-flex align-items-center border-0 bg-transparent text-primary"
+                    className="btn btn-lg dropdown-toggle d-flex align-items-center border-0 bg-transparent text-primary"
                     type="button"
                     id="profileDropdown"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <span className="mx-2 d-none d-sm-inline">{user && <span>Welcome, {user?.name}</span>}</span>
+                    <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome, {user?.name}</b></span>}</span>
                   </button>
 
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
@@ -93,6 +94,7 @@ const Navbar = () => {
           ) : (
             <div className="d-flex align-items-center justify-content-end parent-right-content">
               <span className="me-2">Already a member?</span>
+               <span className="me-2">then</span>
               <button
                 type="button"
                 className="btn btn-primary blinking-btn"

@@ -58,6 +58,9 @@ const UploadProfile: React.FC = () => {
       setSuccess('Images uploaded successfully!');
       console.log('Upload success:', result);
       setImages([]);
+        setTimeout(() => {
+      window.location.reload();
+    }, 1000);
     } catch (err: any) {
       console.error('Upload failed', err);
       setError('Upload failed. Please try again.');
@@ -107,7 +110,13 @@ const UploadProfile: React.FC = () => {
         <button type="submit" disabled={images.length < 3 || isLoading}>
           {isLoading ? 'Uploading...' : 'Submit'}
         </button>
+         <h3 className='blinking-btn mt-3 text-primary'>
+          {
+            isLoading && 'please wait'
+          }
+         </h3>
       </form>
+
     </motion.div>
   );
 };

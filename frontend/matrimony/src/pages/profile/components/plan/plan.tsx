@@ -213,6 +213,9 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         // response.razorpay_payment_id
         // response.razorpay_order_id
         // response.razorpay_signature
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       },
       modal: {
         ondismiss: function () {
@@ -231,19 +234,52 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
   return (
     <section className="pricing-plans container py-5">
       <div className="row justify-content-center g-4">
-        <motion.p
+        {/* <motion.p
           className="mt-3 text-center pro_text"
           initial={{ opacity: 0, y: -20 }}
           animate={{ y: [0, -10, 0], opacity: [1, 0.8, 1] }}
           transition={{ duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
         >
           🚀 Unlock your matches by upgrading your plan! 💖✨
+        </motion.p> */}
+         <p
+          className="mt-3 text-center pro_text"
+        >
+          🚀 Unlock your matches by upgrading your plan! 💖✨
+        </p>
+
+        {/* <motion.p
+          className="mt-3 text-center pro_text text-danger blinking-btn"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ y: [0, -10, 0], opacity: [1, 0.8, 1] }}
+          transition={{ duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
+        >
+          After payment you can go to profile gallery
+        </motion.p> */}
+        <motion.p
+          className="mt-3 text-center pro_text blinking-btn"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{
+            y: [0, -10, 0],
+            opacity: [1, 0.8, 1],
+            color: ['#ff0000', '#00ff00'], // red -> yellow -> green
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            repeatType: 'loop',
+            ease: 'easeInOut',
+          }}
+        >
+          * After payment you can go to profile gallery *
         </motion.p>
 
-        {plans.map((plan, index) => (
+
+
+        {plans.map((plan: any, index) => (
           <div key={index} className="col-md-6 col-lg-4">
             <div className="card h-100 bg-primary shadow pricing-card border-dark text-center position-relative">
-            {/* <div
+              {/* <div
               className={`card h-100 shadow pricing-card border-dark text-center position-relative`}
               style={{ backgroundColor: plan.bgColor }}
             > */}
@@ -255,7 +291,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                   <sub className="fs-6 text-white"> / 90 days</sub>
                 </h1>
                 <ul className="list-unstyled text-start mt-3 flex-grow-1">
-                  {plan.features.map((feature, idx) => (
+                  {plan.features.map((feature: any, idx: any) => (
                     <li key={idx} className="mb-2">
                       <i className="fa-solid fa-check me-2 text-light" />
                       <span className="text-light">{feature}</span>

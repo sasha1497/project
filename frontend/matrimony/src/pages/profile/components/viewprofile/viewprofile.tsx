@@ -1,203 +1,3 @@
-// import React, { useState } from 'react';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import './viewprofile.css';
-// import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
-
-// type ImageData = {
-//   name: string;
-//   url: string;
-//   date: string;
-// };
-
-// type UserDetails = {
-//   imageData: ImageData[];
-// };
-
-// type User = {
-//   id: number;
-//   name: string;
-//   userDetails: UserDetails;
-// };
-
-// const ViewProfile: React.FC = () => {
-//   const [selectedUser, setSelectedUser] = useState<any | null>(null);
-//   const [currentIndex, setCurrentIndex] = useState<number>(0);
-
-//   const payload: any = {
-//     page: 1,
-//     limit: 10,
-//     filter: {
-//       country: ''
-//     },
-//     search: ""
-//   };
-
-//   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
-
-//   if (isLoading) return <div>Loading...</div>;
-//   if (error) return <div>Error loading users.</div>;
-//   if (users.length === 0) return <div>No users found.</div>;
-
-//   // Handler for opening popup and resetting index
-//   const openUserImages = (user: User) => {
-//     setSelectedUser(user);
-//     setCurrentIndex(0);
-//   };
-
-//   // Next image with wrap-around
-//   const nextImage = () => {
-//     if (!selectedUser) return;
-//     setCurrentIndex((prevIndex) =>
-//       prevIndex === selectedUser.userDetails.imageData.length - 1 ? 0 : prevIndex + 1
-//     );
-//   };
-
-//   // Previous image with wrap-around
-//   const prevImage = () => {
-//     if (!selectedUser) return;
-//     setCurrentIndex((prevIndex) =>
-//       prevIndex === 0 ? selectedUser.userDetails.imageData.length - 1 : prevIndex - 1
-//     );
-//   };
-
-//   return (
-//     <div className="gallery-container">
-//       <h2 className="gallery-title">Image Gallery</h2>
-
-//       <div className="gallery-grid">
-//         {users.map((user: any) => {
-//           const firstImage = user?.userDetails?.imageData?.[0];
-//           if (!firstImage) return null;
-
-//           return (
-//             <motion.div
-//               key={user.id}
-//               className="gallery-card"
-//               whileHover={{ scale: 1.05, boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}
-//               onClick={() => openUserImages(user)}
-//             >
-//               <motion.img
-//                 src={firstImage.url}
-//                 alt={`Name: ${user.name}`}
-//                 className="gallery-image"
-//                 initial={{ opacity: 0 }}
-//                 animate={{ opacity: 1 }}
-//                 transition={{ duration: 0.5 }}
-//               />
-//               <div className="gallery-description">Name: {user.name}</div>
-//             </motion.div>
-//           );
-//         })}
-//       </div>
-
-//       {/* Popup for selected user images */}
-//       <AnimatePresence>
-//         {selectedUser && (
-//           <motion.div
-//             className="popup-overlay"
-//             initial={{ opacity: 0 }}
-//             animate={{ opacity: 1 }}
-//             exit={{ opacity: 0 }}
-//             onClick={() => setSelectedUser(null)}
-//           >
-//             <motion.div
-//               className="popup-content"
-//               initial={{ scale: 0.8 }}
-//               animate={{ scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }}
-//               exit={{ scale: 0.8 }}
-//               onClick={(e) => e.stopPropagation()}
-//               style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}
-//             >
-//               <div className="close-icon" onClick={() => setSelectedUser(null)}>
-//                 &times;
-//               </div>
-
-//               {/* Display current image */}
-//               <img
-//                 src={selectedUser.userDetails.imageData[currentIndex].url}
-//                 alt={selectedUser.userDetails.imageData[currentIndex].name}
-//                 className="popup-image"
-//                 style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px' }}
-//               />
-             
-
-//               <div className="view-profile-content">
-//                 <p><strong>Name :</strong> {selectedUser?.name}</p>
-//                 <p><strong>Age :</strong> {selectedUser?.age}</p>
-//                 <p><strong>Gender :</strong> {selectedUser?.gender}</p>
-//                 <p><strong>Height:</strong> {selectedUser?.height}</p>
-//                 <p><strong>Weight:</strong> {selectedUser?.weight}</p>
-//                 <p><strong>Caste:</strong> {selectedUser?.caste}</p>
-//                 <p><strong>Religion:</strong> {selectedUser?.religion}</p>
-//                 <p><strong>District:</strong> {selectedUser?.district}</p>
-//                 <p><strong>State:</strong> {selectedUser?.state}</p>
-//                 <p><strong>Country:</strong> {selectedUser?.country}</p>
-//                 <p><strong>Mobile:</strong> {selectedUser?.phone_number}</p>
-//                 <p><strong>Whatsapp:</strong> {selectedUser?.whatsapp}</p>
-//                 <p><strong>Job:</strong> {selectedUser?.job}</p>
-//                 <p><strong>Salary:</strong> {selectedUser?.monthlySalary}</p>
-//                 <p><strong>Marriage status:</strong> {selectedUser?.count}</p>
-//                 <p><strong>Whose marriage:</strong> {selectedUser?.person}</p>
-//               </div>
-
-
-
-//               {/* Navigation arrows */}
-//               <button
-//                 className="nav-arrow prev-arrow"
-//                 onClick={prevImage}
-//                 aria-label="Previous Image"
-//                 style={{
-//                   position: 'absolute',
-//                   top: '50%',
-//                   left: '10px',
-//                   transform: 'translateY(-50%)',
-//                   background: 'rgba(0,0,0,0.5)',
-//                   color: 'white',
-//                   border: 'none',
-//                   borderRadius: '50%',
-//                   width: '40px',
-//                   height: '40px',
-//                   cursor: 'pointer',
-//                   fontSize: '24px',
-//                   userSelect: 'none',
-//                 }}
-//               >
-//                 ‹
-//               </button>
-
-//               <button
-//                 className="nav-arrow next-arrow"
-//                 onClick={nextImage}
-//                 aria-label="Next Image"
-//                 style={{
-//                   position: 'absolute',
-//                   top: '50%',
-//                   right: '10px',
-//                   transform: 'translateY(-50%)',
-//                   background: 'rgba(0,0,0,0.5)',
-//                   color: 'white',
-//                   border: 'none',
-//                   borderRadius: '50%',
-//                   width: '40px',
-//                   height: '40px',
-//                   cursor: 'pointer',
-//                   fontSize: '24px',
-//                   userSelect: 'none',
-//                 }}
-//               >
-//                 ›
-//               </button>
-//             </motion.div>
-//           </motion.div>
-//         )}
-//       </AnimatePresence>
-//     </div>
-//   );
-// };
-
-// export default React.memo(ViewProfile);
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './viewprofile.css';
@@ -305,7 +105,22 @@ const ViewProfile: React.FC = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users.</div>;
-  if (users.length === 0) return <div>No users found.</div>;
+  if (users.length === 0) {
+    return (
+      <div className="no-users-container">
+        <div className="no-users-card">
+          <h3>No Users Found</h3>
+          <p>
+            We couldn’t find any matching users. Try adjusting your search or
+            filters.
+          </p>
+          <button className="retry-btn" onClick={() => window.location.reload()}>
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const openUserImages = (user: User) => {
     setSelectedUser(user);
@@ -328,14 +143,45 @@ const ViewProfile: React.FC = () => {
 
   return (
     <div className="gallery-container">
-      <h2 className="gallery-title">Image Gallery</h2>
+      {/* <h2 className="gallery-title text-primary ">Image Gallery</h2> */}
+      <motion.div
+        className="relative bg-primary text-white shadow-lg rounded-xl p-2 text-center max-w-2xl mx-auto mt-6 mb-3
+             ring-4 ring-blue-500/70"
+        initial={{ opacity: 0, y: -30, scale: 0.9, boxShadow: "0 0 10px rgba(59, 130, 246, 0.5)" }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          boxShadow: [
+            "0 0 10px rgba(59, 130, 246, 0.5)",
+            "0 0 20px rgba(59, 130, 246, 0.8)",
+            "0 0 30px rgba(59, 130, 246, 1)",
+            "0 0 20px rgba(59, 130, 246, 0.8)",
+            "0 0 10px rgba(59, 130, 246, 0.5)",
+          ],
+        }}
+        transition={{ duration: 2, repeat: Infinity, repeatType: "loop", ease: "easeInOut" }}
+      >
+        <h2 className="text-2xl font-bold text-blue-300 mb-2 drop-shadow-lg">
+         ✨📷 Image Gallery 📷✨
+        </h2>
+        {/* <p className="text-blue-100 text-sm">
+    Browse beautiful profiles and find your perfect match
+  </p> */}
+      </motion.div>
+
+
+
 
       {/* Search form */}
-      <form onSubmit={handleSearchSubmit} style={{ marginBottom: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+      <form
+        onSubmit={handleSearchSubmit}
+        className="custom-search-form"
+      >
         <select
           value={countryInput}
           onChange={(e) => setCountryInput(e.target.value)}
-          style={{ padding: '8px', fontSize: '14px', minWidth: '350px' }}
+          className="custom-input text-primary fw-bold"
           aria-label="Select Country"
         >
           <option value="">You can select your interest country to get Bride / Groom</option>
@@ -351,26 +197,15 @@ const ViewProfile: React.FC = () => {
           placeholder="Enter State"
           value={stateInput}
           onChange={(e) => setStateInput(e.target.value)}
-          style={{ padding: '8px', fontSize: '14px', minWidth: '350px' }}
+          className="custom-input text-primary placeholder-primary fw-bold "
           aria-label="State input"
         />
 
-        <button
-          type="submit"
-          style={{
-            padding: '8px 16px',
-            fontSize: '14px',
-            cursor: 'pointer',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            display: 'inline-block'
-          }}
-        >
-          Search
+        <button type="submit" className="custom-button">
+          🔍 Search
         </button>
       </form>
+
 
       <div className="gallery-grid">
         {users.map((user: any) => {
@@ -401,7 +236,7 @@ const ViewProfile: React.FC = () => {
       <AnimatePresence>
         {selectedUser && (
           <motion.div
-            className="popup-overlay"
+            className="popup-overlay mt-5"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

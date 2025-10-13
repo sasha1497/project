@@ -11,7 +11,7 @@ const Step6: React.FC<Props> = ({ methods }) => {
 
   return (
     <div className="mb-3">
-        <label className="form-label">which Marraige this for you ?</label>
+        <label className="form-label">which Number of Marraige you ?</label>
         <select
           className={`form-control ${errors.count ? 'is-invalid' : ''}`}
           {...register("count", { required: "marrige count is required" })}

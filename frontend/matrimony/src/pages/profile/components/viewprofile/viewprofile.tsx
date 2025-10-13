@@ -202,7 +202,7 @@ const ViewProfile: React.FC = () => {
           className="custom-input text-primary fw-bold"
           aria-label="Select Gender"
         >
-          <option value="">Select Gender</option>
+          <option value="">You can select your option</option>
           {genders.map((g) => (
             <option key={g} value={g.toLowerCase()}>
               {g}

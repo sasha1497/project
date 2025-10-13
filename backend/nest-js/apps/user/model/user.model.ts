@@ -22,12 +22,10 @@ export class UserModel {
                 'users.date_of_birth',
                 'users.age',
                 'users.person',
-                'users.height',
                 'users.job',
                 'users.mobile',
                 'users.whatsapp',
                 'users.monthlySalary',
-                'users.weight',
                 'users.religion',
                 'users.caste',
                 'users.mother_tongue',
@@ -52,6 +50,8 @@ export class UserModel {
         if (filter.age) query.where('users.age', filter.age);
         if (filter.religion) query.where('users.religion', filter.religion);
         if (filter.country) query.where('users.country', filter.country);
+        if (filter.state) query.where('users.state', filter.state);
+
 
 
         // Global search

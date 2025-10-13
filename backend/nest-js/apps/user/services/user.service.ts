@@ -4,6 +4,10 @@ import { UserModel } from '../model/user.model';
 import { McrudService } from '@app/main/services/mcurd.service';
 import { StorageService } from '@app/main/services/storage.service';
 import { MailService } from './mail.service';
+import * as jwt from 'jsonwebtoken';
+import { register } from 'module';
+const JWT_SECRET = process.env.JWT_SECRET as string;
+
 
 @Injectable()
 export class UserService {
@@ -46,7 +50,11 @@ export class UserService {
     } else {
       // Create new user
       const newId = await this.mcurdSerRef.create('users', payload, 'id');
-      result = { id: newId, ...payload };
+
+      const tokenPayload = { userId: newId.id };
+      const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '1h' });
+
+      result = { id: newId[0], ...payload,  token, register:true};
 
       // if (email && name) {
       //   this.mailSerRef.sendUserCreationMail(email, name).catch(err => {
@@ -61,20 +69,45 @@ export class UserService {
 
 
   /******************** USER LIST ****************************/
+  // async listUsers(payload: any) {
+  //   // Get initial list of users
+  //   const { data }: any = await this.userModRef.list(payload);
+
+  //   // Fetch additional data for each user
+  //   const detailedData = await Promise.all(
+  //     data.map(async (user: any) => {
+  //       const userDetails = await this.getUserData(user.id);
+  //       return { ...user, userDetails }; // merge user info with additional details
+  //     })
+  //   );
+
+  //   return detailedData;
+  // }
   async listUsers(payload: any) {
-    // Get initial list of users
-    const { data }: any = await this.userModRef.list(payload);
+  const { filter } = payload;
 
-    // Fetch additional data for each user
-    const detailedData = await Promise.all(
-      data.map(async (user: any) => {
-        const userDetails = await this.getUserData(user.id);
-        return { ...user, userDetails }; // merge user info with additional details
-      })
-    );
+  // Check if all filter values are empty
+  const isFilterEmpty = Object.values(filter).every((value: any) => !value || value === "");
 
-    return detailedData;
+  if (isFilterEmpty) {
+    // Return empty array if no filter is applied
+    return [];
   }
+
+  // Get initial list of users based on filter
+  const { data }: any = await this.userModRef.list(payload);
+
+  // Fetch additional data for each user
+  const detailedData = await Promise.all(
+    data.map(async (user: any) => {
+      const userDetails = await this.getUserData(user.id);
+      return { ...user, userDetails }; // merge user info with additional details
+    })
+  );
+
+  return detailedData;
+}
+
 
 
   /******************** GET USER DATA ****************************/

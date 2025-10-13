@@ -19,6 +19,8 @@ const Step9: React.FC<Props> = ({ methods }) => {
     <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
       {/* Password */}
       <span className='d-flex justify-content-center text-danger mb-3'>Please don't forget your password</span>
+      <p className='d-flex justify-content-center text-danger mb-3'>*Note your password anywhere*</p>
+
       <div style={{ marginBottom: '1rem' }}>
         <label htmlFor="password">Password</label>
         <div style={{ position: 'relative' }}>

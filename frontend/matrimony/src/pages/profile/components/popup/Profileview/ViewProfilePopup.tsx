@@ -56,7 +56,7 @@ const ViewProfilePopup = () => {
     },
   });
 
-    const [editForm] = useEditFormMutation();
+  const [editForm] = useEditFormMutation();
 
 
   // ✅ Prefill form when profile data is fetched
@@ -65,8 +65,8 @@ const ViewProfilePopup = () => {
       reset(data);
     }
   }, [data, reset]);
- 
-   const onSubmit = async (formData: any) => {
+
+  const onSubmit = async (formData: any) => {
     try {
       dispatch(startEdit());
 
@@ -145,25 +145,25 @@ const ViewProfilePopup = () => {
               </div>
 
               {/* Height */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">Height (cm)</label>
                 <input type="text" className="form-control" {...register("height",  { required: "height is required" })} />
                 {errors.height && <small className="text-danger">{errors.height.message}</small>}
 
-              </div>
+              </div> */}
 
               {/* Weight */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">Weight (kg)</label>
                 <input type="text" className="form-control" {...register("weight", {required: "weight is required" })} />
                 {errors.weight && <small className="text-danger">{errors.weight.message}</small>}
 
-              </div>
+              </div> */}
 
               {/* Job */}
               <div className="mb-3">
                 <label className="form-label">Job</label>
-                <input type="text" className="form-control" {...register("job", {required: "job is required" })} />
+                <input type="text" className="form-control" {...register("job", { required: "job is required" })} />
                 {errors.job && <small className="text-danger">{errors.job.message}</small>}
 
               </div>
@@ -171,7 +171,7 @@ const ViewProfilePopup = () => {
               {/* Monthly Salary */}
               <div className="mb-3">
                 <label className="form-label">Monthly Salary</label>
-                <input type="text" className="form-control" {...register("monthlySalary", {required: "monthlySalary is required"})} />
+                <input type="text" className="form-control" {...register("monthlySalary", { required: "monthlySalary is required" })} />
                 {errors.monthlySalary && <small className="text-danger">{errors.monthlySalary.message}</small>}
 
               </div>
@@ -341,7 +341,31 @@ const ViewProfilePopup = () => {
                 <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
                   Cancel
                 </button>
+                 {/* <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
+                  delete account
+                </button> */}
               </div>
+              {/* <div className="d-flex flex-column flex-md-row justify-content-end gap-2 mt-4">
+                <button type="submit" className="btn btn-primary px-4 mb-2 mb-md-0">
+                  Save Changes
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-danger px-4 mb-2 mb-md-0"
+                  onClick={() => dispatch(closeViewPopup())}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-danger px-4 mb-2 mb-md-0"
+                  onClick={() => dispatch(closeViewPopup())}
+                >
+                  Delete Account
+                </button>
+              </div> */}
             </form>
           </div>
         ) : (

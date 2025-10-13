@@ -17,7 +17,7 @@ const viewSlice = createSlice({
     },
     clearUsers: (state) => {
       state.users = [];
-    },
+    }
   },
 });
 

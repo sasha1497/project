@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
-import { updateFormData, resetForm } from '../../features/form/formSlice';
+import { updateFormData, resetForm, setTokens, setUse } from '../../features/form/formSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { motion } from "framer-motion";
+
 
 import Step1 from '../../pages/steps/step1';
 import Step2 from '../../pages/steps/step2';
@@ -12,7 +14,7 @@ import Step3 from '../../pages/steps/step3';
 import Step4 from '../../pages/steps/step4';
 import Step5 from '../../pages/steps/step5';
 import Step6 from '../../pages/steps/step6';
-import Step7 from '../../pages/steps/step7';
+// import Step7 from '../../pages/steps/step7';
 import Step8 from '../../pages/steps/step8';
 import Step9 from '../../pages/steps/step9';
 
@@ -25,7 +27,9 @@ import Loader from '../../components/loader/loader';
 import logo from '../../asset/bajollogo.jpeg';
 
 
-const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9];
+// const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9];
+const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step8, Step9];
+
 
 export default function App() {
   const methods = useForm();
@@ -54,12 +58,16 @@ export default function App() {
     try {
       const result = await submitForm({ ...formState, ...data });
 
-      console.log('Submission success:', result);
+      console.log('Submission success:', result?.data?.data);
+       
+       dispatch(setTokens(result?.data?.data?.token));
+       dispatch(setUse(result?.data?.data));
 
       if (result?.data?.message) {
+        
         toast.success(result.data.message, {
           autoClose: 500,
-          onClose: () => navigate('/'),
+          onClose: () => navigate('/profile'),
         });
       } else {
         toast.error('Mobile number already exists. Please use a new number');
@@ -79,17 +87,71 @@ export default function App() {
     }
   };
 
+//   const onSubmit = async (data: any) => {
+//   dispatch(updateFormData(data)); // Save latest step data
+
+//   try {
+//     const result = await submitForm({ ...formState, ...data });
+//     console.log('Submission success:', result);
+
+//     const response = result?.data;
+
+//     if (response?.message === 'User created successfully' && response?.data?.token) {
+//       // 🧠 Store token in localStorage
+//       localStorage.setItem('token', response?.data?.token);
+
+//       // Optionally store user info too
+//       localStorage.setItem('authUser', JSON.stringify(response?.data));
+
+//       toast.success(response.message, {
+//         autoClose: 800,
+//         onClose: () => navigate('/profile'),
+//       });
+//     } else if (response?.message) {
+//       toast.info(response.message);
+//     } else {
+//       toast.error('Mobile number already exists. Please use a new number');
+//     }
+//   } catch (error: any) {
+//     console.error('Submission failed:', error);
+
+//     const errorMessage =
+//       error?.response?.data?.message ||
+//       error?.message ||
+//       'Registration failed. Please try again later.';
+
+//     toast.error(errorMessage, {
+//       autoClose: 2000,
+//     });
+//   }
+// };
+
+
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center vh-10">
       {isLoading && <Loader />} {/* Show Loader when API is loading */}
       <div className="card shadow" style={{ width: '400px' }}>
         <div className="card-body">
           {/* <h2 className="card-title text-center mb-4">Sign Up 👋</h2> */}
-          <img
+          {/* <img
             src={logo}
             alt="Company Logo"
             style={{ width: '120px' }}
             className="d-block mx-auto"
+          /> */}
+          <motion.img
+            src={logo}
+            alt="Company Logo"
+            style={{ width: "120px" }}
+            className="d-block mx-auto"
+            animate={{
+              x: [0, 15, -15, 0], // move right → left → center
+            }}
+            transition={{
+              duration: 3, // total time per loop
+              repeat: Infinity, // repeat forever
+              ease: "easeInOut",
+            }}
           />
           <FormProvider {...methods}>
             <form onSubmit={methods.handleSubmit(currentStep === steps.length - 1 ? onSubmit : handleNext)}>
@@ -101,7 +163,7 @@ export default function App() {
                   </button>
                 )}
                 <button type="submit" className="btn btn-primary ms-auto blinking-btn">
-                  {currentStep === steps.length - 1 ? 'Now Submit →' : 'Next →'}
+                  {currentStep === steps.length - 1 ? 'Now Next →' : 'Next →'}
                 </button>
               </div>
             </form>

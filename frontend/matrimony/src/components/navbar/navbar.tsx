@@ -20,7 +20,11 @@ const Navbar = () => {
   const isSignupPage = location.pathname === '/signup';
   const isProfilePage = location.pathname === '/profile'
 
-  const { user } = useSelector((state: any) => state.auth);
+  const  {user}  = useSelector((state: any) => state.auth);
+  // const {authUserId} = useSelector((state: any) => state.form.authUser?.name);
+
+  // const finalUserId = user || authUserId;
+  
 
   const dispatch = useDispatch();
 
@@ -79,12 +83,12 @@ const Navbar = () => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome, {user?.name}</b></span>}</span>
+                    <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome, {user?.name }</b></span>}</span>
                   </button>
 
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
-                    <li><button className="dropdown-item">Delete Account</button></li>
+                    {/* <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
+                    <li><button className="dropdown-item">Delete Account</button></li> */}
                     <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                   </ul>
                 </div>
@@ -93,7 +97,7 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="d-flex align-items-center justify-content-end parent-right-content">
-              <span className="me-2">Already a member?</span>
+              {/* <span className="me-2">Already a member?</span>
                <span className="me-2">then</span>
               <button
                 type="button"
@@ -102,14 +106,7 @@ const Navbar = () => {
               >
                 Now Login
               </button>
-              <span className="mx-2">|</span>
-              {/* <a
-                href="#"
-                className="text-dark text-decoration-none d-inline-flex align-items-center"
-              >
-                Help
-                <span className="material-icons me-2 ml-5 jump-icon">contact_support</span>
-              </a> */}
+              <span className="mx-2">|</span> */}
               <div className="position-relative">
                 <button
                   type="button"

@@ -4,6 +4,7 @@ type FormData = {
   [key: string]: any;
 };
 
+
 const initialState: FormData = {};
 
 const formSlice = createSlice({
@@ -15,9 +16,17 @@ const formSlice = createSlice({
     },
     resetForm: () => {
       return {};
-    }
+    },
+    setTokens: (state, action) => {
+      state = action.payload;
+      localStorage.setItem('token', action.payload);
+    },
+      setUse: (state, action: PayloadAction<any>) => {
+      state.authUser = action.payload; // save full user object
+      localStorage.setItem('authUser', JSON.stringify(action.payload));
+    },
   }
 });
 
-export const { updateFormData, resetForm } = formSlice.actions;
+export const { updateFormData, resetForm, setTokens, setUse } = formSlice.actions;
 export default formSlice.reducer;

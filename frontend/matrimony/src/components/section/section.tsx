@@ -9,15 +9,9 @@ import { useNavigate } from "react-router-dom";
 const Section = () => {
   const navigate = useNavigate(); // initialize it
 
-
-  // const [imageSrc, setImageSrc] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   const storedImage = localStorage.getItem("uploadedPhoto");
-  //   if (storedImage) {
-  //     setImageSrc(storedImage);
-  //   }
-  // }, []);
+  const handleClick = (flag: number) => {
+    navigate("/signup", { state: { flag } });
+  };
 
   return (
     <div>
@@ -30,6 +24,38 @@ const Section = () => {
         <div className="container-fluid">
           <div className="row justify-content-md-center align-items-center">
             <div className="col-12 col-md-11 col-lg-9 col-xl-8 col-xxl-7">
+
+              <motion.div
+                className="text-center mb-5"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <p className="fs-5 fw-semibold text-light mb-3 blink-text">
+                  Are you already registered ?
+                </p>
+
+                <div className="d-flex justify-content-center gap-3">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
+                    onClick={() => handleClick(1)}
+                  >
+                    ✅ Yes
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className=" px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
+                    onClick={() => handleClick(2)}
+                  >
+                    🚀 No
+                  </motion.button>
+                </div>
+              </motion.div>
+
               <motion.h2
                 className="hero-title"
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -53,7 +79,7 @@ const Section = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
               >
-                <motion.button
+                {/* <motion.button
                   type="button"
                   className="btn bsb-btn-2xl btn-outline-light"
                   animate={{ y: [0, -10, 0] }}
@@ -61,14 +87,8 @@ const Section = () => {
                   onClick={() => navigate("/signup")}
                 >
                   🎉 Register Now
-                </motion.button>
-                {/* <div>
-                  {imageSrc ? (
-                    <img src={imageSrc} alt="Uploaded" style={{ width: 200, height: 'auto' }} />
-                  ) : (
-                    <p>No image found</p>
-                  )}
-                </div> */}
+                </motion.button> */}
+
               </motion.div>
             </div>
           </div>

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './viewprofile.css';
 import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
+import { openViewPopup } from "../../../../features/profileui/profileUISlice";
+import { useDispatch } from 'react-redux';
+
 
 type ImageData = {
   name: string;
@@ -67,6 +70,9 @@ const countries = [
   "Norway"
 ];
 
+const genders = ["Male", "Female", "Transgender"];
+
+
 
 const ViewProfile: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
@@ -75,14 +81,18 @@ const ViewProfile: React.FC = () => {
   // Form inputs
   const [countryInput, setCountryInput] = useState<string>('');
   const [stateInput, setStateInput] = useState<string>('');
+  const [districtInput, setDistrictInput] = useState<string>('');
+  const [genderInput, setGenderInput] = useState<string>('');
 
   // Payload state for API query
   const [payload, setPayload] = useState<any>({
     page: 1,
-    limit: 10,
+    limit: 100,
     filter: {
       country: '',
-      state: ''
+      state: '',
+      district: districtInput,
+      gender: genderInput
     },
     search: ""
   });
@@ -96,31 +106,36 @@ const ViewProfile: React.FC = () => {
       page: 1, // reset page on new search
       filter: {
         country: countryInput,
-        state: stateInput
+        state: stateInput,
+        district: districtInput,
+        gender: genderInput
       }
     });
   };
+
+  const dispatch = useDispatch();
+
 
   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users.</div>;
-  if (users.length === 0) {
-    return (
-      <div className="no-users-container">
-        <div className="no-users-card">
-          <h3>No Users Found</h3>
-          <p>
-            We couldn’t find any matching users. Try adjusting your search or
-            filters.
-          </p>
-          <button className="retry-btn" onClick={() => window.location.reload()}>
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (users.length === 0) {
+  //   return (
+  //     <div className="no-users-container">
+  //       <div className="no-users-card">
+  //         <h3>No Users Found</h3>
+  //         <p>
+  //           We couldn’t find any matching users. Try adjusting your search or
+  //           filters.
+  //         </p>
+  //         <button className="retry-btn" onClick={() => window.location.reload()}>
+  //           Retry
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const openUserImages = (user: User) => {
     setSelectedUser(user);
@@ -140,6 +155,7 @@ const ViewProfile: React.FC = () => {
       prevIndex === 0 ? selectedUser.userDetails.imageData.length - 1 : prevIndex - 1
     );
   };
+
 
   return (
     <div className="gallery-container">
@@ -163,7 +179,7 @@ const ViewProfile: React.FC = () => {
         transition={{ duration: 2, repeat: Infinity, repeatType: "loop", ease: "easeInOut" }}
       >
         <h2 className="text-2xl font-bold text-blue-300 mb-2 drop-shadow-lg">
-         ✨📷 Image Gallery 📷✨
+          ✨📷 Image Gallery 📷✨
         </h2>
         {/* <p className="text-blue-100 text-sm">
     Browse beautiful profiles and find your perfect match
@@ -178,6 +194,43 @@ const ViewProfile: React.FC = () => {
         onSubmit={handleSearchSubmit}
         className="custom-search-form"
       >
+
+        {/* Gender Select */}
+        <select
+          value={genderInput}
+          onChange={(e) => setGenderInput(e.target.value)}
+          className="custom-input text-primary fw-bold"
+          aria-label="Select Gender"
+        >
+          <option value="">Select Gender</option>
+          {genders.map((g) => (
+            <option key={g} value={g.toLowerCase()}>
+              {g}
+            </option>
+          ))}
+        </select>
+
+        {/* District Input */}
+        <input
+          type="text"
+          placeholder="Enter District"
+          value={districtInput}
+          onChange={(e) => setDistrictInput(e.target.value)}
+          className="custom-input text-primary fw-bold"
+        />
+
+
+        <input
+          type="text"
+          placeholder="Enter State"
+          value={stateInput}
+          onChange={(e) => setStateInput(e.target.value)}
+          className="custom-input text-primary placeholder-primary fw-bold "
+          aria-label="State input"
+        />
+
+
+
         <select
           value={countryInput}
           onChange={(e) => setCountryInput(e.target.value)}
@@ -192,46 +245,80 @@ const ViewProfile: React.FC = () => {
           ))}
         </select>
 
-        <input
-          type="text"
-          placeholder="Enter State"
-          value={stateInput}
-          onChange={(e) => setStateInput(e.target.value)}
-          className="custom-input text-primary placeholder-primary fw-bold "
-          aria-label="State input"
-        />
-
         <button type="submit" className="custom-button">
           🔍 Search
         </button>
       </form>
 
+      <>
+        {users.length > 0 ? (
+          <>
+            <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 my-3">
+              <button
+                className="btn btn-primary px-4 py-2 shadow-lg fw-bold"
+                onClick={() => dispatch(openViewPopup())}
+                style={{
+                  borderRadius: '50px',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+              >
+                View Profile
+              </button>
 
-      <div className="gallery-grid">
-        {users.map((user: any) => {
-          const firstImage = user?.userDetails?.imageData?.[0];
-          if (!firstImage) return null;
+              <button
+                className="btn btn-danger px-4 py-2 shadow-lg fw-bold"
+                style={{
+                  borderRadius: '50px',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+              >
+                Delete Account
+              </button>
+            </div>
+            <div className="gallery-grid">
+              {/* <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li> */}
+              {users.map((user: any) => {
+                const firstImage = user?.userDetails?.imageData?.[0];
+                if (!firstImage) return null;
 
-          return (
-            <motion.div
-              key={user.id}
-              className="gallery-card"
-              whileHover={{ scale: 1.05, boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}
-              onClick={() => openUserImages(user)}
-            >
-              <motion.img
-                src={firstImage.url}
-                alt={`Name: ${user.name}`}
-                className="gallery-image"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              />
-              <div className="gallery-description">Name: {user.name}</div>
-            </motion.div>
-          );
-        })}
-      </div>
+                return (
+                  <motion.div
+                    key={user.id}
+                    className="gallery-card"
+                    whileHover={{ scale: 1.05, boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)' }}
+                    onClick={() => openUserImages(user)}
+                  >
+                    <motion.img
+                      src={firstImage.url}
+                      alt={`Name: ${user.name}`}
+                      className="gallery-image"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    />
+                    <div className="gallery-description">Name: {user.name}</div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <div className="no-users-container">
+            <div className="no-users-card">
+              <h3>No Users Found</h3>
+              <p>We couldn’t find any matching users. Try adjusting your search or filters.</p>
+              {/* <button className="retry-btn" onClick={() => window.location.reload()}>
+                Retry
+              </button> */}
+            </div>
+          </div>
+        )}
+      </>
+
 
       <AnimatePresence>
         {selectedUser && (
@@ -265,8 +352,8 @@ const ViewProfile: React.FC = () => {
                 <p><strong>Name :</strong> {selectedUser?.name}</p>
                 <p><strong>Age :</strong> {selectedUser?.age}</p>
                 <p><strong>Gender :</strong> {selectedUser?.gender}</p>
-                <p><strong>Height:</strong> {selectedUser?.height}</p>
-                <p><strong>Weight:</strong> {selectedUser?.weight}</p>
+                {/* <p><strong>Height:</strong> {selectedUser?.height}</p>
+                <p><strong>Weight:</strong> {selectedUser?.weight}</p> */}
                 <p><strong>Caste:</strong> {selectedUser?.caste}</p>
                 <p><strong>Religion:</strong> {selectedUser?.religion}</p>
                 <p><strong>District:</strong> {selectedUser?.district}</p>
@@ -280,7 +367,7 @@ const ViewProfile: React.FC = () => {
                 <p><strong>Whose marriage:</strong> {selectedUser?.person}</p>
               </div>
 
-              <button
+              {/* <button
                 className="nav-arrow prev-arrow"
                 onClick={prevImage}
                 aria-label="Previous Image"
@@ -324,7 +411,7 @@ const ViewProfile: React.FC = () => {
                 }}
               >
                 ›
-              </button>
+              </button> */}
             </motion.div>
           </motion.div>
         )}

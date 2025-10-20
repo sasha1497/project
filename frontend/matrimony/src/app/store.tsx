@@ -62,6 +62,10 @@ import profileUIEditReducer from "../features/profileeditui/profileUIEditSlice";
 import editFormReducer from "../features/editform/editFormSlice";
 import { editFormApi } from '../features/editform/editFormApi';
 import otpReducer from '../features/otp/otpSlice'
+import deleteAccountReducer from "../features/deleteaccount/deleteAccountSlice";
+import { deleteAccountApi } from "../features/deleteaccount/deleteAccountApi";
+
+
 
 // ✅ New import
 import { otpApi } from '../features/otp/otpApi';
@@ -80,6 +84,8 @@ export const store = configureStore({
     editForm: editFormReducer,
     otp: otpReducer,
     view: viewReducer,
+    deleteAccount: deleteAccountReducer,
+
 
     [authApi.reducerPath]: authApi.reducer,
     [formApi.reducerPath]: formApi.reducer,
@@ -88,6 +94,8 @@ export const store = configureStore({
     [editFormApi.reducerPath]: editFormApi.reducer,
     [otpApi.reducerPath]: otpApi.reducer,
     [viewApi.reducerPath]: viewApi.reducer,
+    [deleteAccountApi.reducerPath]: deleteAccountApi.reducer,
+
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -99,6 +107,7 @@ export const store = configureStore({
       editFormApi.middleware,
       otpApi.middleware,
       viewApi.middleware,
+      deleteAccountApi.middleware
     ),
 });
 

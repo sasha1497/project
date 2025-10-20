@@ -90,7 +90,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
 
             {/* state */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="state">State</label>
+                <label htmlFor="state">State / Region</label>
                 <input
                     id="state"
                     {...register('state', {
@@ -107,7 +107,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
 
             {/* district */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="district">District</label>
+                <label htmlFor="district">District / Territory</label>
                 <input
                     id="district"
                     {...register('district', { required: 'district is required' })}

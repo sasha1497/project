@@ -5,6 +5,7 @@ import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
 import { closeViewPopup, openViewPopup } from "../../../../features/profileui/profileUISlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useDeleteUserAccountMutation } from '../../../../features/deleteaccount/deleteAccountApi';
 
 
 type ImageData = {
@@ -143,6 +144,7 @@ const ViewProfile: React.FC = () => {
 
   const dispatch = useDispatch();
 
+   const [deleteUserAccount] = useDeleteUserAccountMutation();
 
   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
 
@@ -171,45 +173,68 @@ const ViewProfile: React.FC = () => {
     );
   };
 
+  // const handleDeleteAccount = async () => {
+  //   if (!userId) {
+  //     toast.error("User ID not found");
+  //     return;
+  //   }
+
+  //   const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+  //   if (!confirmDelete) return;
+
+  //   try {
+  //     const response = await fetch(`http://localhost:3002/user/delete/${userId}`, {
+  //       method: "DELETE",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`, // optional if auth is needed
+  //       },
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to delete account");
+  //     }
+
+  //     toast.success("Account deleted successfully!");
+
+  //     // Optional: clear local storage and redirect to login
+  //     localStorage.removeItem("token");
+  //     localStorage.removeItem("user");
+
+  //     // Close popup or redirect
+  //     dispatch(closeViewPopup());
+  //     window.location.href = "/dashboard"; // redirect to login page
+
+  //   } catch (error) {
+  //     console.error("Delete failed:", error);
+  //     toast.error("Something went wrong while deleting your account.");
+  //   }
+  // };
+
   const handleDeleteAccount = async () => {
-    if (!userId) {
-      toast.error("User ID not found");
-      return;
-    }
 
-    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (!confirmDelete) return;
+  if (!userId) {
+    toast.error("User ID not found");
+    return;
+  }
 
-    try {
-      const response = await fetch(`http://localhost:3002/user/delete/${userId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // optional if auth is needed
-        },
-      });
+  const confirmDelete = window.confirm("Are you sure you want to delete your account?");
+  if (!confirmDelete) return;
 
-      if (!response.ok) {
-        throw new Error("Failed to delete account");
-      }
+  try {
+    await deleteUserAccount(userId).unwrap();
+    toast.success("Account deleted successfully");
 
-      toast.success("Account deleted successfully!");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-      // Optional: clear local storage and redirect to login
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-
-      // Close popup or redirect
-      dispatch(closeViewPopup());
-      window.location.href = "/dashboard"; // redirect to login page
-
-    } catch (error) {
-      console.error("Delete failed:", error);
-      toast.error("Something went wrong while deleting your account.");
-    }
-  };
-
-
+    dispatch(closeViewPopup());
+    window.location.href = "/dashboard"; // redirect
+  } catch (err: any) {
+    toast.error("Failed to delete account");
+    console.error(err);
+  }
+};
 
 
   return (
@@ -517,7 +542,7 @@ const ViewProfile: React.FC = () => {
                 <p><strong>Whatsapp:</strong> {selectedUser?.whatsapp}</p>
                 <p><strong>Job:</strong> {selectedUser?.job}</p>
                 <p><strong>Salary:</strong> {selectedUser?.monthlySalary}</p>
-                <p><strong>Marriage status:</strong> {selectedUser?.count}</p>
+                <p><strong>Marriage status:</strong> {selectedUser?.userDetails?.count}</p>
                 <p><strong>Whose marriage:</strong> {selectedUser?.person}</p>
               </div>
             </motion.div>

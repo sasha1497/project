@@ -29,10 +29,10 @@ const Step9: React.FC<Props> = ({ methods }) => {
             type={showPassword ? 'text' : 'password'}
             {...register('password', {
               required: 'Password is required',
-              minLength: {
-                value: 6,
-                message: 'Password must be at least 6 characters',
-              },
+              // minLength: {
+              //   value: 20,
+              //   message: 'Password must be at least 6 characters',
+              // },
             })}
             style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           />

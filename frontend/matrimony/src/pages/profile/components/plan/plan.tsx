@@ -418,7 +418,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                 <p className="text-white small">{plan.description}</p>
                 <h1 className={`my-3 fw-bold ${plan.colorClass}`}>
                   {getPriceLabel(plan.price, country)}
-                  <sub className="fs-6 text-white"> / 90 days</sub>
+                  <sub className="fs-6 text-white"> / 40 days</sub>
                 </h1>
                 <ul className="list-unstyled text-start mt-3 flex-grow-1">
                   {plan.features.map((feature: any, idx: any) => (

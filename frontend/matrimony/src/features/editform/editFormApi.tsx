@@ -8,7 +8,7 @@ export const editFormApi = createApi({
   endpoints: (builder) => ({
     editForm: builder.mutation<any, any>({
       query: ({ id, ...formData }) => ({
-        url: `user/update/1`, // assuming you're passing user id
+        url: `user/update/${id}`, // assuming you're passing user id
         method: "post",           // use PUT for updates
         body: formData,
       }),

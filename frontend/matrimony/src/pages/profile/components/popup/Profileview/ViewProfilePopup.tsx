@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useGetUserProfileQuery } from "../../../../../features/profile/profileApi";
 import { closeViewPopup } from "../../../../../features/profileui/profileUISlice";
 import { RootState } from "../../../../../app/store";
@@ -9,6 +9,7 @@ import "./ViewProfilePopup.css";
 import { editFailure, editSuccess, startEdit } from "../../../../../features/editform/editFormSlice";
 import { toast } from "react-toastify";
 import { useEditFormMutation } from "../../../../../features/editform/editFormApi";
+import PhoneInput from "react-phone-input-2";
 // import {
 //   startEdit,
 //   editSuccess,
@@ -34,6 +35,7 @@ const ViewProfilePopup = () => {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -47,7 +49,7 @@ const ViewProfilePopup = () => {
       district: "",
       state: "",
       country: "",
-      mobile: "",
+      phone_number: "",
       whatsapp: "",
       job: "",
       monthlySalary: "",
@@ -70,7 +72,7 @@ const ViewProfilePopup = () => {
     try {
       dispatch(startEdit());
 
-      const { password, confirmPassword, imageData, ...cleanedData } = formData;
+      const { password, confirmPassword, imageData, hasPayments, paymentExpiryInfo, ...cleanedData } = formData;
 
       await editForm({ id: userId, ...cleanedData }).unwrap();
 
@@ -177,7 +179,7 @@ const ViewProfilePopup = () => {
               </div>
 
               {/* {caste} */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">Caste</label>
                 <select className="form-select" {...register("caste", { required: "caste is required" })}>
                   <option value="">Select Caste</option>
@@ -188,10 +190,10 @@ const ViewProfilePopup = () => {
                   <option value="No Caste">No Caste</option>
                 </select>
                 {errors.caste && <small className="text-danger">{errors.caste.message}</small>}
-              </div>
+              </div> */}
 
               {/* Religion */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">Religion</label>
                 <select className="form-select" {...register("religion", { required: "religion is required" })}>
                   <option value="">Select Religion</option>
@@ -203,24 +205,64 @@ const ViewProfilePopup = () => {
                   <option value="No Religion">No Religion</option>
                 </select>
                 {errors.religion && <small className="text-danger">{errors.religion.message}</small>}
+              </div> */}
+              {/* Caste */}
+              <div className="mb-3">
+                <label className="form-label">Caste</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your caste"
+                  {...register("caste", { required: "Caste is required" })}
+                />
+                {errors.caste && <small className="text-danger">{errors.caste.message}</small>}
               </div>
 
-              {/* Mobile */}
+              {/* Religion */}
               <div className="mb-3">
+                <label className="form-label">Religion</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your religion"
+                  {...register("religion", { required: "Religion is required" })}
+                />
+                {errors.religion && <small className="text-danger">{errors.religion.message}</small>}
+              </div>
+
+
+              {/* Mobile */}
+              {/* <div className="mb-3">
                 <label className="form-label">Mobile</label>
                 <input
                   type="tel"
                   className="form-control"
-                  {...register("mobile", {
+                  {...register("phone_number", {
                     required: "Mobile number is required",
                     pattern: { value: /^[0-9]{10}$/, message: "Enter a valid 10-digit number" },
                   })}
                 />
-                {errors.mobile && <small className="text-danger">{errors.mobile.message}</small>}
-              </div>
+                {errors.phone_number && <small className="text-danger">{errors.phone_number.message}</small>}
+              </div> */}
+
+
+              {/* <Controller
+                name="phone_number"
+                control={control}
+                rules={{ required: "Mobile number is required" }}
+                render={({ field }) => (
+                  <PhoneInput
+                    {...field}
+                    country="in"
+                    enableSearch
+                    inputClass="form-control"
+                    onChange={(value) => field.onChange("+" + value)}
+                  />
+                )}
+              /> */}
 
               {/* {WA} */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">Whatsapp Number</label>
                 <input
                   type="tel"
@@ -231,7 +273,149 @@ const ViewProfilePopup = () => {
                   })}
                 />
                 {errors.whatsapp && <small className="text-danger">{errors.whatsapp.message}</small>}
-              </div>
+              </div> */}
+              {/* <Controller
+                name="whatsapp"
+                control={control}
+                rules={{ required: "whatsapp number is required" }}
+                render={({ field }) => (
+                  <PhoneInput
+                    {...field}
+                    country="in"
+                    enableSearch
+                    inputClass="form-control"
+                    onChange={(value) => field.onChange("+" + value)}
+                  />
+                )}
+              /> */}
+
+
+              {/* <Controller
+                name="phone_number"
+                control={control}
+                rules={{
+                  required: "Mobile number is required",
+                  validate: (value) => {
+                    // Remove any non-digit characters for validation
+                    const digitsOnly = value.replace(/\D/g, "");
+                    if (digitsOnly.length < 10) return "Enter a valid 10-digit number";
+                    return true;
+                  },
+                }}
+                render={({ field }) => (
+                  <div className="mb-3">
+                    <label className="form-label">Mobile</label>
+                    <PhoneInput
+                      {...field}
+                      country="in"
+                      enableSearch
+                      inputClass="form-control phone-input"
+                      containerClass="phone-input-container"
+                      inputStyle={{ width: "100%", height: "45px" }}
+                      onChange={(value) => field.onChange("+" + value)}
+                      placeholder="Enter mobile number"
+                    />
+                    {errors.phone_number && (
+                      <small className="text-danger">{errors.phone_number.message}</small>
+                    )}
+                  </div>
+                )}
+              />
+
+              <Controller
+                name="whatsapp"
+                control={control}
+                rules={{
+                  required: "Whatsapp number is required",
+                  validate: (value) => {
+                    const digitsOnly = value.replace(/\D/g, "");
+                    if (digitsOnly.length < 10) return "Enter a valid 10-digit number";
+                    return true;
+                  },
+                }}
+                render={({ field }) => (
+                  <div className="mb-3">
+                    <label className="form-label">Whatsapp Number</label>
+                    <PhoneInput
+                      {...field}
+                      country="in"
+                      enableSearch
+                      inputClass="form-control phone-input"
+                      containerClass="phone-input-container"
+                      inputStyle={{ width: "100%", height: "45px" }}
+                      onChange={(value) => field.onChange("+" + value)}
+                      placeholder="Enter whatsapp number"
+                    />
+                    {errors.whatsapp && (
+                      <small className="text-danger">{errors.whatsapp.message}</small>
+                    )}
+                  </div>
+                )}
+              /> */}
+
+              <Controller
+                name="phone_number"
+                control={control}
+                rules={{
+                  required: "Mobile number is required", // only empty check
+                }}
+                render={({ field }) => (
+                  <div className="mb-3">
+                    <label className="form-label">Mobile</label>
+                    <PhoneInput
+                      {...field}
+                      country="in"
+                      enableSearch
+                      inputClass="form-control phone-input"
+                      containerClass="phone-input-container"
+                      inputStyle={{ width: "100%", height: "45px" }}
+                      onChange={(value) => field.onChange(value ? "+" + value : "")} // add + prefix
+                      placeholder="Enter mobile number"
+                      inputProps={{
+                        name: field.name,
+                        required: true,
+                      }}
+                    />
+                    {errors.phone_number && (
+                      <small className="text-danger">{errors.phone_number.message}</small>
+                    )}
+                  </div>
+                )}
+              />
+
+              <Controller
+                name="whatsapp"
+                control={control}
+                rules={{
+                  required: "Whatsapp number is required", // only empty check
+                }}
+                render={({ field }) => (
+                  <div className="mb-3">
+                    <label className="form-label">Whatsapp Number</label>
+                    <PhoneInput
+                      {...field}
+                      country="in"
+                      enableSearch
+                      inputClass="form-control phone-input"
+                      containerClass="phone-input-container"
+                      inputStyle={{ width: "100%", height: "45px" }}
+                      onChange={(value) => field.onChange(value ? "+" + value : "")}
+                      placeholder="Enter whatsapp number"
+                      inputProps={{
+                        name: field.name,
+                        required: true,
+                      }}
+                    />
+                    {errors.whatsapp && (
+                      <small className="text-danger">{errors.whatsapp.message}</small>
+                    )}
+                  </div>
+                )}
+              />
+
+
+
+
 
               {/* {district} */}
               <div className="mb-3">
@@ -278,6 +462,8 @@ const ViewProfilePopup = () => {
                   <option value="Malaysia">Malaysia</option>
                   <option value="Singapore">Singapore</option>
                   <option value="Germany">Germany</option>
+                  <option value="Sweden">Sweden</option>
+                  <option value="Denmark">Denmark</option>
                   <option value="Sharjah">Sharjah</option>
                   <option value="Abhudhabi">Abhu Dhabi</option>
                   <option value="Brunei">Brunei</option>
@@ -285,7 +471,7 @@ const ViewProfilePopup = () => {
                   <option value="Philippine">Philippine</option>
                   <option value="Israel">Israel</option>
                   <option value="srilanka">Sri Lanka</option>
-                  <option value="walves">walves</option>
+                  <option value="wales">wales</option>
                   <option value="Finland">Finland</option>
                   <option value="Bahamas">Bahamas</option>
                   <option value="Fiji">Fiji</option>
@@ -341,7 +527,7 @@ const ViewProfilePopup = () => {
                 <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
                   Cancel
                 </button>
-                 {/* <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
+                {/* <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
                   delete account
                 </button> */}
               </div>
@@ -375,14 +561,12 @@ const ViewProfilePopup = () => {
               <p><strong>Name :</strong> {data?.name}</p>
               <p><strong>Age :</strong> {data?.age}</p>
               <p><strong>Gender :</strong> {data?.gender}</p>
-              <p><strong>Height:</strong> {data?.height}</p>
-              <p><strong>Weight:</strong> {data?.weight}</p>
               <p><strong>Caste:</strong> {data?.caste}</p>
               <p><strong>Religion:</strong> {data?.religion}</p>
               <p><strong>District:</strong> {data?.district}</p>
               <p><strong>State:</strong> {data?.state}</p>
               <p><strong>Country:</strong> {data?.country}</p>
-              <p><strong>Mobile:</strong> {data?.mobile}</p>
+              <p><strong>Mobile:</strong> {data?.phone_number}</p>
               <p><strong>Whatsapp:</strong> {data?.whatsapp}</p>
               <p><strong>Job:</strong> {data?.job}</p>
               <p><strong>Salary:</strong> {data?.monthlySalary}</p>

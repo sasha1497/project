@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './viewprofile.css';
 import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
-import { openViewPopup } from "../../../../features/profileui/profileUISlice";
-import { useDispatch } from 'react-redux';
+import { closeViewPopup, openViewPopup } from "../../../../features/profileui/profileUISlice";
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 
 type ImageData = {
@@ -45,6 +46,8 @@ const countries = [
   "Malaysia",
   "Singapore",
   "Germany",
+  "Sweden",
+  "Denmark",
   "Sharjah",
   "Abhudhabi",
   "Brunei",
@@ -52,7 +55,7 @@ const countries = [
   "Philippine",
   "Israel",
   "Sri Lanka",
-  "Walves",
+  "wales",
   "Finland",
   "Bahamas",
   "Fiji",
@@ -78,6 +81,31 @@ const ViewProfile: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
+
+  const [step, setStep] = useState<number>(1);
+
+
+  const [formValues, setFormValues] = useState({
+    country: "",
+    state: "",
+    district: "",
+    gender: ""
+  });
+
+  const handleNextStep = () => setStep((prev) => prev + 1);
+  const handlePrevStep = () => setStep((prev) => prev - 1);
+
+
+  const handleSubmitSearch = () => {
+    setPayload({
+      page: 1,
+      limit: 1000,
+      filter: { ...formValues },
+      // search: ""
+    });
+  };
+
+
   // Form inputs
   const [countryInput, setCountryInput] = useState<string>('');
   const [stateInput, setStateInput] = useState<string>('');
@@ -94,48 +122,35 @@ const ViewProfile: React.FC = () => {
       district: districtInput,
       gender: genderInput
     },
-    search: ""
+    // search: ""
   });
 
   // Update payload and trigger API refetch on submit
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // const handleSearchSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
 
-    setPayload({
-      ...payload,
-      page: 1, // reset page on new search
-      filter: {
-        country: countryInput,
-        state: stateInput,
-        district: districtInput,
-        gender: genderInput
-      }
-    });
-  };
+  //   setPayload({
+  //     ...payload,
+  //     page: 1, // reset page on new search
+  //     filter: {
+  //       country: countryInput,
+  //       state: stateInput,
+  //       district: districtInput,
+  //       gender: genderInput
+  //     }
+  //   });
+  // };
 
   const dispatch = useDispatch();
 
 
   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
 
+  const userId = useSelector((state: any) => state.auth.user?.id);
+
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading users.</div>;
-  // if (users.length === 0) {
-  //   return (
-  //     <div className="no-users-container">
-  //       <div className="no-users-card">
-  //         <h3>No Users Found</h3>
-  //         <p>
-  //           We couldn’t find any matching users. Try adjusting your search or
-  //           filters.
-  //         </p>
-  //         <button className="retry-btn" onClick={() => window.location.reload()}>
-  //           Retry
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   const openUserImages = (user: User) => {
     setSelectedUser(user);
@@ -156,99 +171,226 @@ const ViewProfile: React.FC = () => {
     );
   };
 
+  const handleDeleteAccount = async () => {
+    if (!userId) {
+      toast.error("User ID not found");
+      return;
+    }
+
+    const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:3002/user/delete/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // optional if auth is needed
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete account");
+      }
+
+      toast.success("Account deleted successfully!");
+
+      // Optional: clear local storage and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Close popup or redirect
+      dispatch(closeViewPopup());
+      window.location.href = "/dashboard"; // redirect to login page
+
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("Something went wrong while deleting your account.");
+    }
+  };
+
+
+
 
   return (
     <div className="gallery-container">
-      {/* <h2 className="gallery-title text-primary ">Image Gallery</h2> */}
-      <motion.div
-        className="relative bg-primary text-white shadow-lg rounded-xl p-2 text-center max-w-2xl mx-auto mt-6 mb-3
-             ring-4 ring-blue-500/70"
-        initial={{ opacity: 0, y: -30, scale: 0.9, boxShadow: "0 0 10px rgba(59, 130, 246, 0.5)" }}
-        animate={{
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          boxShadow: [
-            "0 0 10px rgba(59, 130, 246, 0.5)",
-            "0 0 20px rgba(59, 130, 246, 0.8)",
-            "0 0 30px rgba(59, 130, 246, 1)",
-            "0 0 20px rgba(59, 130, 246, 0.8)",
-            "0 0 10px rgba(59, 130, 246, 0.5)",
-          ],
-        }}
-        transition={{ duration: 2, repeat: Infinity, repeatType: "loop", ease: "easeInOut" }}
-      >
-        <h2 className="text-2xl font-bold text-blue-300 mb-2 drop-shadow-lg">
-          ✨📷 Image Gallery 📷✨
-        </h2>
-        {/* <p className="text-blue-100 text-sm">
-    Browse beautiful profiles and find your perfect match
-  </p> */}
-      </motion.div>
 
-
-
-
-      {/* Search form */}
-      <form
-        onSubmit={handleSearchSubmit}
-        className="custom-search-form"
-      >
-
-        {/* Gender Select */}
-        <select
-          value={genderInput}
-          onChange={(e) => setGenderInput(e.target.value)}
-          className="custom-input text-primary fw-bold"
-          aria-label="Select Gender"
+      {/* Multi-Step Form */}
+      <div className="d-flex justify-content-center mt-5">
+        <motion.div
+          className="animated-border-card shadow-sm"
+          style={{ width: "100%", maxWidth: "500px" }}
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <option value="">You can select your option</option>
-          {genders.map((g) => (
-            <option key={g} value={g.toLowerCase()}>
-              {g}
-            </option>
-          ))}
-        </select>
+          <div className="card-body p-4">
+            {/* Progress Bar */}
+            <div className="progress mb-4" style={{ height: "8px", borderRadius: "8px" }}>
+              <div
+                className="progress-bar bg-primary"
+                role="progressbar"
+                style={{ width: `${(step / 4) * 100}%` }}
+                aria-valuenow={(step / 4) * 100}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              ></div>
+            </div>
 
-        {/* District Input */}
-        <input
-          type="text"
-          placeholder="Enter District"
-          value={districtInput}
-          onChange={(e) => setDistrictInput(e.target.value)}
-          className="custom-input text-primary fw-bold"
-        />
+            {step === 1 && (
+              <div className="mb-3 mt-5">
+                <motion.h4
+                  className="form-label fw-bold mb-5 text-primary jump-heading"
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  You can select your interest <span className='text-danger'>Country</span> to get bride or groom?
+                </motion.h4>
+                <select
+                  value={formValues.country}
+                  onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
+                  className="form-select"
+                >
+                  <option value="">Select Country</option>
+                  {countries.map((c) => (
+                    <option key={c} value={c.toLowerCase()}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+                <div className="d-flex justify-content-end mt-3">
+                  <button
+                    disabled={!formValues.country}
+                    onClick={handleNextStep}
+                    className="btn btn-primary blinking-btn"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
 
+            {/* Step 2: State */}
+            {step === 2 && (
+              <div className="mb-3">
+                <motion.h4
+                  className="form-label fw-bold mb-5 text-primary jump-heading"
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  You can select your interest <span className='text-danger'>State / Region</span> to get bride or groom?
+                </motion.h4>
+                <input
+                  type="text"
+                  value={formValues.state}
+                  onChange={(e) => setFormValues({ ...formValues, state: e.target.value })}
+                  placeholder="Enter State / Region"
+                  className="form-control"
+                />
 
-        <input
-          type="text"
-          placeholder="Enter State"
-          value={stateInput}
-          onChange={(e) => setStateInput(e.target.value)}
-          className="custom-input text-primary placeholder-primary fw-bold "
-          aria-label="State input"
-        />
+                {/* 👇 Clickable helper text */}
+                <p
+                  className="text-primary mt-2 dont-have-text cursor-pointer"
+                  onClick={() => setFormValues({ ...formValues, state: "N/A" })}
+                >
+                  I Don’t Know State / Region
+                </p>
+                <div className="d-flex justify-content-between mt-3">
+                  <button onClick={handlePrevStep} className="btn btn-outline-secondary">
+                    Back
+                  </button>
+                  <button
+                    disabled={!formValues.state}
+                    onClick={handleNextStep}
+                    className="btn btn-primary blinking-btn"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
 
+            {/* Step 3: District */}
+            {step === 3 && (
+              <div className="mb-3">
+                <motion.h4
+                  className="form-label fw-bold mb-5 text-primary jump-heading"
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom?
+                </motion.h4>
+                <input
+                  type="text"
+                  value={formValues.district}
+                  onChange={(e) => setFormValues({ ...formValues, district: e.target.value })}
+                  placeholder="Enter District / Territory"
+                  className="form-control"
+                />
+                <p
+                  className="text-primary mt-2 dont-have-text cursor-pointer"
+                  onClick={() => setFormValues({ ...formValues, district: "N/A" })}
+                >
+                  I don’t have a District / Territory
+                </p>
+                <div className="d-flex justify-content-between mt-3">
+                  <button onClick={handlePrevStep} className="btn btn-outline-secondary">
+                    Back
+                  </button>
+                  <button
+                    disabled={!formValues.district}
+                    onClick={handleNextStep}
+                    className="btn btn-primary blinking-btn"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
 
-
-        <select
-          value={countryInput}
-          onChange={(e) => setCountryInput(e.target.value)}
-          className="custom-input text-primary fw-bold"
-          aria-label="Select Country"
-        >
-          <option value="">You can select your interest country to get Bride / Groom</option>
-          {countries.map((c) => (
-            <option key={c} value={c.toLowerCase()}>
-              {c}
-            </option>
-          ))}
-        </select>
-
-        <button type="submit" className="custom-button">
-          🔍 Search
-        </button>
-      </form>
+            {/* Step 4: Gender */}
+            {step === 4 && (
+              <div className="mb-3">
+                <motion.h4
+                  className="form-label fw-bold mb-5 text-primary jump-heading"
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  You can select your interest <span className='text-danger'>Gender</span> to get bride or groom?
+                </motion.h4>
+                <select
+                  value={formValues.gender}
+                  onChange={(e) => setFormValues({ ...formValues, gender: e.target.value })}
+                  className="form-select"
+                >
+                  <option value="">Select Gender</option>
+                  {genders.map((g) => (
+                    <option key={g} value={g.toLowerCase()}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+                <div className="d-flex justify-content-between mt-3">
+                  <button onClick={handlePrevStep} className="btn btn-outline-secondary">
+                    Back
+                  </button>
+                  <button
+                    disabled={!formValues.gender}
+                    onClick={handleSubmitSearch}
+                    className="btn btn-success blinking-btn"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </div>
 
       <>
         {users.length > 0 ? (
@@ -264,7 +406,7 @@ const ViewProfile: React.FC = () => {
                 onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
-                View Profile
+                View My Profile
               </button>
 
               <button
@@ -275,8 +417,22 @@ const ViewProfile: React.FC = () => {
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                onClick={handleDeleteAccount}
               >
-                Delete Account
+                Delete My Account
+              </button>
+              {/* 🔄 Reload Button */}
+              <button
+                className="btn btn-success px-4 py-2 shadow-lg fw-bold"
+                onClick={() => window.location.reload()}
+                style={{
+                  borderRadius: '50px',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+              >
+                🔄 Reload
               </button>
             </div>
             <div className="gallery-grid">
@@ -311,13 +467,11 @@ const ViewProfile: React.FC = () => {
             <div className="no-users-card">
               <h3>No Users Found</h3>
               <p>We couldn’t find any matching users. Try adjusting your search or filters.</p>
-              {/* <button className="retry-btn" onClick={() => window.location.reload()}>
-                Retry
-              </button> */}
             </div>
           </div>
         )}
       </>
+
 
 
       <AnimatePresence>
@@ -366,52 +520,6 @@ const ViewProfile: React.FC = () => {
                 <p><strong>Marriage status:</strong> {selectedUser?.count}</p>
                 <p><strong>Whose marriage:</strong> {selectedUser?.person}</p>
               </div>
-
-              {/* <button
-                className="nav-arrow prev-arrow"
-                onClick={prevImage}
-                aria-label="Previous Image"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '10px',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(0,0,0,0.5)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  cursor: 'pointer',
-                  fontSize: '24px',
-                  userSelect: 'none',
-                }}
-              >
-                ‹
-              </button>
-
-              <button
-                className="nav-arrow next-arrow"
-                onClick={nextImage}
-                aria-label="Next Image"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  right: '10px',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(0,0,0,0.5)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  cursor: 'pointer',
-                  fontSize: '24px',
-                  userSelect: 'none',
-                }}
-              >
-                ›
-              </button> */}
             </motion.div>
           </motion.div>
         )}

@@ -73,4 +73,18 @@
   background-color: #0056b3;
 }
 
+.phone-input-container {
+  width: 100%;
+}
+
+.phone-input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding-left: 50px; /* leave space for country code */
+  font-size: 16px;
+}
+
+.phone-input input {
+  height: 45px;
+}
 

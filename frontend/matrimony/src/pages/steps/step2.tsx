@@ -32,7 +32,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
                     <option value="Scotland">Scotland</option>
                     <option value="Netherlands">Netherlands</option>
                     <option value="Switzerland">Switzerland</option>
-                    <option value="Ireland">Ireland</option>  
+                    <option value="Ireland">Ireland</option>
                     <option value="Bahrain">Bahrain</option>
                     <option value="Kuwait">Kuwait</option>
                     <option value="Oman">Oman</option>
@@ -44,6 +44,8 @@ const Step2: React.FC<Props> = ({ methods }) => {
                     <option value="Malaysia">Malaysia</option>
                     <option value="Singapore">Singapore</option>
                     <option value="Germany">Germany</option>
+                    <option value="Sweden">Sweden</option>
+                    <option value="Denmark">Denmark</option>
 
                     <option value="Sharjah">Sharjah</option>
                     <option value="Abhudhabi">Abhu Dhabi</option>
@@ -52,7 +54,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
                     <option value="Philippine">Philippine</option>
                     <option value="Israel">Israel</option>
                     <option value="srilanka">Sri Lanka</option>
-                    <option value="walves">walves</option>
+                    <option value="wales">wales</option>
                     <option value="Finland">Finland</option>
                     <option value="Bahamas">Bahamas</option>
 
@@ -76,7 +78,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
 
 
 
-                    
+
                 </select>
                 {errors.country && (
                     <p style={{ color: 'red', marginBottom: '10px' }}>

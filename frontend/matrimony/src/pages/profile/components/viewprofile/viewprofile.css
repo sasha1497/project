@@ -360,3 +360,63 @@
     font-size: 13px;
   }
 }
+
+
+/* Animated gradient border card */
+.animated-border-card {
+  position: relative;
+  border-radius: 1rem;
+  padding: 2px; /* space for border */
+  background: linear-gradient(90deg, #ff3c3c, #ffcd3c, #3cff99, #3c9fff, #ff3c3c);
+  background-size: 400% 400%;
+  animation: gradient-border 5s linear infinite;
+  overflow: hidden;
+}
+
+.animated-border-card .card-body {
+  background-color: white; /* inner card */
+  border-radius: 1rem; /* same as parent */
+  height: 100%;
+}
+
+/* Gradient animation keyframes */
+@keyframes gradient-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes jump {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-10px); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(-5px); }
+}
+
+.jump-heading {
+  display: inline-block; /* needed for transform */
+  animation: jump 3s ease-in-out infinite;
+}
+
+@keyframes blinking {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.blinking-btn {
+  animation: blinking 1s infinite;
+}
+
+.cursor-pointer{
+  cursor: pointer;
+}
+
+
+

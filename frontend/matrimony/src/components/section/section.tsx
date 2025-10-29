@@ -31,7 +31,7 @@ const Section = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <p className="fs-5 fw-semibold text-light mb-3 blink-text">
+                <p className="fw-semibold text-light mb-3 blink-text fs-larger">
                   Are you already registered ?
                 </p>
 

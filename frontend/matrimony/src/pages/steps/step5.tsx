@@ -11,12 +11,12 @@ const Step5: React.FC<Props> = ({ methods }) => {
 
   return (
     <div className="mb-3">
-        <label className="form-label">Gender</label>
+        <label className="form-label">Select Your Gender</label>
         <select
           className={`form-control ${errors.gender ? 'is-invalid' : ''}`}
           {...register("gender", { required: "gender is required" })}
         >
-          <option value="">Select gender</option>
+          <option value="">Select Your gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
           <option value="transgender">Transgender</option>

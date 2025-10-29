@@ -101,8 +101,8 @@ const Step2: React.FC<Props> = ({ methods }) => {
       </style>
 
       {/* Mobile Number */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="mobile">Mobile Number</label>
+      {/* <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="mobile">Enter your Mobile Number</label>
         <Controller
           name="mobile"
           control={control}
@@ -124,11 +124,51 @@ const Step2: React.FC<Props> = ({ methods }) => {
             {errors.mobile.message as string}
           </p>
         )}
+      </div> */}
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="mobile">Enter your Mobile Number</label>
+        <Controller
+          name="mobile"
+          control={control}
+          // rules={{
+          //   required: 'Mobile number is required', pattern: {
+          //     value: /^[6-9]\d{9}$/,
+          //     message: 'Enter a valid 10-digit mobile number',
+          //   },
+          // }}
+           rules={{
+            required: 'Mobile number is required'
+          }}
+
+          render={({ field }) => (
+            <PhoneInput
+              {...(field as any)}
+              country="in"
+              onlyCountries={['in']}
+              disableDropdown={true}
+              disableCountryCode={false}
+              countryCodeEditable={false}
+              inputStyle={{ width: '100%' }}
+              placeholder="Enter mobile number"
+              inputProps={{
+                name: field.name,
+                ref: field.ref, // ✅ Attach ref here
+                required: true,
+              }}
+              onChange={(value) => field.onChange("+" + value)}
+            />
+          )}
+        />
+        {errors.mobile && (
+          <p style={{ color: 'red', marginBottom: '10px' }}>
+            {errors.mobile.message as string}
+          </p>
+        )}
       </div>
 
       {/* WhatsApp Number */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="whatsapp">WhatsApp Number</label>
+      {/* <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="whatsapp">Enter your WhatsApp Number</label>
         <Controller
           name="whatsapp"
           control={control}
@@ -141,6 +181,45 @@ const Step2: React.FC<Props> = ({ methods }) => {
               separateDialCode={true}
               inputStyle={{ width: '100%' }}
               placeholder="Enter WhatsApp number"
+              onChange={(value) => field.onChange("+" + value)}
+            />
+          )}
+        />
+        {errors.whatsapp && (
+          <p style={{ color: 'red', marginBottom: '10px' }}>
+            {errors.whatsapp.message as string}
+          </p>
+        )}
+      </div> */}
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="whatsapp">Enter your WhatsApp Number</label>
+        <Controller
+          name="whatsapp"
+          control={control}
+          // rules={{
+          //   required: 'WhatsApp number is required', pattern: {
+          //     value: /^[6-9]\d{9}$/,
+          //     message: 'Enter a valid 10-digit mobile number',
+          //   },
+          // }}
+           rules={{
+            required: 'WhatsApp number is required'
+          }}
+          render={({ field }) => (
+            <PhoneInput
+              {...(field as any)}
+              country="in"
+              onlyCountries={['in']}
+              disableDropdown={true}
+              disableCountryCode={false}
+              countryCodeEditable={false}
+              inputStyle={{ width: '100%' }}
+              placeholder="Enter WhatsApp number"
+              inputProps={{
+                name: field.name,
+                ref: field.ref, // ✅ Attach ref here
+                required: true,
+              }}
               onChange={(value) => field.onChange("+" + value)}
             />
           )}

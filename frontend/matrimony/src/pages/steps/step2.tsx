@@ -15,7 +15,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
         <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
             {/* country */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="country">Country</label>
+                <label htmlFor="country">Select Your Country</label>
                 <select
                     id="country"
                     {...register('country', { required: 'country is required' })}
@@ -24,7 +24,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
                     {/* <option value="">You can select your interest country to get Bride / Groom </option> */}
                     <option value="">select your country</option>
                     <option value="India">India</option>
-                    <option value="USA">USA</option>
+                    {/* <option value="USA">USA</option>
                     <option value="England">England</option>
                     <option value="Australia">Australia</option>
                     <option value="Canada">Canada</option>
@@ -72,12 +72,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
 
                     <option value="Greece">Greece</option>
                     <option value="Ghana">Ghana</option>
-                    <option value="Norway">Norway</option>
-
-
-
-
-
+                    <option value="Norway">Norway</option> */}
 
                 </select>
                 {errors.country && (
@@ -89,8 +84,8 @@ const Step2: React.FC<Props> = ({ methods }) => {
 
 
             {/* state */}
-            <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="state">State / Region</label>
+            {/* <div style={{ marginBottom: '1rem' }}>
+                <label htmlFor="state">State</label>
                 <input
                     id="state"
                     {...register('state', {
@@ -103,11 +98,67 @@ const Step2: React.FC<Props> = ({ methods }) => {
                         {errors.state.message as string}
                     </p>
                 )}
+            </div> */}
+            <div style={{ marginBottom: '1rem' }}>
+                <label htmlFor="state">Select Your State</label>
+                <select
+                    id="state"
+                    {...register('state', {
+                        required: 'State is required'
+                    })}
+                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                >
+                    <option value="">Select Your State</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                    <option value="Ladakh">Ladakh</option>
+                    <option value="Lakshadweep">Lakshadweep</option>
+                    <option value="Puducherry">Puducherry</option>
+                </select>
+
+                {errors.state && (
+                    <p style={{ color: 'red', marginBottom: '10px' }}>
+                        {errors.state.message as string}
+                    </p>
+                )}
             </div>
+
 
             {/* district */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="district">District / Territory</label>
+                {/* <label htmlFor="district">District / Territory</label> */}
+                <label htmlFor="district">Enter Your District</label>
                 <input
                     id="district"
                     {...register('district', { required: 'district is required' })}

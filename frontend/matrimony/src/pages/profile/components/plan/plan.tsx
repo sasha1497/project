@@ -84,7 +84,7 @@ declare global {
 // ✅ Function to show price labels based on country & currency
 const getPriceLabel = (priceUSD: number, country?: string): string => {
   switch (country?.toLowerCase()) {
-    case 'india': return `₹${priceUSD * 194}`;
+    case 'india': return `₹${priceUSD * 294}`;
     case 'bahrain':
     case 'kuwait': return `د.ك 10`;
     case 'oman': return `﷼ 10`;
@@ -132,8 +132,8 @@ const getPriceLabel = (priceUSD: number, country?: string): string => {
     case 'scotland': return `£10`;
     case 'england': return `£6`;
     case 'usa': return `$6`;
-    case 'canada': return `CA$${(priceUSD * 1.35).toFixed(2)}`;
-    case 'australia': return `A$${(priceUSD * 1.5).toFixed(2)}`;
+    case 'canada': return `CA$${(priceUSD * 6).toFixed(2)}`;
+    case 'australia': return `A$${(priceUSD * 6).toFixed(2)}`;
     default: return `$${priceUSD}`;
   }
 };
@@ -172,7 +172,7 @@ const getPriceLabel = (priceUSD: number, country?: string): string => {
 
 const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
   switch (country?.toLowerCase()) {
-    case 'india': return priceUSD * 194;
+    case 'india': return priceUSD * 294;
     case 'bahrain':
     case 'kuwait': return 10;              // matches label د.ك 10
     case 'oman': return 10;                // ﷼ 10
@@ -220,7 +220,7 @@ const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
     case 'scotland': return 10;            // £10
     case 'england': return 6;              // £6
     case 'usa': return 6;                  // $6
-    case 'canada': return priceUSD * 1.35; // keeps previous behavior
+    case 'canada': return 6; // keeps previous behavior
     case 'australia': return priceUSD * 1.5; // keeps previous behavior
     default: return priceUSD;
   }
@@ -418,7 +418,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                 <p className="text-white small">{plan.description}</p>
                 <h1 className={`my-3 fw-bold ${plan.colorClass}`}>
                   {getPriceLabel(plan.price, country)}
-                  <sub className="fs-6 text-white"> / 40 days</sub>
+                  <sub className="fs-6 text-white"> / 45 days</sub>
                 </h1>
                 <ul className="list-unstyled text-start mt-3 flex-grow-1">
                   {plan.features.map((feature: any, idx: any) => (

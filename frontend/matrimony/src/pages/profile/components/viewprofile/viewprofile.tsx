@@ -27,51 +27,51 @@ type User = {
 // const countries = ['India', 'USA']; // Example countries, update as needed
 const countries = [
   "India",
-  "USA",
-  "England",
-  "Australia",
-  "Canada",
-  "New Zealand",
-  "Scotland",
-  "Netherlands",
-  "Switzerland",
-  "Ireland",
-  "Bahrain",
-  "Kuwait",
-  "Oman",
-  "Qatar",
-  "Saudi Arabia",
-  "Dubai",
-  "Malta",
-  "Bermuda",
-  "Malaysia",
-  "Singapore",
-  "Germany",
-  "Sweden",
-  "Denmark",
-  "Sharjah",
-  "Abhudhabi",
-  "Brunei",
-  "Mauritius",
-  "Philippine",
-  "Israel",
-  "Sri Lanka",
-  "wales",
-  "Finland",
-  "Bahamas",
-  "Fiji",
-  "Solomon Island",
-  "Barbados",
-  "Saint Lucia",
-  "Zambia",
-  "Botswana",
-  "Egypt",
-  "Mexico",
-  "Thailand",
-  "Colombia",
-  "Greece",
-  "Ghana",
-  "Norway"
+  // "USA",
+  // "England",
+  // "Australia",
+  // "Canada",
+  // "New Zealand",
+  // "Scotland",
+  // "Netherlands",
+  // "Switzerland",
+  // "Ireland",
+  // "Bahrain",
+  // "Kuwait",
+  // "Oman",
+  // "Qatar",
+  // "Saudi Arabia",
+  // "Dubai",
+  // "Malta",
+  // "Bermuda",
+  // "Malaysia",
+  // "Singapore",
+  // "Germany",
+  // "Sweden",
+  // "Denmark",
+  // "Sharjah",
+  // "Abhudhabi",
+  // "Brunei",
+  // "Mauritius",
+  // "Philippine",
+  // "Israel",
+  // "Sri Lanka",
+  // "wales",
+  // "Finland",
+  // "Bahamas",
+  // "Fiji",
+  // "Solomon Island",
+  // "Barbados",
+  // "Saint Lucia",
+  // "Zambia",
+  // "Botswana",
+  // "Egypt",
+  // "Mexico",
+  // "Thailand",
+  // "Colombia",
+  // "Greece",
+  // "Ghana",
+  // "Norway"
 ];
 
 const genders = ["Male", "Female", "Transgender"];
@@ -144,7 +144,7 @@ const ViewProfile: React.FC = () => {
 
   const dispatch = useDispatch();
 
-   const [deleteUserAccount] = useDeleteUserAccountMutation();
+  const [deleteUserAccount] = useDeleteUserAccountMutation();
 
   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
 
@@ -213,28 +213,28 @@ const ViewProfile: React.FC = () => {
 
   const handleDeleteAccount = async () => {
 
-  if (!userId) {
-    toast.error("User ID not found");
-    return;
-  }
+    if (!userId) {
+      toast.error("User ID not found");
+      return;
+    }
 
-  const confirmDelete = window.confirm("Are you sure you want to delete your account?");
-  if (!confirmDelete) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete your account?");
+    if (!confirmDelete) return;
 
-  try {
-    await deleteUserAccount(userId).unwrap();
-    toast.success("Account deleted successfully");
+    try {
+      await deleteUserAccount(userId).unwrap();
+      toast.success("Account deleted successfully");
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-    dispatch(closeViewPopup());
-    window.location.href = "/dashboard"; // redirect
-  } catch (err: any) {
-    toast.error("Failed to delete account");
-    console.error(err);
-  }
-};
+      dispatch(closeViewPopup());
+      window.location.href = "/dashboard"; // redirect
+    } catch (err: any) {
+      toast.error("Failed to delete account");
+      console.error(err);
+    }
+  };
 
 
   return (
@@ -298,6 +298,45 @@ const ViewProfile: React.FC = () => {
 
             {/* Step 2: State */}
             {step === 2 && (
+              // <div className="mb-3">
+              //   <motion.h4
+              //     className="form-label fw-bold mb-5 text-primary jump-heading"
+              //     initial={{ opacity: 0, y: -50 }}
+              //     animate={{ opacity: 1, y: 0 }}
+              //     transition={{ duration: 0.6, ease: "easeOut" }}
+              //   >
+              //     {/* You can select your interest <span className='text-danger'>State / Region</span> to get bride or groom? */}
+              //     You can select your interest <span className='text-danger'>State</span> to get bride or groom?
+              //   </motion.h4>
+              //   <input
+              //     type="text"
+              //     value={formValues.state}
+              //     onChange={(e) => setFormValues({ ...formValues, state: e.target.value })}
+              //     // placeholder="Enter State / Region"
+              //     placeholder="Enter State"
+              //     className="form-control"
+              //   />
+
+              //   {/* 👇 Clickable helper text */}
+              //   <p
+              //     className="text-primary mt-2 dont-have-text cursor-pointer"
+              //     onClick={() => setFormValues({ ...formValues, state: "N/A" })}
+              //   >
+              //     I Don’t Know State / Region
+              //   </p>
+              //   <div className="d-flex justify-content-between mt-3">
+              //     <button onClick={handlePrevStep} className="btn btn-outline-secondary">
+              //       Back
+              //     </button>
+              //     <button
+              //       disabled={!formValues.state}
+              //       onClick={handleNextStep}
+              //       className="btn btn-primary blinking-btn"
+              //     >
+              //       Next →
+              //     </button>
+              //   </div>
+              // </div>
               <div className="mb-3">
                 <motion.h4
                   className="form-label fw-bold mb-5 text-primary jump-heading"
@@ -305,23 +344,63 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>State / Region</span> to get bride or groom?
+                  You can select your interest <span className='text-danger'>State</span> to get bride or groom?
                 </motion.h4>
-                <input
-                  type="text"
+
+                {/* ✅ Dropdown for Indian States */}
+                <select
                   value={formValues.state}
                   onChange={(e) => setFormValues({ ...formValues, state: e.target.value })}
-                  placeholder="Enter State / Region"
                   className="form-control"
-                />
+                >
+                  <option value="">Select State</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                  <option value="Ladakh">Ladakh</option>
+                  <option value="Lakshadweep">Lakshadweep</option>
+                  <option value="Puducherry">Puducherry</option>
+                </select>
 
                 {/* 👇 Clickable helper text */}
-                <p
+                {/* <p
                   className="text-primary mt-2 dont-have-text cursor-pointer"
                   onClick={() => setFormValues({ ...formValues, state: "N/A" })}
                 >
                   I Don’t Know State / Region
-                </p>
+                </p> */}
+
+                {/* Navigation Buttons */}
                 <div className="d-flex justify-content-between mt-3">
                   <button onClick={handlePrevStep} className="btn btn-outline-secondary">
                     Back
@@ -335,6 +414,7 @@ const ViewProfile: React.FC = () => {
                   </button>
                 </div>
               </div>
+
             )}
 
             {/* Step 3: District */}
@@ -346,20 +426,23 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom?
+                  {/* You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom? */}
+                  You can select your interest <span className='text-danger'> District</span> to get bride or groom?
                 </motion.h4>
                 <input
                   type="text"
                   value={formValues.district}
                   onChange={(e) => setFormValues({ ...formValues, district: e.target.value })}
-                  placeholder="Enter District / Territory"
+                  // placeholder="Enter District / Territory"
+                  placeholder="Enter District"
                   className="form-control"
                 />
                 <p
                   className="text-primary mt-2 dont-have-text cursor-pointer"
                   onClick={() => setFormValues({ ...formValues, district: "N/A" })}
                 >
-                  I don’t have a District / Territory
+                  {/* I don’t have a District / Territory */}
+                  I don’t have a District
                 </p>
                 <div className="d-flex justify-content-between mt-3">
                   <button onClick={handlePrevStep} className="btn btn-outline-secondary">
@@ -387,6 +470,9 @@ const ViewProfile: React.FC = () => {
                 >
                   You can select your interest <span className='text-danger'>Gender</span> to get bride or groom?
                 </motion.h4>
+                <label htmlFor="gender" className="form-label fw-bold fs-4 text-primary">
+                  Select Now
+                </label>
                 <select
                   value={formValues.gender}
                   onChange={(e) => setFormValues({ ...formValues, gender: e.target.value })}

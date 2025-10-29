@@ -195,7 +195,7 @@ const SignUp: React.FC = () => {
             <h2 className="card-title text-center mb-4">Sign In 👋</h2>
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Mobile input with country code, connected to react-hook-form */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <PhoneInput
                   country="in"
                   value={mobile}
@@ -209,6 +209,30 @@ const SignUp: React.FC = () => {
                   placeholder="Enter mobile number"
                 />
                 {errors.mobileNumber && <div className="invalid-feedback">{errors.mobileNumber.message}</div>}
+              </div> */}
+              <div className="mb-3">
+                <PhoneInput
+                  country="in"
+                  onlyCountries={['in']}       // ✅ Restrict to India only
+                  disableDropdown={true}       // ✅ Hide the country selector
+                  countryCodeEditable={false}  // ✅ Prevent editing +91
+                  value={mobile}
+                  onChange={(phone) => {
+                    const fullPhone = "+" + phone;
+                    setMobile(fullPhone);
+                    setValue("mobileNumber", fullPhone, { shouldValidate: true });
+                  }}
+                  inputClass={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
+                  inputStyle={{ width: "100%" }}
+                  placeholder="Enter mobile number"
+                />
+
+                {errors.mobileNumber && (
+                  <div className="invalid-feedback">
+                    {errors.mobileNumber.message}
+                  </div>
+                )}
+
               </div>
 
               <div className="mb-3">
@@ -243,16 +267,37 @@ const SignUp: React.FC = () => {
             <h5 className="text-center mb-3">Forgot Password</h5>
 
             {!passwordStep && step === "mobile" && (
+              // <>
+              //   <PhoneInput
+              //     country="in"
+              //     value={mobile}
+              //     onChange={(phone) => setMobile("+" + phone)}
+              //     inputClass="form-control mb-3"
+              //     inputStyle={{ width: "100%" }}
+              //     placeholder="Enter mobile number"
+              //   />
+              //   <button className="btn btn-primary w-100 mt-3" onClick={handleMobileSubmit} disabled={loading}>
+              //     {loading ? 'Sending...' : 'Send OTP'}
+              //   </button>
+              // </>
               <>
                 <PhoneInput
                   country="in"
+                  onlyCountries={['in']}        // ✅ Restrict to India only
+                  disableDropdown={true}        // ✅ Hide country dropdown
+                  countryCodeEditable={false}   // ✅ Prevent editing +91
                   value={mobile}
                   onChange={(phone) => setMobile("+" + phone)}
                   inputClass="form-control mb-3"
                   inputStyle={{ width: "100%" }}
                   placeholder="Enter mobile number"
                 />
-                <button className="btn btn-primary w-100 mt-3" onClick={handleMobileSubmit} disabled={loading}>
+
+                <button
+                  className="btn btn-primary w-100 mt-3"
+                  onClick={handleMobileSubmit}
+                  disabled={loading}
+                >
                   {loading ? 'Sending...' : 'Send OTP'}
                 </button>
               </>

@@ -64,7 +64,7 @@ const Step4: React.FC<Props> = ({ methods }) => {
     <div>
       {/* Caste Field */}
       <div className="mb-3">
-        <label className="form-label">Caste</label>
+        <label className="form-label">Enter Your Caste</label>
         <input
           type="text"
           placeholder="Enter your caste"
@@ -80,7 +80,7 @@ const Step4: React.FC<Props> = ({ methods }) => {
 
       {/* Religion Field */}
       <div className="mb-3">
-        <label className="form-label">Religion</label>
+        <label className="form-label">Enter your Religion</label>
         <input
           type="text"
           placeholder="Enter your religion"

@@ -21,7 +21,7 @@
 }
 
 @keyframes borderAnimation {
-  0% {
+  0% { 
     border-color: #007bff;
   }
   50% {

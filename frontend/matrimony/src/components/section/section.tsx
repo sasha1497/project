@@ -4,6 +4,10 @@ import "./section.css";
 import { motion } from "framer-motion";
 import Couples from "../couples/couples";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+
+
 
 
 const Section = () => {
@@ -13,8 +17,55 @@ const Section = () => {
     navigate("/signup", { state: { flag } });
   };
 
+
+
+
+  //  const handlePayment = async () => {
+  //   const order = await axios.post("http://localhost:3002/cashfree/order", {
+  //     amount: 1,
+  //     user: {
+  //       id: "user001",
+  //       email: "test@gmail.com",
+  //       phone: "9999999999"
+  //     }
+  //   });
+
+  //   // const cashfree = new Cashfree();
+  //   const cashfree = new Cashfree();
+
+
+  //   cashfree.checkout({
+  //     paymentSessionId: order.data.payment_session_id,
+  //     redirectTarget: "_self"  // or "_blank"
+  //   });
+  // };
+
+
+  const handlePayment = async () => {
+    const order = await axios.post("http://localhost:3002/cashfree/order", {
+      amount: 1,
+      user: {
+        id: "user001",
+        email: "test@gmail.com",
+        phone: "9999999999"
+      }
+    });
+
+     const cashfree = (window as any).Cashfree({
+    mode: "sandbox",
+  });
+
+    cashfree.checkout({
+      paymentSessionId: order.data.payment_session_id,
+      redirectTarget: "_self"
+    });
+  };
+
   return (
     <div>
+      <button onClick={handlePayment}>
+        Pay ₹499
+      </button>
       <motion.section
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}

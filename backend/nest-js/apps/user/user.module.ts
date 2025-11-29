@@ -15,6 +15,8 @@ import { MainModule } from '@app/main/main.module';
 import { SMSService } from './services/sms.service';
 import { RegisterService } from './services/register.service';
 import { MailService } from './services/mail.service';
+import { CashfreeController } from './controllers/cashfree.controller';
+import { CashfreeService } from './services/cashhfree.service';
 
 @Module({
   imports: [
@@ -24,7 +26,8 @@ import { MailService } from './services/mail.service';
   controllers: [
     UserController,
     RazorpayController,
-    UploadController  // controllers only here
+    UploadController , // controllers only here
+    CashfreeController
   ],
   providers: [
     UserService,
@@ -34,7 +37,8 @@ import { MailService } from './services/mail.service';
     AssetService,
     SMSService,
     RegisterService,
-    MailService
+    MailService,
+    CashfreeService
   ],
 })
 export class UserModule {}

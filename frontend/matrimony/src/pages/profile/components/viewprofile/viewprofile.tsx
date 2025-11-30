@@ -270,7 +270,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>Country</span> to get bride or groom?
+                  You can select your interest <span className='text-danger'>Country</span> for get marraige ?
                 </motion.h4>
                 <select
                   value={formValues.country}
@@ -344,7 +344,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>State</span> to get bride or groom?
+                  You can select your interest <span className='text-danger'>State</span> for get marraige ?
                 </motion.h4>
 
                 {/* ✅ Dropdown for Indian States */}
@@ -427,7 +427,7 @@ const ViewProfile: React.FC = () => {
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
                   {/* You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom? */}
-                  You can select your interest <span className='text-danger'> District</span> to get bride or groom?
+                  You can select your interest <span className='text-danger'> District</span> for get marraige ?
                 </motion.h4>
                 <input
                   type="text"
@@ -468,7 +468,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>Gender</span> to get bride or groom?
+                  You can select your interest <span className='text-danger'>Gender</span> for get marraige ?
                 </motion.h4>
                 <label htmlFor="gender" className="form-label fw-bold fs-4 text-primary">
                   Select Now

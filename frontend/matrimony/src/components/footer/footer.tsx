@@ -49,7 +49,7 @@ const Footer = () => {
 
         <hr className="bg-light" />
         <div className="text-center">
-          <p className="mb-0">&copy; {new Date().getFullYear()} Bajol. All Rights Reserved.</p>
+          <p className="mb-0">&copy; {new Date().getFullYear()} BAJOL ONLINE MATRIMONY PRIVATE LIMITED. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

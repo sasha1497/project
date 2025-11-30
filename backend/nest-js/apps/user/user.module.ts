@@ -38,7 +38,8 @@ import { CashfreeService } from './services/cashfree.service';
     AssetService,
     SMSService,
     RegisterService,
-    MailService
+    MailService,
+    CashfreeService
   ],
 })
 export class UserModule {}

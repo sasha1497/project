@@ -16,7 +16,7 @@ import { SMSService } from './services/sms.service';
 import { RegisterService } from './services/register.service';
 import { MailService } from './services/mail.service';
 import { CashfreeController } from './controllers/cashfree.controller';
-import { CashfreeService } from './services/cashhfree.service';
+import { CashfreeService } from './services/cashfree.service';
 
 @Module({
   imports: [
@@ -27,13 +27,14 @@ import { CashfreeService } from './services/cashhfree.service';
     UserController,
     RazorpayController,
     UploadController , // controllers only here
-    CashfreeController
+    CashfreeController,
   ],
   providers: [
     UserService,
     RazorpayService,  
     UserModel,
     SubscriptionService,
+    CashfreeService,
     AssetService,
     SMSService,
     RegisterService,

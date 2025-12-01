@@ -5,67 +5,91 @@ import { motion } from "framer-motion";
 import Couples from "../couples/couples";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { load } from '@cashfreepayments/cashfree-js'
 
 
 
 
 
 const Section = () => {
+
+  const [cashfree, setCashfree] = useState<any>(null);
+  const [orderId, setOrderId] = useState("");
+
   const navigate = useNavigate(); // initialize it
 
   const handleClick = (flag: number) => {
     navigate("/signup", { state: { flag } });
   };
 
+  useEffect(() => {
+    (async () => {
+      const cf = await load({ mode: "production" }); // initialize SDK here
+      setCashfree(cf);
+      console.log("Cashfree SDK Loaded ✔");
+    })();
+  }, []);
 
+  
 
-
-  //  const handlePayment = async () => {
-  //   const order = await axios.post("http://localhost:3002/cashfree/order", {
-  //     amount: 1,
-  //     user: {
-  //       id: "user001",
-  //       email: "test@gmail.com",
-  //       phone: "9999999999"
-  //     }
-  //   });
-
-  //   // const cashfree = new Cashfree();
-  //   const cashfree = new Cashfree();
-
-
-  //   cashfree.checkout({
-  //     paymentSessionId: order.data.payment_session_id,
-  //     redirectTarget: "_self"  // or "_blank"
-  //   });
-  // };
-
-
-  const handlePayment = async () => {
-    const order = await axios.post("http://localhost:3002/cashfree/order", {
-      amount: 1,
-      user: {
-        id: "user001",
-        email: "test@gmail.com",
-        phone: "9999999999"
+  const getSessionId = async () => {
+  try {
+    const res = await axios.post("https://usrapi.bajolmatrimony.com/cashfree/create-subscription-order", {
+      order_id: "order_123456788",
+      order_amount: 1000,
+      order_currency: "INR",
+      user_id: 5,
+      plan_id: 1,
+      order_note: "Monthly Subscription Payment",
+      customer_id: "2",
+      customer_phone: "9999997998",
+      order_meta: {
+        return_url: "https://app.bajolmatrimony.com/payment/callback"
       }
     });
 
-     const cashfree = (window as any).Cashfree({
-    mode: "sandbox",
+    console.log("Order Response:", res.data);
+
+    setOrderId(res.data.order_id);
+
+    // 🔥 Correct session extraction
+    return res.data.cashfree_order.payment_session_id;
+  } catch (err) {
+    console.log("Session Error:", err);
+  }
+};
+
+
+const handlePayment = async () => {
+  if (!cashfree) {
+    alert("❌ Cashfree SDK not ready!");
+    return;
+  }
+
+  const sessionId = await getSessionId();
+  console.log("SESSION:", sessionId);
+
+  if (!sessionId) {
+    alert("❌ No Session ID received from backend");
+    return;
+  }
+
+  await cashfree.checkout({
+    paymentSessionId: sessionId,  // YES 🔥
+    redirectTarget: "_modal",     // modal view
   });
 
-    cashfree.checkout({
-      paymentSessionId: order.data.payment_session_id,
-      redirectTarget: "_self"
-    });
-  };
+  console.log("Payment window opened...");
+};
+
+
+
 
   return (
     <div>
-      <button onClick={handlePayment}>
+      {/* <button onClick={handlePayment}>
         Pay ₹499
-      </button>
+      </button> */}
       <motion.section
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}

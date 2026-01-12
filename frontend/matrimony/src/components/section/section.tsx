@@ -126,7 +126,7 @@ const handlePayment = async () => {
                     className=" px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(2)}
                   >
-                    🚀 No
+                    🚀 Register Now
                   </motion.button>
                 </div>
               </motion.div>

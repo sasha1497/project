@@ -1,18 +1,20 @@
 import { motion } from "framer-motion";
 import young1 from '../../asset/young1.jpg';
 import young2 from '../../asset/young2.jpg';
-import pink1 from '../../asset/pink1.jpg';
-import pink2 from '../../asset/pink2.jpg';
-import hair1 from '../../asset/hair1.jpg';
-import hair2 from '../../asset/hair2.jpg';
-import thatha from "../../asset/thatha.jpg";
-import b1 from "../../asset/b1.jpg";
+// import pink1 from '../../asset/pink1.jpg';
+// import pink2 from '../../asset/pink2.jpg';
+// import hair1 from '../../asset/hair1.jpg';
+// import hair2 from '../../asset/hair2.jpg';
+// import thatha from "../../asset/thatha.jpg";
+// import b1 from "../../asset/b1.jpg";
 
 
 import './couples.css';
 
 const Couples = () => {
-    const coupleImages = [young1, pink1, young2, hair1, pink2, hair2, thatha, b1];
+    // const coupleImages = [young1, pink1, young2, hair1, pink2, hair2, thatha, b1];
+    const coupleImages = [young1, young2];
+
 
     return (
         <div className="container-fluid my-4">

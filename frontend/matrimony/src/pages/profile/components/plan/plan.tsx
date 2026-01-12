@@ -356,6 +356,25 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
     await cashfree.checkout({
       paymentSessionId: sessionId,
       redirectTarget: "_modal",  // Popup Modal 🔥
+
+      onSuccess: function (data: any) {
+        console.log("✅ Payment Success:", data);
+
+        // optional: show toast / success message
+        setTimeout(() => {
+          // window.location.reload();
+          window.location.href = "/profile";
+        }, 2000); // 2 seconds delay
+      },
+
+      onFailure: function (data: any) {
+        console.log("❌ Payment Failed:", data);
+        alert("Payment failed, please try again");
+      },
+
+      onClose: function () {
+        console.log("Modal closed by user");
+      }
     });
 
     console.log("Payment Modal Launched!");
@@ -464,7 +483,8 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
             ease: 'easeInOut',
           }}
         >
-          * After payment you can go to profile gallery *
+          {/* * After Payment On Reload Button to go Next page * */}
+          * After Payment You Touch On Reload Button *
         </motion.p>
 
         <>
@@ -508,7 +528,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                 <button
                   className="btn mt-4 w-100 fw-bold bg-white text-dark border-0 blinking-btn"
                   // onClick={() => handleSelectPlan(plan.plan_id, country, plan.price)}
-                 onClick={() => startCashfreePayment(plan.plan_id, plan.price)}
+                  onClick={() => startCashfreePayment(plan.plan_id, plan.price)}
                 >
                   SELECT
                 </button>

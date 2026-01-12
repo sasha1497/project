@@ -610,7 +610,7 @@ const ViewProfile: React.FC = () => {
                 src={selectedUser.userDetails.imageData[currentIndex].url}
                 alt={selectedUser.userDetails.imageData[currentIndex].name}
                 className="popup-image"
-                style={{ maxWidth: '100%', maxHeight: '80vh', borderRadius: '8px' }}
+                style={{ maxWidth: '50vh', maxHeight: '50vh', borderRadius: '8px' }}
               />
 
               <div className="view-profile-content">

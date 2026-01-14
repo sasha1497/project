@@ -139,7 +139,7 @@ export class UserService {
 
       // Calculate difference in days
       const diffDays = Math.floor((now.getTime() - createdAt.getTime()) / 1000 / 60 / 60 / 24);
-      const totalValidityDays = 90; // total expiry days
+      const totalValidityDays = 45; // total expiry days
       const remainingDays = totalValidityDays - diffDays;
 
       if (remainingDays > 0) {

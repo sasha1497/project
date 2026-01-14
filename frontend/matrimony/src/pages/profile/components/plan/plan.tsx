@@ -19,31 +19,31 @@ interface Plan {
 }
 
 const plans: Plan[] = [
-  {
-    plan_id: 1,
-    name: 'SILVER',
-    description: 'Best for exploring the platform',
-    price: 1,
-    features: [
-      'Create and manage profile',
-      'Limited daily profile views',
-      'Send up to 5 interests per day',
-      'View basic contact info (limited)',
-      'Basic support',
-    ],
-    colorClass: 'text-white',
-    // bgColor: '#C0C0C0'
-  },
+  // {
+  //   plan_id: 1,
+  //   name: 'SILVER',
+  //   description: 'Best for exploring the platform',
+  //   price: 1,
+  //   features: [
+  //     'Create and manage profile',
+  //     'Limited daily profile views',
+  //     'Send up to 5 interests per day',
+  //     'View basic contact info (limited)',
+  //     'Basic support',
+  //   ],
+  //   colorClass: 'text-white',
+  //   // bgColor: '#C0C0C0'
+  // },
   {
     plan_id: 2,
     name: 'GOLD',
     description: 'For serious users looking for quick matches',
     price: 1,
     features: [
+      'All Gold features',
       'Unlimited profile views',
-      'Send up to 25 interests per day',
-      'Chat with verified users',
-      'See who viewed your profile',
+      'Send up to many interests per day',
+      'Trust with verified users',
       'Priority listing in search',
       'Access to full contact info',
       'Customer support',
@@ -51,24 +51,24 @@ const plans: Plan[] = [
     colorClass: 'text-white',
     // bgColor: '#FFD700',
   },
-  {
-    plan_id: 3,
-    name: 'PLATINUM',
-    description: 'For those who want maximum reach and priority',
-    price: 1,
-    features: [
-      'All Gold features',
-      'Top placement in search results',
-      'Verified badge on your profile',
-      'Unlimited interest sending',
-      'Personal matchmaker assistance',
-      'Dedicated support team',
-      'Profile boost 5x per month',
-      'Priority customer care',
-    ],
-    colorClass: 'text-white',
-    // bgColor: '#E5E4E2',
-  },
+  // {
+  //   plan_id: 3,
+  //   name: 'PLATINUM',
+  //   description: 'For those who want maximum reach and priority',
+  //   price: 1,
+  //   features: [
+  //     'All Gold features',
+  //     'Top placement in search results',
+  //     'Verified badge on your profile',
+  //     'Unlimited interest sending',
+  //     'Personal matchmaker assistance',
+  //     'Dedicated support team',
+  //     'Profile boost 5x per month',
+  //     'Priority customer care',
+  //   ],
+  //   colorClass: 'text-white',
+  //   // bgColor: '#E5E4E2',
+  // },
 ];
 
 interface PlanProps {
@@ -317,8 +317,8 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         user_id: userId,
         plan_id: planId,
         order_id: `order_${Date.now()}`,
-        // order_amount: amount,
-        order_amount: 1,
+        order_amount: amount,
+        // order_amount: 1,
         order_currency: getCurrencyCode(country),
         customer_phone: "8610453387",
         customer_id: userId,
@@ -457,7 +457,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         <p
           className="mt-3 text-center pro_text"
         >
-          🚀 Unlock your matches by upgrading your plan! 💖✨
+          🚀 After payment you can go to profile gallery  🚀
         </p>
 
         {/* <motion.p

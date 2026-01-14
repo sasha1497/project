@@ -169,6 +169,8 @@ const SignUp: React.FC = () => {
         setNewPassword("");
         setConfirmPassword("");
         setTimer(0);
+
+        window.location.reload();
       } else {
         toast.error(result.message || "Failed to update password");
       }

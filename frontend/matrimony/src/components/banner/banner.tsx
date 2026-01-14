@@ -5,9 +5,13 @@ import ios from '../../asset/apple.svg'
 import figure from '../../asset/figure.png'
 import bajol from '../../asset/bajollogo.jpeg'
 import Footer from '../footer/footer';
+import { useState } from 'react';
 
 
 const Banner = () => {
+
+    const [showPopup, setShowPopup] = useState(false);
+
     const cards: { title: any, text: any }[] = [
         {
             title: "📝 Sign Up",
@@ -59,12 +63,33 @@ const Banner = () => {
                     </p>
                     <div className='d-flex'>
                         <div className='p-3'>
-                            <img src={and} alt="couple" className="img-fluid" />
+                            <img src={and} alt="couple" className="img-fluid" onClick={() => setShowPopup(true)}
+                            />
                         </div>
                         <div className='p-3'>
-                            <img src={ios} alt="couple" className="img-fluid" />
+                            <img src={ios} alt="couple" className="img-fluid" onClick={() => setShowPopup(true)}
+                            />
                         </div>
                     </div>
+                    {/* Popup */}
+                    {showPopup && (
+                        <div className="popup-overlay" onClick={() => setShowPopup(false)}>
+                            <div
+                                className="popup-content"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <h4 className='text-primary'>🚀 Coming Soon</h4>
+                                <p className='text-primary'>Our mobile app is launching soon. Stay tuned!</p>
+
+                                <button
+                                    className="btn btn-primary mt-3"
+                                    onClick={() => setShowPopup(false)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     <p className='mt-3'>
                         BajolMatrimony® - Trusted Matrimony, Bajol App
                         <b>&nbsp;20,000+ Downloads</b>

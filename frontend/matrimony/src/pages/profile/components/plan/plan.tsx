@@ -86,7 +86,8 @@ declare global {
 // ✅ Function to show price labels based on country & currency
 const getPriceLabel = (priceUSD: number, country?: string): string => {
   switch (country?.toLowerCase()) {
-    case 'india': return `₹${priceUSD * 294}`;
+    // case 'india': return `₹${priceUSD * 294}`;
+    case 'india': return `₹${priceUSD * 40}`;
     case 'bahrain':
     case 'kuwait': return `د.ك 10`;
     case 'oman': return `﷼ 10`;
@@ -174,7 +175,8 @@ const getPriceLabel = (priceUSD: number, country?: string): string => {
 
 const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
   switch (country?.toLowerCase()) {
-    case 'india': return priceUSD * 294;
+    // case 'india': return priceUSD * 294;
+    case 'india': return priceUSD * 40;
     case 'bahrain':
     case 'kuwait': return 10;              // matches label د.ك 10
     case 'oman': return 10;                // ﷼ 10
@@ -515,7 +517,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                 <p className="text-white small">{plan.description}</p>
                 <h1 className={`my-3 fw-bold ${plan.colorClass}`}>
                   {getPriceLabel(plan.price, country)}
-                  <sub className="fs-6 text-white"> / 45 days</sub>
+                  {/* {<sub className="fs-6 text-white"> / 45 days</sub>} */}
                 </h1>
                 <ul className="list-unstyled text-start mt-3 flex-grow-1">
                   {plan.features.map((feature: any, idx: any) => (

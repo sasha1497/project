@@ -106,6 +106,16 @@ const ViewProfile: React.FC = () => {
     });
   };
 
+  const handleNoDistrict = () => {
+    setFormValues((prev) => ({
+      ...prev,
+      district: "N/A",
+    }));
+
+    toast.info("District skipped");
+    handleNextStep();
+  };
+
 
   // Form inputs
   const [countryInput, setCountryInput] = useState<string>('');
@@ -355,7 +365,7 @@ const ViewProfile: React.FC = () => {
                 >
                   <option value="">Select State</option>
                   <option value="Kerala">Kerala</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  {/* <option value="Tamil Nadu">Tamil Nadu</option>
                   <option value="Andhra Pradesh">Andhra Pradesh</option>
                   <option value="Telangana">Telangana</option>
                   <option value="Karnataka">Karnataka</option>
@@ -389,7 +399,7 @@ const ViewProfile: React.FC = () => {
                   <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                   <option value="Ladakh">Ladakh</option>
                   <option value="Lakshadweep">Lakshadweep</option>
-                  <option value="Puducherry">Puducherry</option>
+                  <option value="Puducherry">Puducherry</option> */}
                 </select>
 
                 {/* 👇 Clickable helper text */}
@@ -429,17 +439,42 @@ const ViewProfile: React.FC = () => {
                   {/* You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom? */}
                   You can select your interest <span className='text-danger'> District</span> for get marraige ?
                 </motion.h4>
-                <input
+                {/* <input
                   type="text"
                   value={formValues.district}
                   onChange={(e) => setFormValues({ ...formValues, district: e.target.value })}
                   // placeholder="Enter District / Territory"
                   placeholder="Enter District"
                   className="form-control"
-                />
+                /> */}
+                <select
+                  value={formValues.district}
+                  onChange={(e) =>
+                    setFormValues({ ...formValues, district: e.target.value })
+                  }
+                  className="form-control"
+                >
+                  <option value="">Select District</option>
+                  <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                  <option value="Kollam">Kollam</option>
+                  <option value="Pathanamthitta">Pathanamthitta</option>
+                  <option value="Alappuzha">Alappuzha</option>
+                  <option value="Kottayam">Kottayam</option>
+                  <option value="Idukki">Idukki</option>
+                  <option value="Ernakulam">Ernakulam</option>
+                  <option value="Thrissur">Thrissur</option>
+                  <option value="Palakkad">Palakkad</option>
+                  <option value="Malappuram">Malappuram</option>
+                  <option value="Kozhikode">Kozhikode</option>
+                  <option value="Wayanad">Wayanad</option>
+                  <option value="Kannur">Kannur</option>
+                  <option value="Kasaragod">Kasaragod</option>
+                </select>
                 <p
                   className="text-primary mt-2 dont-have-text cursor-pointer"
-                  onClick={() => setFormValues({ ...formValues, district: "N/A" })}
+                  // onClick={() => setFormValues({ ...formValues, district: "N/A" })}
+                  onClick={handleNoDistrict}
+
                 >
                   {/* I don’t have a District / Territory */}
                   I don’t have a District

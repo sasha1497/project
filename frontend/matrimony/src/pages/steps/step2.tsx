@@ -110,7 +110,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
                 >
                     <option value="">Select Your State</option>
                     <option value="Kerala">Kerala</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    {/* <option value="Tamil Nadu">Tamil Nadu</option>
                     <option value="Andhra Pradesh">Andhra Pradesh</option>
                     <option value="Telangana">Telangana</option>
                     <option value="Karnataka">Karnataka</option>
@@ -144,7 +144,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
                     <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                     <option value="Ladakh">Ladakh</option>
                     <option value="Lakshadweep">Lakshadweep</option>
-                    <option value="Puducherry">Puducherry</option>
+                    <option value="Puducherry">Puducherry</option> */}
                 </select>
 
                 {errors.state && (
@@ -156,9 +156,9 @@ const Step2: React.FC<Props> = ({ methods }) => {
 
 
             {/* district */}
-            <div style={{ marginBottom: '1rem' }}>
-                {/* <label htmlFor="district">District / Territory</label> */}
-                <label htmlFor="district">Enter Your District</label>
+            {/* <div style={{ marginBottom: '1rem' }}> */}
+            {/* <label htmlFor="district">District / Territory</label> */}
+            {/* <label htmlFor="district">Enter Your District</label>
                 <input
                     id="district"
                     {...register('district', { required: 'district is required' })}
@@ -169,7 +169,43 @@ const Step2: React.FC<Props> = ({ methods }) => {
                         {errors.district.message as string}
                     </p>
                 )}
+            </div> */}
+
+            {/* district */}
+            <div style={{ marginBottom: '1rem' }}>
+                <label htmlFor="district">Select Your District</label>
+
+                <select
+                    id="district"
+                    {...register('district', {
+                        required: 'District is required',
+                    })}
+                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                >
+                    <option value="">Select Your District</option>
+                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                    <option value="Kollam">Kollam</option>
+                    <option value="Pathanamthitta">Pathanamthitta</option>
+                    <option value="Alappuzha">Alappuzha</option>
+                    <option value="Kottayam">Kottayam</option>
+                    <option value="Idukki">Idukki</option>
+                    <option value="Ernakulam">Ernakulam</option>
+                    <option value="Thrissur">Thrissur</option>
+                    <option value="Palakkad">Palakkad</option>
+                    <option value="Malappuram">Malappuram</option>
+                    <option value="Kozhikode">Kozhikode</option>
+                    <option value="Wayanad">Wayanad</option>
+                    <option value="Kannur">Kannur</option>
+                    <option value="Kasaragod">Kasaragod</option>
+                </select>
+
+                {errors.district && (
+                    <p style={{ color: 'red', marginBottom: '10px' }}>
+                        {errors.district.message as string}
+                    </p>
+                )}
             </div>
+
 
         </div>
     );

@@ -30,57 +30,57 @@ const Section = () => {
     })();
   }, []);
 
-  
+
 
   const getSessionId = async () => {
-  try {
-    const res = await axios.post("https://usrapi.bajolmatrimony.com/cashfree/create-subscription-order", {
-      order_id: "order_123456788",
-      order_amount: 1000,
-      order_currency: "INR",
-      user_id: 5,
-      plan_id: 1,
-      order_note: "Monthly Subscription Payment",
-      customer_id: "2",
-      customer_phone: "9999997998",
-      order_meta: {
-        return_url: "https://app.bajolmatrimony.com/payment/callback"
-      }
+    try {
+      const res = await axios.post("https://usrapi.bajolmatrimony.com/cashfree/create-subscription-order", {
+        order_id: "order_123456788",
+        order_amount: 1000,
+        order_currency: "INR",
+        user_id: 5,
+        plan_id: 1,
+        order_note: "Monthly Subscription Payment",
+        customer_id: "2",
+        customer_phone: "9999997998",
+        order_meta: {
+          return_url: "https://app.bajolmatrimony.com/payment/callback"
+        }
+      });
+
+      console.log("Order Response:", res.data);
+
+      setOrderId(res.data.order_id);
+
+      // 🔥 Correct session extraction
+      return res.data.cashfree_order.payment_session_id;
+    } catch (err) {
+      console.log("Session Error:", err);
+    }
+  };
+
+
+  const handlePayment = async () => {
+    if (!cashfree) {
+      alert("❌ Cashfree SDK not ready!");
+      return;
+    }
+
+    const sessionId = await getSessionId();
+    console.log("SESSION:", sessionId);
+
+    if (!sessionId) {
+      alert("❌ No Session ID received from backend");
+      return;
+    }
+
+    await cashfree.checkout({
+      paymentSessionId: sessionId,  // YES 🔥
+      redirectTarget: "_modal",     // modal view
     });
 
-    console.log("Order Response:", res.data);
-
-    setOrderId(res.data.order_id);
-
-    // 🔥 Correct session extraction
-    return res.data.cashfree_order.payment_session_id;
-  } catch (err) {
-    console.log("Session Error:", err);
-  }
-};
-
-
-const handlePayment = async () => {
-  if (!cashfree) {
-    alert("❌ Cashfree SDK not ready!");
-    return;
-  }
-
-  const sessionId = await getSessionId();
-  console.log("SESSION:", sessionId);
-
-  if (!sessionId) {
-    alert("❌ No Session ID received from backend");
-    return;
-  }
-
-  await cashfree.checkout({
-    paymentSessionId: sessionId,  // YES 🔥
-    redirectTarget: "_modal",     // modal view
-  });
-
-  console.log("Payment window opened...");
-};
+    console.log("Payment window opened...");
+  };
 
 
 
@@ -107,7 +107,8 @@ const handlePayment = async () => {
                 transition={{ duration: 0.6 }}
               >
                 <p className="fw-semibold text-light mb-3 blink-text fs-larger">
-                  Are you already registered ?
+                  {/* Are you already registered ? */}
+                  നിങ്ങൾ ഇതിനകം രജിസ്റ്റർ ചെയ്തിട്ടുണ്ടോ?
                 </p>
 
                 <div className="d-flex justify-content-center gap-3">
@@ -117,7 +118,8 @@ const handlePayment = async () => {
                     className="px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(1)}
                   >
-                    ✅ Yes
+                    {/* ✅ Yes */}
+                    ✅ അതെ
                   </motion.button>
 
                   <motion.button
@@ -126,7 +128,8 @@ const handlePayment = async () => {
                     className=" px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(2)}
                   >
-                    🚀 Register Now
+                    {/* 🚀 Register Now */}
+                    🚀 ഇപ്പോൾ രജിസ്റ്റർ ചെയ്യുക
                   </motion.button>
                 </div>
               </motion.div>
@@ -137,7 +140,8 @@ const handlePayment = async () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <p>💍 <span className="text-danger white-shadow-text">Dream</span> of <span className="text-danger white-shadow-text">Marriage</span></p>
+                {/* <p>💍 <span className="text-danger white-shadow-text">Dream</span> of <span className="text-danger white-shadow-text">Marriage</span></p> */}
+                <p>💍 <span className="text-danger white-shadow-text">വിവാഹത്തിന്റെ</span> <span className="text-danger white-shadow-text">സ്വപ്നം</span></p>
               </motion.h2>
               <motion.p
                 className="hero-subtext"
@@ -145,8 +149,13 @@ const handlePayment = async () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
+                {/* <span className="hero-subtext-inner">
+                  There are three ways to a happy marriage: The first way is to be kind. The second way is to be kind. The third way is to be kind.</span> */}
                 <span className="hero-subtext-inner">
-                  There are three ways to a happy marriage: The first way is to be kind. The second way is to be kind. The third way is to be kind.              </span>
+                  സന്തോഷകരമായ ഒരു വിവാഹത്തിലേക്ക് പോകാൻ മൂന്ന് വഴികളുണ്ട്:
+                  ആദ്യ വഴി ദയയുള്ളവരാകുക എന്നതാണ്.
+                  രണ്ടാമത്തെ വഴി ദയയുള്ളവരാകുക എന്നതാണ്.
+                  മൂന്നാമത്തെ വഴിയും ദയയുള്ളവരാകുക എന്നതാണ്.</span>
               </motion.p>
               <motion.div
                 className="hero-btn-wrapper"

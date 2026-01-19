@@ -424,7 +424,7 @@ const ViewProfilePopup = () => {
 
 
               {/* {district} */}
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">District</label>
                 <input
                   type="text"
@@ -432,7 +432,38 @@ const ViewProfilePopup = () => {
                   {...register("district", { required: "district is required" })}
                 />
                 {errors.district && <small className="text-danger">{errors.district.message}</small>}
+              </div> */}
+              <div className="mb-3">
+                <label className="form-label">District</label>
+
+                <select
+                  className="form-control"
+                  {...register("district", { required: "District is required" })}
+                >
+                  <option value="">Select District</option>
+                  <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                  <option value="Kollam">Kollam</option>
+                  <option value="Pathanamthitta">Pathanamthitta</option>
+                  <option value="Alappuzha">Alappuzha</option>
+                  <option value="Kottayam">Kottayam</option>
+                  <option value="Idukki">Idukki</option>
+                  <option value="Ernakulam">Ernakulam</option>
+                  <option value="Thrissur">Thrissur</option>
+                  <option value="Palakkad">Palakkad</option>
+                  <option value="Malappuram">Malappuram</option>
+                  <option value="Kozhikode">Kozhikode</option>
+                  <option value="Wayanad">Wayanad</option>
+                  <option value="Kannur">Kannur</option>
+                  <option value="Kasaragod">Kasaragod</option>
+                </select>
+
+                {errors.district && (
+                  <small className="text-danger">
+                    {errors.district.message}
+                  </small>
+                )}
               </div>
+
 
               {/* State */}
               {/* <div className="mb-3">
@@ -449,7 +480,8 @@ const ViewProfilePopup = () => {
                   {...register("state", { required: "State is required" })}
                 >
                   <option value="">-- Select State --</option>
-                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Kerala">Kerala</option>
+                  {/* <option value="Andhra Pradesh">Andhra Pradesh</option>
                   <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                   <option value="Assam">Assam</option>
                   <option value="Bihar">Bihar</option>
@@ -460,7 +492,6 @@ const ViewProfilePopup = () => {
                   <option value="Himachal Pradesh">Himachal Pradesh</option>
                   <option value="Jharkhand">Jharkhand</option>
                   <option value="Karnataka">Karnataka</option>
-                  <option value="Kerala">Kerala</option>
                   <option value="Madhya Pradesh">Madhya Pradesh</option>
                   <option value="Maharashtra">Maharashtra</option>
                   <option value="Manipur">Manipur</option>
@@ -486,7 +517,7 @@ const ViewProfilePopup = () => {
                   <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                   <option value="Ladakh">Ladakh</option>
                   <option value="Lakshadweep">Lakshadweep</option>
-                  <option value="Puducherry">Puducherry</option>
+                  <option value="Puducherry">Puducherry</option> */}
                 </select>
 
                 {errors.state && (

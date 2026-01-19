@@ -24,7 +24,8 @@ const Couples = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
-                ❤️ Alliances for Every Age | Bajol Matrimony ❤️
+                {/* ❤️ Alliances for Every Age | Bajol Matrimony ❤️ */}
+                ❤️ എല്ലാ പ്രായക്കാർക്കും അനുയോജ്യമായ വിവാഹാലോചനകൾ | Bajol Matrimony ❤️
             </motion.h2>
 
             <motion.div
@@ -90,7 +91,8 @@ const Couples = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    See more photos touch on the photo more see
+                    {/* See more photos touch on the photo more see */}
+                    കൂടുതൽ ഫോട്ടോകൾ കാണാൻ ചിത്രത്തിൽ സ്പർശിക്കുക
                 </motion.h2>
             </motion.div>
         </div>

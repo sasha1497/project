@@ -107,8 +107,7 @@ const Section = () => {
                 transition={{ duration: 0.6 }}
               >
                 <p className="fw-semibold text-light mb-3 blink-text fs-larger">
-                  {/* Are you already registered ? */}
-                  നിങ്ങൾ ഇതിനകം രജിസ്റ്റർ ചെയ്തിട്ടുണ്ടോ?
+                  Are you already registered ?
                 </p>
 
                 <div className="d-flex justify-content-center gap-3">
@@ -118,8 +117,7 @@ const Section = () => {
                     className="px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(1)}
                   >
-                    {/* ✅ Yes */}
-                    ✅ അതെ
+                    ✅ Do Register Now
                   </motion.button>
 
                   <motion.button
@@ -128,8 +126,7 @@ const Section = () => {
                     className=" px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(2)}
                   >
-                    {/* 🚀 Register Now */}
-                    🚀 ഇപ്പോൾ രജിസ്റ്റർ ചെയ്യുക
+                    🚀 Did
                   </motion.button>
                 </div>
               </motion.div>
@@ -140,8 +137,7 @@ const Section = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                {/* <p>💍 <span className="text-danger white-shadow-text">Dream</span> of <span className="text-danger white-shadow-text">Marriage</span></p> */}
-                <p>💍 <span className="text-danger white-shadow-text">വിവാഹത്തിന്റെ</span> <span className="text-danger white-shadow-text">സ്വപ്നം</span></p>
+                <p>💍 <span className="text-danger white-shadow-text">Dream</span> of <span className="text-danger white-shadow-text">Marriage</span></p>
               </motion.h2>
               <motion.p
                 className="hero-subtext"
@@ -149,13 +145,9 @@ const Section = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                {/* <span className="hero-subtext-inner">
-                  There are three ways to a happy marriage: The first way is to be kind. The second way is to be kind. The third way is to be kind.</span> */}
                 <span className="hero-subtext-inner">
-                  സന്തോഷകരമായ ഒരു വിവാഹത്തിലേക്ക് പോകാൻ മൂന്ന് വഴികളുണ്ട്:
-                  ആദ്യ വഴി ദയയുള്ളവരാകുക എന്നതാണ്.
-                  രണ്ടാമത്തെ വഴി ദയയുള്ളവരാകുക എന്നതാണ്.
-                  മൂന്നാമത്തെ വഴിയും ദയയുള്ളവരാകുക എന്നതാണ്.</span>
+                  There are three ways to a happy marriage: The first way is to be kind. The second way is to be kind. The third way is to be kind.</span>
+               
               </motion.p>
               <motion.div
                 className="hero-btn-wrapper"

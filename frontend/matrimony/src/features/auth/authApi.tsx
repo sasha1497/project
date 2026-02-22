@@ -5,7 +5,7 @@ export const authApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_API_BASE_URL,
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('token');
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
@@ -20,7 +20,14 @@ export const authApi = createApi({
         body: data,
       }),
     }),
+    registerUser: builder.mutation<any, any>({
+      query: (data) => ({
+        url: '/user/save',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginUserMutation } = authApi;
+export const { useLoginUserMutation, useRegisterUserMutation } = authApi;

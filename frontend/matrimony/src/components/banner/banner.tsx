@@ -12,43 +12,28 @@ const Banner = () => {
 
     const [showPopup, setShowPopup] = useState(false);
 
-    // const cards: { title: any, text: any }[] = [
-    //     {
-    //         title: "📝 Sign Up",
-    //         text: "Register for free & put up your Matrimony Profile"
-    //     },
-    //     {
-    //         title: "💞 Connect",
-    //         text: "Select find your perfect match & Connect with Matches you like"
-    //     },
-    //     {
-    //         title: "💬 Interact",
-    //         text: "Become a  Member & Start a Conversation & Change your life style"
-    //     },
-    // ];
-    const cards: { title: any; text: any }[] = [
+    const cards: { title: any, text: any }[] = [
         {
-            title: "📝 രജിസ്റ്റർ ചെയ്യുക",
-            text: "സൗജന്യമായി രജിസ്റ്റർ ചെയ്ത് നിങ്ങളുടെ മാട്രിമോണി പ്രൊഫൈൽ സൃഷ്ടിക്കുക"
+            title: "📝 Sign Up",
+            text: "Register for free & put up your Matrimony Profile"
         },
         {
-            title: "💞 ബന്ധപ്പെടുക",
-            text: "നിങ്ങളുടെ അനുയോജ്യമായ ജീവിത പങ്കാളിയെ തിരഞ്ഞെടുക്കുകയും ഇഷ്ടപ്പെട്ട മാച്ചുകളുമായി ബന്ധപ്പെടുകയും ചെയ്യുക"
+            title: "💞 Connect",
+            text: "Select find your perfect match & Connect with Matches you like"
         },
         {
-            title: "💬 ആശയവിനിമയം നടത്തുക",
-            text: "അംഗമാകുക, സംഭാഷണം ആരംഭിക്കുക, നിങ്ങളുടെ ജീവിതശൈലി മാറ്റുക"
+            title: "💬 Interact",
+            text: "Become a  Member & Start a Conversation & Change your life style"
         },
     ];
-
+   
 
     return (
         <div className="container-fluid" style={{ background: '#F5F5F5' }}>
             <div className="row">
                 <div className="col-12 text-center">
                     <p className="hero-text">
-                        {/* <span className='text-danger'>&hearts;</span> Find your Special Someone <span className='text-danger'>&hearts;</span> */}
-                        <span className='text-danger'>&hearts;</span> നിങ്ങളുടെ പ്രത്യേക വ്യക്തിയെ കണ്ടെത്തൂ <span className='text-danger'>&hearts;</span>
+                        <span className='text-danger'>&hearts;</span> Find your Special Someone <span className='text-danger'>&hearts;</span>
                     </p>
                 </div>
             </div>
@@ -74,12 +59,10 @@ const Banner = () => {
             </div>
             <div className="row" style={{ background: '#251839' }}>
                 <div className="col-12 col-md-6  text-white p-4 d-flex flex-column justify-content-center align-items-center text-center">
-                    {/* <p className='download-para'>
-                        To speed up your partner search, download <b>Bajol App</b>
-                    </p> */}
                     <p className='download-para'>
-                        നിങ്ങളുടെ പങ്കാളി തിരയൽ വേഗത്തിലാക്കാൻ, <b>Bajol App</b> ഡൗൺലോഡ് ചെയ്യുക
+                        To speed up your partner search, download <b>Bajol App</b>
                     </p>
+                  
                     <div className='d-flex'>
                         <div className='p-3'>
                             <img src={and} alt="couple" className="img-fluid" onClick={() => setShowPopup(true)}
@@ -138,7 +121,7 @@ const Banner = () => {
                     </div>
                 </div>
             </div>
-            {/* <div className='row'>
+            <div className='row'>
                 <div className='col-12  p-4 d-flex flex-column justify-content-center align-items-center text-center'>
                     <p className='download-para-millio d-flex  justify-content-center align-items-center text-center'>
                         <b>20,000+</b>&nbsp;have found their life partner at BajolMatrimony!
@@ -172,8 +155,8 @@ const Banner = () => {
                         </div>
                     </div>
                 </div>
-            </div> */}
-            <div className='row'>
+            </div>
+            {/* <div className='row'>
                 <div className='col-12 p-4 d-flex flex-column justify-content-center align-items-center text-center'>
 
                     <p className='download-para-millio d-flex justify-content-center align-items-center text-center'>
@@ -227,7 +210,7 @@ const Banner = () => {
                     </div>
 
                 </div>
-            </div>
+            </div> */}
 
 
             {/* <div className='row'>

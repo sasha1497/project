@@ -137,7 +137,7 @@ const getPriceLabel = (priceUSD: number, country?: string): string => {
     case 'usa': return `$6`;
     case 'canada': return `CA$${(priceUSD * 6).toFixed(2)}`;
     case 'australia': return `A$${(priceUSD * 6).toFixed(2)}`;
-    default: return `$${priceUSD}`;
+    default: return `₹${priceUSD * 30}`;
   }
 };
 
@@ -226,7 +226,7 @@ const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
     case 'usa': return 6;                  // $6
     case 'canada': return 6; // keeps previous behavior
     case 'australia': return priceUSD * 1.5; // keeps previous behavior
-    default: return priceUSD;
+    default: return priceUSD * 30;
   }
 };
 
@@ -459,7 +459,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         <p
           className="mt-3 text-center pro_text"
         >
-          🚀 After payment you can go to profile gallery  🚀
+          🚀 After payment you can go to register page Fill your Bio-data  🚀
         </p>
 
         {/* <motion.p

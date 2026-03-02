@@ -1,84 +1,96 @@
-import React, { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../app/store';
-import { updateFormData, resetForm, setTokens, setUse } from '../../features/form/formSlice';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { setTokens, setUse } from '../../features/form/formSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion } from "framer-motion";
 
-
-import Step1 from '../../pages/steps/step1';
-import Step2 from '../../pages/steps/step2';
-import Step3 from '../../pages/steps/step3';
-import Step4 from '../../pages/steps/step4';
-import Step5 from '../../pages/steps/step5';
-import Step6 from '../../pages/steps/step6';
-// import Step7 from '../../pages/steps/step7';
-import Step8 from '../../pages/steps/step8';
-import Step9 from '../../pages/steps/step9';
-
 import './multi.css';
 import { useSubmitFormMutation } from '../../features/form/formApi';
-// import { useRegisterUserMutation } from '../../features/auth/authApi';
-import { logout } from '../../features/auth/authSlice';
 import Loader from '../../components/loader/loader';
 
 import logo from '../../asset/bajollogo.jpeg';
 
+type SignupFormValues = {
+  mobile: string;
+  state: string;
+  password: string;
+  confirmPassword: string;
+};
 
-// const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9];
-const steps = [Step1, Step2, Step3, Step4, Step5, Step6, Step8, Step9];
-
+const INDIAN_STATES_AND_UTS = [
+  'Kerala',
+  'Tamil Nadu',
+  'Andhra Pradesh',
+  'Telangana',
+  'Karnataka',
+  'Punjab',
+  'Manipur',
+  'Gujarat',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Rajasthan',
+  'Sikkim',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry',
+];
 
 export default function App() {
-  const methods = useForm();
-  const [currentStep, setCurrentStep] = useState(0);
-  const CurrentComponent = steps[currentStep];
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<SignupFormValues>({
+    defaultValues: {
+      mobile: '',
+      state: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
   const dispatch = useDispatch();
-  const formState = useSelector((state: RootState) => state.form);
   const navigate = useNavigate();
-
-  const [submitForm, { isLoading, isError, isSuccess, error }] = useSubmitFormMutation();
-
-
-  const handleNext = () => {
-    const values = methods.getValues();
-    dispatch(updateFormData(values));
-    setCurrentStep((prev) => prev + 1);
-  };
-
-  const handleBack = () => {
-    setCurrentStep((prev) => prev - 1);
-  };
+  const [submitForm, { isLoading }] = useSubmitFormMutation();
 
   const onSubmit = async (data: any) => {
-    dispatch(updateFormData(data)); // Save latest step data
-
     try {
-      const result = await submitForm({ ...formState, ...data });
+      const result = await submitForm(data).unwrap();
 
-      console.log('Submission success:', result?.data?.data);
-       
-       dispatch(setTokens(result?.data?.data?.token));
-       dispatch(setUse(result?.data?.data));
+      dispatch(setTokens(result?.data?.token));
+      dispatch(setUse(result?.data));
 
-      if (result?.data?.message) {
-        
-        toast.success(result.data.message, {
-          autoClose: 500,
-          onClose: () => navigate('/profile'),
-        });
-      } else {
-        toast.error('Mobile number already exists. Please use a new number');
-      }
+      toast.success(result?.message || 'User created successfully', {
+        autoClose: 500,
+        onClose: () => navigate('/profile'),
+      });
     } catch (error: any) {
-      console.error('Submission failed:', error);
-
-      // Extract error message safely from API response
       const errorMessage =
-        error?.response?.data?.message || // from axios-like response
-        error?.message ||                // fallback
+        error?.data?.message ||
+        error?.message ||
         'Registration failed. Please try again later.';
 
       toast.error(errorMessage, {
@@ -87,58 +99,11 @@ export default function App() {
     }
   };
 
-//   const onSubmit = async (data: any) => {
-//   dispatch(updateFormData(data)); // Save latest step data
-
-//   try {
-//     const result = await submitForm({ ...formState, ...data });
-//     console.log('Submission success:', result);
-
-//     const response = result?.data;
-
-//     if (response?.message === 'User created successfully' && response?.data?.token) {
-//       // 🧠 Store token in localStorage
-//       localStorage.setItem('token', response?.data?.token);
-
-//       // Optionally store user info too
-//       localStorage.setItem('authUser', JSON.stringify(response?.data));
-
-//       toast.success(response.message, {
-//         autoClose: 800,
-//         onClose: () => navigate('/profile'),
-//       });
-//     } else if (response?.message) {
-//       toast.info(response.message);
-//     } else {
-//       toast.error('Mobile number already exists. Please use a new number');
-//     }
-//   } catch (error: any) {
-//     console.error('Submission failed:', error);
-
-//     const errorMessage =
-//       error?.response?.data?.message ||
-//       error?.message ||
-//       'Registration failed. Please try again later.';
-
-//     toast.error(errorMessage, {
-//       autoClose: 2000,
-//     });
-//   }
-// };
-
-
   return (
     <div className="container d-flex flex-column align-items-center justify-content-center vh-10">
-      {isLoading && <Loader />} {/* Show Loader when API is loading */}
+      {isLoading && <Loader />}
       <div className="card shadow" style={{ width: '400px' }}>
         <div className="card-body">
-          {/* <h2 className="card-title text-center mb-4">Sign Up 👋</h2> */}
-          {/* <img
-            src={logo}
-            alt="Company Logo"
-            style={{ width: '120px' }}
-            className="d-block mx-auto"
-          /> */}
           <motion.img
             src={logo}
             alt="Company Logo"
@@ -153,24 +118,75 @@ export default function App() {
               ease: "easeInOut",
             }}
           />
-          <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(currentStep === steps.length - 1 ? onSubmit : handleNext)}>
-              <CurrentComponent methods={methods} />
-              <div className="d-flex justify-content-between mt-4">
-                {currentStep > 0 && (
-                  <button type="button" className="btn btn-secondary px-4 mt-3 mx-0" onClick={handleBack}>
-                    ← Back
-                  </button>
-                )}
-                <button type="submit" className="btn btn-primary ms-auto blinking-btn">
-                  {currentStep === steps.length - 1 ? 'Now Next →' : 'Next →'}
-                </button>
-              </div>
-            </form>
-          </FormProvider>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-3 mt-3">
+              <input
+                type="text"
+                className={`form-control ${errors.mobile ? 'is-invalid' : ''}`}
+                placeholder="Phone Number"
+                {...register('mobile', {
+                  required: 'Phone number is required',
+                })}
+              />
+              {errors.mobile && <div className="invalid-feedback">{errors.mobile.message}</div>}
+            </div>
+
+            <div className="mb-3">
+              <select
+                className={`form-control ${errors.state ? 'is-invalid' : ''}`}
+                {...register('state', {
+                  required: 'State is required',
+                })}
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Select State
+                </option>
+                {INDIAN_STATES_AND_UTS.map((stateName) => (
+                  <option key={stateName} value={stateName}>
+                    {stateName}
+                  </option>
+                ))}
+              </select>
+              {errors.state && <div className="invalid-feedback">{errors.state.message}</div>}
+            </div>
+
+            <div className="mb-3">
+              <input
+                type="password"
+                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                placeholder="Password"
+                {...register('password', {
+                  required: 'Password is required',
+                })}
+              />
+              {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
+            </div>
+
+            <div className="mb-3">
+              <input
+                type="password"
+                className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                placeholder="Confirm Password"
+                {...register('confirmPassword', {
+                  required: 'Confirm password is required',
+                  validate: (value) =>
+                    value === watch('password') || 'Password and confirm password do not match',
+                })}
+              />
+              {errors.confirmPassword && (
+                <div className="invalid-feedback">{errors.confirmPassword.message}</div>
+              )}
+            </div>
+
+            <div className="d-flex justify-content-end mt-4">
+              <button type="submit" className="btn btn-primary blinking-btn">
+                Register
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   );
 }
-

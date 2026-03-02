@@ -20,24 +20,57 @@ export class UserService {
 
   /******************** CREATE AND UPDATE USER ****************************/
   async upsertUser(id: any, data: any) {
-    const { password, confirmPassword, mobile, ...rest } = data;
+    const {
+      password,
+      confirmPassword,
+      confirm_password,
+      mobile,
+      mobileNumber,
+      phone_number,
+      phoneNumber,
+      ...rest
+    } = data;
 
-    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
-    const hashedConfirmPassword = confirmPassword ? await bcrypt.hash(confirmPassword, 10) : null;
+    const normalizedMobile = (mobile || mobileNumber || phone_number || phoneNumber || '').trim();
+    const normalizedState = (data?.state || '').trim();
+    const normalizedPassword = (password || '').trim();
+    const normalizedConfirmPassword = (confirmPassword || confirm_password || '').trim();
+    const isCreate = !id;
+
+    if (isCreate) {
+      if (!normalizedMobile) {
+        throw new BadRequestException('Phone number is required');
+      }
+      if (!normalizedState) {
+        throw new BadRequestException('State is required');
+      }
+      if (!normalizedPassword || !normalizedConfirmPassword) {
+        throw new BadRequestException('Password and confirm password are required');
+      }
+    }
+
+    if ((normalizedPassword || normalizedConfirmPassword) && normalizedPassword !== normalizedConfirmPassword) {
+      throw new BadRequestException('Password and confirm password do not match');
+    }
+
+    const hashedPassword = normalizedPassword ? await bcrypt.hash(normalizedPassword, 10) : null;
+
+    const cleanedRest = Object.fromEntries(
+      Object.entries(rest).filter(([, value]) => value !== '' && value !== null && value !== undefined),
+    );
 
     const payload = {
-      ...rest,
-      ...(hashedPassword && { password: hashedPassword }),
-      ...(hashedConfirmPassword && { confirmPassword: hashedConfirmPassword }),
-      ...(mobile && { phone_number: mobile }),
-      // ...(email && { email }),
+      ...cleanedRest,
+      ...(normalizedState && { state: normalizedState }),
+      ...(hashedPassword && { password: hashedPassword, confirmPassword: hashedPassword }),
+      ...(normalizedMobile && { phone_number: normalizedMobile }),
     };
 
     // Mobile uniqueness check
-    if (mobile) {
-      const existingUser = await this.mcurdSerRef.find('users', { phone_number: mobile });
+    if (normalizedMobile) {
+      const existingUser = await this.mcurdSerRef.find('users', { phone_number: normalizedMobile });
       if (existingUser && existingUser.length > 0) {
-        if (!id || existingUser[0].id !== +id) {
+        if (!id || Number(existingUser[0].id) !== Number(id)) {
           throw new BadRequestException('Mobile number already exists. Please use a new number.');
         }
       }
@@ -50,11 +83,12 @@ export class UserService {
     } else {
       // Create new user
       const newId = await this.mcurdSerRef.create('users', payload, 'id');
+      const createdUserId = Array.isArray(newId) ? newId[0] : newId?.id;
 
-      const tokenPayload = { userId: newId.id };
+      const tokenPayload = { userId: createdUserId };
       const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: '1h' });
 
-      result = { id: newId[0], ...payload,  token, register:true};
+      result = { id: createdUserId, ...payload, token, register: true };
 
       // if (email && name) {
       //   this.mailSerRef.sendUserCreationMail(email, name).catch(err => {

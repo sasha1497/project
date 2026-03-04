@@ -10,7 +10,7 @@ const Step8: React.FC<Props> = ({ methods }) => {
   const { register , formState: { errors }} = methods;
 
   return (
-    <div className="mb-3">
+    <div className="mb-3" style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
         <label className="form-label">Who are you going to marry ?</label>
         <select
           className={`form-control ${errors.person ? 'is-invalid' : ''}`}

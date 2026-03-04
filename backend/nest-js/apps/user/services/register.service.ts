@@ -13,25 +13,51 @@ export class RegisterService {
         private smsService: SMSService,
     ) { }
 
+    private getMobileVariants(rawMobile: string): string[] {
+        const input = (rawMobile || '').trim();
+        const digits = input.replace(/\D/g, '');
+        const local10 = digits.length >= 10 ? digits.slice(-10) : digits;
+
+        return Array.from(
+            new Set([
+                input,
+                digits,
+                local10,
+                `91${local10}`,
+                `+91${local10}`,
+            ].filter(Boolean)),
+        );
+    }
+
     /******************** LOGIN ****************************/
-    async login(data: { mobileNumber: string; password: string }) {
-        const { mobileNumber, password } = data;
+    async login(data: { mobileNumber: string; state: string; password: string }) {
+        const { mobileNumber, state, password } = data;
 
         // Validate input
-        if (!mobileNumber || !password) {
-            throw new BadRequestException('Mobile number and password are required');
+        if (!mobileNumber || !state || !password) {
+            throw new BadRequestException('Mobile number, state and password are required');
         }
 
-        // Fetch user
-        const user = await this.mcurdSerRef.get('*', 'users', { phone_number: mobileNumber });
+        // Fetch user by trying common mobile formats (+91XXXXXXXXXX / 91XXXXXXXXXX / XXXXXXXXXX)
+        const stateValue = (state || '').trim();
+        const mobileVariants = this.getMobileVariants(mobileNumber);
+        let user: any = null;
+
+        for (const phone of mobileVariants) {
+            user = await this.mcurdSerRef.get('*', 'users', {
+                phone_number: phone,
+                state: stateValue,
+            });
+            if (user) break;
+        }
         if (!user) {
-            throw new UnauthorizedException('Invalid mobile number or password');
+            throw new UnauthorizedException('Invalid mobile number, state or password');
         }
 
         // Verify password
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            throw new UnauthorizedException('Invalid mobile number or password');
+            throw new UnauthorizedException('Invalid mobile number, state or password');
         }
 
         // Determine gender type

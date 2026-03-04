@@ -17,6 +17,7 @@ type SignupFormValues = {
   state: string;
   password: string;
   confirmPassword: string;
+  country: string;
 };
 
 const INDIAN_STATES_AND_UTS = [
@@ -70,6 +71,7 @@ export default function App() {
       state: '',
       password: '',
       confirmPassword: '',
+      country : 'India'
     },
   });
   const dispatch = useDispatch();
@@ -181,7 +183,7 @@ export default function App() {
 
             <div className="d-flex justify-content-end mt-4">
               <button type="submit" className="btn btn-primary blinking-btn">
-                Register
+                Next
               </button>
             </div>
           </form>

@@ -66,12 +66,16 @@ export class UserService {
       ...(normalizedMobile && { phone_number: normalizedMobile }),
     };
 
-    // Mobile uniqueness check
-    if (normalizedMobile) {
-      const existingUser = await this.mcurdSerRef.find('users', { phone_number: normalizedMobile });
+    // Uniqueness check should be mobile + state, not mobile alone.
+    if (normalizedMobile && normalizedState) {
+      const existingUser = await this.mcurdSerRef.find('users', {
+        phone_number: normalizedMobile,
+        state: normalizedState,
+      });
       if (existingUser && existingUser.length > 0) {
-        if (!id || Number(existingUser[0].id) !== Number(id)) {
-          throw new BadRequestException('Mobile number already exists. Please use a new number.');
+        const conflict = existingUser.some((user: any) => Number(user.id) !== Number(id));
+        if (conflict) {
+          throw new BadRequestException('User already exists with this mobile number in the selected state.');
         }
       }
     }

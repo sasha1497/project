@@ -83,7 +83,8 @@ const Navbar = () => {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome, {user?.name }</b></span>}</span>
+                    {/* <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome, {user?.name }</b></span>}</span> */}
+                    <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome to BAJOL</b></span>}</span>
                   </button>
 
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">

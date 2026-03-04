@@ -1,215 +1,275 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
 type Props = {
-    methods: UseFormReturn<any>;
+  methods: UseFormReturn<any>;
 };
 
+export const STATE_DISTRICT_MAP: Record<string, string[]> = {
+  Kerala: [
+    'Thiruvananthapuram', 'Kollam', 'Pathanamthitta', 'Alappuzha', 'Kottayam', 'Idukki',
+    'Ernakulam', 'Thrissur', 'Palakkad', 'Malappuram', 'Kozhikode', 'Wayanad', 'Kannur', 'Kasaragod',
+  ],
+  'Tamil Nadu': [
+    'Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul',
+    'Erode', 'Kallakurichi', 'Kanchipuram', 'Kanniyakumari', 'Karur', 'Krishnagiri', 'Madurai',
+    'Mayiladuthurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai',
+    'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni',
+    'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur',
+    'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar',
+  ],
+  'Andhra Pradesh': [
+    'Anantapur', 'Chittoor', 'East Godavari', 'Guntur', 'Kadapa', 'Krishna', 'Kurnool',
+    'Nellore', 'Prakasam', 'Srikakulam', 'Visakhapatnam', 'Vizianagaram', 'West Godavari',
+  ],
+  Telangana: [
+    'Adilabad', 'Bhadradri Kothagudem', 'Hanamkonda', 'Hyderabad', 'Jagtial', 'Jangaon',
+    'Jayashankar Bhupalpally', 'Jogulamba Gadwal', 'Kamareddy', 'Karimnagar', 'Khammam',
+    'Komaram Bheem Asifabad', 'Mahabubabad', 'Mahabubnagar', 'Mancherial', 'Medak',
+    'Medchal-Malkajgiri', 'Mulugu', 'Nagarkurnool', 'Nalgonda', 'Narayanpet', 'Nirmal',
+    'Nizamabad', 'Peddapalli', 'Rajanna Sircilla', 'Ranga Reddy', 'Sangareddy', 'Siddipet',
+    'Suryapet', 'Vikarabad', 'Wanaparthy', 'Warangal', 'Yadadri Bhuvanagiri',
+  ],
+   Karnataka: [
+    'Bagalkot', 'Ballari', 'Belagavi', 'Bengaluru Rural', 'Bengaluru Urban', 'Bidar', 'Chamarajanagar',
+    'Chikkaballapur', 'Chikkamagaluru', 'Chitradurga', 'Dakshina Kannada', 'Davanagere',
+    'Dharwad', 'Gadag', 'Hassan', 'Haveri', 'Kalaburagi', 'Kodagu', 'Kolar', 'Koppal',
+    'Mandya', 'Mysuru', 'Raichur', 'Ramanagara', 'Shivamogga', 'Tumakuru', 'Udupi',
+    'Uttara Kannada', 'Vijayapura', 'Yadgir',
+  ],
+   Punjab: [
+    'Amritsar', 'Barnala', 'Bathinda', 'Faridkot', 'Fatehgarh Sahib', 'Fazilka', 'Firozpur',
+    'Gurdaspur', 'Hoshiarpur', 'Jalandhar', 'Kapurthala', 'Ludhiana', 'Malerkotla', 'Mansa',
+    'Moga', 'Pathankot', 'Patiala', 'Rupnagar', 'Sahibzada Ajit Singh Nagar', 'Sangrur',
+    'Shaheed Bhagat Singh Nagar', 'Sri Muktsar Sahib', 'Tarn Taran',
+  ],
+   Manipur: [
+    'Bishnupur', 'Chandel', 'Churachandpur', 'Imphal East', 'Imphal West', 'Jiribam', 'Kakching',
+    'Kamjong', 'Kangpokpi', 'Noney', 'Pherzawl', 'Senapati', 'Tamenglong', 'Tengnoupal',
+    'Thoubal', 'Ukhrul',
+  ],
+ 
+   Gujarat: [
+    'Ahmedabad', 'Amreli', 'Anand', 'Aravalli', 'Banaskantha', 'Bharuch', 'Bhavnagar', 'Botad',
+    'Chhota Udaipur', 'Dahod', 'Dang', 'Devbhoomi Dwarka', 'Gandhinagar', 'Gir Somnath',
+    'Jamnagar', 'Junagadh', 'Kheda', 'Kutch', 'Mahisagar', 'Mehsana', 'Morbi', 'Narmada',
+    'Navsari', 'Panchmahal', 'Patan', 'Porbandar', 'Rajkot', 'Sabarkantha', 'Surat',
+    'Surendranagar', 'Tapi', 'Vadodara', 'Valsad',
+  ],
+
+   Meghalaya: [
+    'East Garo Hills', 'East Jaintia Hills', 'East Khasi Hills', 'North Garo Hills',
+    'Ri-Bhoi', 'South Garo Hills', 'South West Garo Hills', 'South West Khasi Hills',
+    'West Garo Hills', 'West Jaintia Hills', 'West Khasi Hills',
+  ],
+  'Arunachal Pradesh': [
+    'Anjaw', 'Changlang', 'Dibang Valley', 'East Kameng', 'East Siang', 'Kamle', 'Kra Daadi',
+    'Kurung Kumey', 'Lepa Rada', 'Lohit', 'Longding', 'Lower Dibang Valley', 'Lower Siang',
+    'Lower Subansiri', 'Namsai', 'Pakke Kessang', 'Papum Pare', 'Shi Yomi', 'Siang',
+    'Tawang', 'Tirap', 'Upper Siang', 'Upper Subansiri', 'West Kameng', 'West Siang',
+  ],
+  Assam: [
+    'Baksa', 'Barpeta', 'Biswanath', 'Bongaigaon', 'Cachar', 'Charaideo', 'Chirang', 'Darrang',
+    'Dhemaji', 'Dhubri', 'Dibrugarh', 'Dima Hasao', 'Goalpara', 'Golaghat', 'Hailakandi',
+    'Hojai', 'Jorhat', 'Kamrup', 'Kamrup Metropolitan', 'Karbi Anglong', 'Karimganj',
+    'Kokrajhar', 'Lakhimpur', 'Majuli', 'Morigaon', 'Nagaon', 'Nalbari', 'Sivasagar',
+    'Sonitpur', 'South Salmara-Mankachar', 'Tinsukia', 'Udalguri', 'West Karbi Anglong',
+  ],
+  Bihar: [
+    'Araria', 'Arwal', 'Aurangabad', 'Banka', 'Begusarai', 'Bhagalpur', 'Bhojpur', 'Buxar',
+    'Darbhanga', 'East Champaran', 'Gaya', 'Gopalganj', 'Jamui', 'Jehanabad', 'Kaimur',
+    'Katihar', 'Khagaria', 'Kishanganj', 'Lakhisarai', 'Madhepura', 'Madhubani', 'Munger',
+    'Muzaffarpur', 'Nalanda', 'Nawada', 'Patna', 'Purnia', 'Rohtas', 'Saharsa', 'Samastipur',
+    'Saran', 'Sheikhpura', 'Sheohar', 'Sitamarhi', 'Siwan', 'Supaul', 'Vaishali', 'West Champaran',
+  ],
+  Chhattisgarh: [
+    'Balod', 'Baloda Bazar', 'Balrampur', 'Bastar', 'Bemetara', 'Bijapur', 'Bilaspur', 'Dantewada',
+    'Dhamtari', 'Durg', 'Gariaband', 'Gaurela-Pendra-Marwahi', 'Janjgir-Champa', 'Jashpur',
+    'Kabirdham', 'Kanker', 'Khairagarh-Chhuikhadan-Gandai', 'Kondagaon', 'Korba', 'Koriya',
+    'Mahasamund', 'Manendragarh-Chirmiri-Bharatpur', 'Mohla-Manpur-Ambagarh Chowki', 'Mungeli',
+    'Narayanpur', 'Raigarh', 'Raipur', 'Rajnandgaon', 'Sakti', 'Sarangarh-Bilaigarh', 'Sukma',
+    'Surajpur', 'Surguja',
+  ],
+  Goa: ['North Goa', 'South Goa'],
+ 
+  Haryana: [
+    'Ambala', 'Bhiwani', 'Charkhi Dadri', 'Faridabad', 'Fatehabad', 'Gurugram', 'Hisar',
+    'Jhajjar', 'Jind', 'Kaithal', 'Karnal', 'Kurukshetra', 'Mahendragarh', 'Nuh', 'Palwal',
+    'Panchkula', 'Panipat', 'Rewari', 'Rohtak', 'Sirsa', 'Sonipat', 'Yamunanagar',
+  ],
+  'Himachal Pradesh': [
+    'Bilaspur', 'Chamba', 'Hamirpur', 'Kangra', 'Kinnaur', 'Kullu', 'Lahaul and Spiti',
+    'Mandi', 'Shimla', 'Sirmaur', 'Solan', 'Una',
+  ],
+  Jharkhand: [
+    'Bokaro', 'Chatra', 'Deoghar', 'Dhanbad', 'Dumka', 'East Singhbhum', 'Garhwa', 'Giridih',
+    'Godda', 'Gumla', 'Hazaribagh', 'Jamtara', 'Khunti', 'Koderma', 'Latehar', 'Lohardaga',
+    'Pakur', 'Palamu', 'Ramgarh', 'Ranchi', 'Sahibganj', 'Seraikela-Kharsawan', 'Simdega',
+    'West Singhbhum',
+  ],
+ 
+  'Madhya Pradesh': [
+    'Agar Malwa', 'Alirajpur', 'Anuppur', 'Ashoknagar', 'Balaghat', 'Barwani', 'Betul', 'Bhind',
+    'Bhopal', 'Burhanpur', 'Chhatarpur', 'Chhindwara', 'Damoh', 'Datia', 'Dewas', 'Dhar', 'Dindori',
+    'Guna', 'Gwalior', 'Harda', 'Indore', 'Jabalpur', 'Jhabua', 'Katni', 'Khandwa', 'Khargone',
+    'Maihar', 'Mandla', 'Mandsaur', 'Morena', 'Narmadapuram', 'Narsinghpur', 'Neemuch', 'Niwari',
+    'Panna', 'Raisen', 'Rajgarh', 'Ratlam', 'Rewa', 'Sagar', 'Satna', 'Sehore', 'Seoni',
+    'Shahdol', 'Shajapur', 'Sheopur', 'Shivpuri', 'Sidhi', 'Singrauli', 'Tikamgarh', 'Ujjain',
+    'Umaria', 'Vidisha',
+  ],
+  Maharashtra: [
+    'Ahmednagar', 'Akola', 'Amravati', 'Aurangabad', 'Beed', 'Bhandara', 'Buldhana', 'Chandrapur',
+    'Dhule', 'Gadchiroli', 'Gondia', 'Hingoli', 'Jalgaon', 'Jalna', 'Kolhapur', 'Latur',
+    'Mumbai City', 'Mumbai Suburban', 'Nagpur', 'Nanded', 'Nandurbar', 'Nashik', 'Osmanabad',
+    'Palghar', 'Parbhani', 'Pune', 'Raigad', 'Ratnagiri', 'Sangli', 'Satara', 'Sindhudurg',
+    'Solapur', 'Thane', 'Wardha', 'Washim', 'Yavatmal',
+  ],
+ 
+  Mizoram: [
+    'Aizawl', 'Champhai', 'Hnahthial', 'Khawzawl', 'Kolasib', 'Lawngtlai', 'Lunglei', 'Mamit',
+    'Saitual', 'Serchhip',
+  ],
+  Nagaland: [
+    'Chumoukedima', 'Dimapur', 'Kiphire', 'Kohima', 'Longleng', 'Mokokchung', 'Mon', 'Niuland',
+    'Noklak', 'Peren', 'Phek', 'Shamator', 'Tseminyu', 'Tuensang', 'Wokha', 'Zunheboto',
+  ],
+  Odisha: [
+    'Angul', 'Balangir', 'Balasore', 'Bargarh', 'Bhadrak', 'Boudh', 'Cuttack', 'Deogarh',
+    'Dhenkanal', 'Gajapati', 'Ganjam', 'Jagatsinghpur', 'Jajpur', 'Jharsuguda', 'Kalahandi',
+    'Kandhamal', 'Kendrapara', 'Kendujhar', 'Khordha', 'Koraput', 'Malkangiri', 'Mayurbhanj',
+    'Nabarangpur', 'Nayagarh', 'Nuapada', 'Puri', 'Rayagada', 'Sambalpur', 'Subarnapur', 'Sundargarh',
+  ],
+ 
+  Rajasthan: [
+    'Ajmer', 'Alwar', 'Anupgarh', 'Balotra', 'Banswara', 'Baran', 'Barmer', 'Beawar', 'Bharatpur',
+    'Bhilwara', 'Bikaner', 'Bundi', 'Chittorgarh', 'Churu', 'Dausa', 'Deeg', 'Dholpur', 'Didwana-Kuchaman',
+    'Dudu', 'Dungarpur', 'Gangapur City', 'Hanumangarh', 'Jaipur', 'Jaipur Rural', 'Jaisalmer',
+    'Jalore', 'Jhalawar', 'Jhunjhunu', 'Jodhpur', 'Jodhpur Rural', 'Karauli', 'Kekri', 'Khairthal-Tijara',
+    'Kota', 'Kotputli-Behror', 'Nagaur', 'Pali', 'Phalodi', 'Pratapgarh', 'Rajsamand', 'Salumber',
+    'Sanchore', 'Sawai Madhopur', 'Shahpura', 'Sikar', 'Sirohi', 'Sri Ganganagar', 'Tonk', 'Udaipur',
+  ],
+  Sikkim: ['Gangtok', 'Mangan', 'Namchi', 'Pakyong', 'Soreng'],
+  Tripura: ['Dhalai', 'Gomati', 'Khowai', 'North Tripura', 'Sepahijala', 'South Tripura', 'Unakoti', 'West Tripura'],
+  'Uttar Pradesh': [
+    'Agra', 'Aligarh', 'Ambedkar Nagar', 'Amethi', 'Amroha', 'Auraiya', 'Ayodhya', 'Azamgarh',
+    'Baghpat', 'Bahraich', 'Ballia', 'Balrampur', 'Banda', 'Barabanki', 'Bareilly', 'Basti',
+    'Bhadohi', 'Bijnor', 'Budaun', 'Bulandshahr', 'Chandauli', 'Chitrakoot', 'Deoria', 'Etah',
+    'Etawah', 'Farrukhabad', 'Fatehpur', 'Firozabad', 'Gautam Buddha Nagar', 'Ghaziabad',
+    'Ghazipur', 'Gonda', 'Gorakhpur', 'Hamirpur', 'Hapur', 'Hardoi', 'Hathras', 'Jalaun',
+    'Jaunpur', 'Jhansi', 'Kannauj', 'Kanpur Dehat', 'Kanpur Nagar', 'Kasganj', 'Kaushambi',
+    'Kheri', 'Kushinagar', 'Lalitpur', 'Lucknow', 'Maharajganj', 'Mahoba', 'Mainpuri', 'Mathura',
+    'Mau', 'Meerut', 'Mirzapur', 'Moradabad', 'Muzaffarnagar', 'Pilibhit', 'Pratapgarh',
+    'Prayagraj', 'Raebareli', 'Rampur', 'Saharanpur', 'Sambhal', 'Sant Kabir Nagar', 'Shahjahanpur',
+    'Shamli', 'Shravasti', 'Siddharthnagar', 'Sitapur', 'Sonbhadra', 'Sultanpur', 'Unnao', 'Varanasi',
+  ],
+  Uttarakhand: [
+    'Almora', 'Bageshwar', 'Chamoli', 'Champawat', 'Dehradun', 'Haridwar', 'Nainital',
+    'Pauri Garhwal', 'Pithoragarh', 'Rudraprayag', 'Tehri Garhwal', 'Udham Singh Nagar', 'Uttarkashi',
+  ],
+  'West Bengal': [
+    'Alipurduar', 'Bankura', 'Birbhum', 'Cooch Behar', 'Dakshin Dinajpur', 'Darjeeling',
+    'Hooghly', 'Howrah', 'Jalpaiguri', 'Jhargram', 'Kalimpong', 'Kolkata', 'Malda',
+    'Murshidabad', 'Nadia', 'North 24 Parganas', 'Paschim Bardhaman', 'Paschim Medinipur',
+    'Purba Bardhaman', 'Purba Medinipur', 'Purulia', 'South 24 Parganas', 'Uttar Dinajpur',
+  ],
+  'Andaman and Nicobar Islands': ['Nicobar', 'North and Middle Andaman', 'South Andaman'],
+  Chandigarh: ['Chandigarh'],
+  'Dadra and Nagar Haveli and Daman and Diu': ['Dadra and Nagar Haveli', 'Daman', 'Diu'],
+  Delhi: ['Central Delhi', 'East Delhi', 'New Delhi', 'North Delhi', 'North East Delhi', 'North West Delhi', 'Shahdara', 'South Delhi', 'South East Delhi', 'South West Delhi', 'West Delhi'],
+  'Jammu and Kashmir': ['Anantnag', 'Bandipora', 'Baramulla', 'Budgam', 'Doda', 'Ganderbal', 'Jammu', 'Kathua', 'Kishtwar', 'Kulgam', 'Kupwara', 'Poonch', 'Pulwama', 'Rajouri', 'Ramban', 'Reasi', 'Samba', 'Shopian', 'Srinagar', 'Udhampur'],
+  Ladakh: ['Kargil', 'Leh'],
+  Lakshadweep: ['Lakshadweep'],
+  Puducherry: ['Karaikal', 'Mahe', 'Puducherry', 'Yanam'],
+};
+
+const STATES = Object.keys(STATE_DISTRICT_MAP);
+
 const Step2: React.FC<Props> = ({ methods }) => {
-    const {
-        register,
-        formState: { errors }
-    } = methods;
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = methods;
 
-    return (
-        <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
-            {/* country */}
-            <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="country">Select Your Country</label>
-                <select
-                    id="country"
-                    {...register('country', { required: 'country is required' })}
-                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-                >
-                    {/* <option value="">You can select your interest country to get Bride / Groom </option> */}
-                    <option value="">select your country</option>
-                    <option value="India">India</option>
-                    {/* <option value="USA">USA</option>
-                    <option value="England">England</option>
-                    <option value="Australia">Australia</option>
-                    <option value="Canada">Canada</option>
-                    <option value="New Zealand">New Zealand</option>
-                    <option value="Scotland">Scotland</option>
-                    <option value="Netherlands">Netherlands</option>
-                    <option value="Switzerland">Switzerland</option>
-                    <option value="Ireland">Ireland</option>
-                    <option value="Bahrain">Bahrain</option>
-                    <option value="Kuwait">Kuwait</option>
-                    <option value="Oman">Oman</option>
-                    <option value="Qatar">Qatar</option>
-                    <option value="Saudi Arabia">Saudi Arabia</option>
-                    <option value="Dubai">Dubai</option>
-                    <option value="Malta">Malta</option>
-                    <option value="Bermuda">Bermuda</option>
-                    <option value="Malaysia">Malaysia</option>
-                    <option value="Singapore">Singapore</option>
-                    <option value="Germany">Germany</option>
-                    <option value="Sweden">Sweden</option>
-                    <option value="Denmark">Denmark</option>
+  const selectedState = watch('state');
+  const selectedDistrict = watch('district');
+  const districts = useMemo(
+    () => (selectedState ? STATE_DISTRICT_MAP[selectedState] || [] : []),
+    [selectedState],
+  );
 
-                    <option value="Sharjah">Sharjah</option>
-                    <option value="Abhudhabi">Abhu Dhabi</option>
-                    <option value="Brunei">Brunei</option>
-                    <option value="Mauritius">Mauritius</option>
-                    <option value="Philippine">Philippine</option>
-                    <option value="Israel">Israel</option>
-                    <option value="srilanka">Sri Lanka</option>
-                    <option value="wales">wales</option>
-                    <option value="Finland">Finland</option>
-                    <option value="Bahamas">Bahamas</option>
+  useEffect(() => {
+    if (selectedDistrict && !districts.includes(selectedDistrict)) {
+      setValue('district', '');
+    }
+  }, [selectedState, selectedDistrict, districts, setValue]);
 
-                    <option value="Fiji">Fiji</option>
-                    <option value="Solomonisland">Solomon Island</option>
-                    <option value="Barbados">Barbados</option>
-                    <option value="Saintlucia">Saint Lucia</option>
-                    <option value="Zambia">Zambia</option>
-                    <option value="Botswana">Botswana</option>
-                    <option value="Egypt">Egypt</option>
+  return (
+    <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="country">Select Your Country</label>
+        <select
+          id="country"
+          {...register('country', { required: 'country is required' })}
+          style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+        >
+          <option value="">select your country</option>
+          <option value="India">India</option>
+        </select>
+        {errors.country && (
+          <p style={{ color: 'red', marginBottom: '10px' }}>
+            {errors.country.message as string}
+          </p>
+        )}
+      </div>
 
-                    <option value="Mexico">Mexico</option>
-                    <option value="Thailand">Thailand</option>
-                    <option value="Colombia">Colombia</option>
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="state">Select Your State</label>
+        <select
+          id="state"
+          {...register('state', { required: 'State is required' })}
+          style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+        >
+          <option value="">Select Your State</option>
+          {STATES.map((stateName) => (
+            <option key={stateName} value={stateName}>
+              {stateName}
+            </option>
+          ))}
+        </select>
 
-                    <option value="Greece">Greece</option>
-                    <option value="Ghana">Ghana</option>
-                    <option value="Norway">Norway</option> */}
+        {errors.state && (
+          <p style={{ color: 'red', marginBottom: '10px' }}>
+            {errors.state.message as string}
+          </p>
+        )}
+      </div>
 
-                </select>
-                {errors.country && (
-                    <p style={{ color: 'red', marginBottom: '10px' }}>
-                        {errors.country.message as string}
-                    </p>
-                )}
-            </div>
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="district">Select Your District</label>
+        <select
+          id="district"
+          {...register('district', { required: 'District is required' })}
+          style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+          disabled={!selectedState}
+        >
+          <option value="">{selectedState ? 'Select Your District' : 'Select state first'}</option>
+          {districts.map((districtName) => (
+            <option key={districtName} value={districtName}>
+              {districtName}
+            </option>
+          ))}
+        </select>
 
-
-            {/* state */}
-            {/* <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="state">State</label>
-                <input
-                    id="state"
-                    {...register('state', {
-                        required: 'state is required'
-                    })}
-                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-                />
-                {errors.state && (
-                    <p style={{ color: 'red', marginBottom: '10px' }}>
-                        {errors.state.message as string}
-                    </p>
-                )}
-            </div> */}
-            <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="state">Select Your State</label>
-                <select
-                    id="state"
-                    {...register('state', {
-                        required: 'State is required'
-                    })}
-                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-                >
-                    <option value="">Select Your State</option>
-                    <option value="Kerala">Kerala</option>
-                    {/* <option value="Tamil Nadu">Tamil Nadu</option>
-                    <option value="Andhra Pradesh">Andhra Pradesh</option>
-                    <option value="Telangana">Telangana</option>
-                    <option value="Karnataka">Karnataka</option>
-                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                    <option value="Assam">Assam</option>
-                    <option value="Bihar">Bihar</option>
-                    <option value="Chhattisgarh">Chhattisgarh</option>
-                    <option value="Goa">Goa</option>
-                    <option value="Gujarat">Gujarat</option>
-                    <option value="Haryana">Haryana</option>
-                    <option value="Himachal Pradesh">Himachal Pradesh</option>
-                    <option value="Jharkhand">Jharkhand</option>
-                    <option value="Madhya Pradesh">Madhya Pradesh</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Manipur">Manipur</option>
-                    <option value="Meghalaya">Meghalaya</option>
-                    <option value="Mizoram">Mizoram</option>
-                    <option value="Nagaland">Nagaland</option>
-                    <option value="Odisha">Odisha</option>
-                    <option value="Punjab">Punjab</option>
-                    <option value="Rajasthan">Rajasthan</option>
-                    <option value="Sikkim">Sikkim</option>
-                    <option value="Tripura">Tripura</option>
-                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                    <option value="Uttarakhand">Uttarakhand</option>
-                    <option value="West Bengal">West Bengal</option>
-                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                    <option value="Chandigarh">Chandigarh</option>
-                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                    <option value="Ladakh">Ladakh</option>
-                    <option value="Lakshadweep">Lakshadweep</option>
-                    <option value="Puducherry">Puducherry</option> */}
-                </select>
-
-                {errors.state && (
-                    <p style={{ color: 'red', marginBottom: '10px' }}>
-                        {errors.state.message as string}
-                    </p>
-                )}
-            </div>
-
-
-            {/* district */}
-            {/* <div style={{ marginBottom: '1rem' }}> */}
-            {/* <label htmlFor="district">District / Territory</label> */}
-            {/* <label htmlFor="district">Enter Your District</label>
-                <input
-                    id="district"
-                    {...register('district', { required: 'district is required' })}
-                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-                />
-                {errors.district && (
-                    <p style={{ color: 'red', marginBottom: '10px' }}>
-                        {errors.district.message as string}
-                    </p>
-                )}
-            </div> */}
-
-            {/* district */}
-            <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="district">Select Your District</label>
-
-                <select
-                    id="district"
-                    {...register('district', {
-                        required: 'District is required',
-                    })}
-                    style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-                >
-                    <option value="">Select Your District</option>
-                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-                    <option value="Kollam">Kollam</option>
-                    <option value="Pathanamthitta">Pathanamthitta</option>
-                    <option value="Alappuzha">Alappuzha</option>
-                    <option value="Kottayam">Kottayam</option>
-                    <option value="Idukki">Idukki</option>
-                    <option value="Ernakulam">Ernakulam</option>
-                    <option value="Thrissur">Thrissur</option>
-                    <option value="Palakkad">Palakkad</option>
-                    <option value="Malappuram">Malappuram</option>
-                    <option value="Kozhikode">Kozhikode</option>
-                    <option value="Wayanad">Wayanad</option>
-                    <option value="Kannur">Kannur</option>
-                    <option value="Kasaragod">Kasaragod</option>
-                </select>
-
-                {errors.district && (
-                    <p style={{ color: 'red', marginBottom: '10px' }}>
-                        {errors.district.message as string}
-                    </p>
-                )}
-            </div>
-
-
-        </div>
-    );
+        {errors.district && (
+          <p style={{ color: 'red', marginBottom: '10px' }}>
+            {errors.district.message as string}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Step2;
-

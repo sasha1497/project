@@ -11,15 +11,17 @@ import 'react-phone-input-2/lib/style.css';
 import './signup.css';
 import { useSendOtpMutation, useVerifyOtpMutation, useResetPasswordMutation } from '../../features/otp/otpApi';
 import { setOtpLoading, setOtpSent, setOtpVerified, setOtpError } from '../../features/otp/otpSlice';
+import { STATE_DISTRICT_MAP } from '../steps/step2';
 
 interface FormData {
   mobileNumber: string;
+  state: string;
   password: string;
 }
 
 const SignUp: React.FC = () => {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
-    defaultValues: { mobileNumber: '', password: '' }
+    defaultValues: { mobileNumber: '', state: '', password: '' }
   });
 
   const [isSignUp, setIsSignUp] = useState(true);
@@ -47,6 +49,14 @@ const SignUp: React.FC = () => {
   const location = useLocation();
 
   const flag = location.state?.flag;
+
+  const getIndianLocalNumber = (input: string) => {
+    const digitsOnly = input.replace(/\D/g, '');
+    if (digitsOnly.startsWith('91') && digitsOnly.length > 10) {
+      return digitsOnly.slice(-10);
+    }
+    return digitsOnly.slice(-10);
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -197,22 +207,11 @@ const SignUp: React.FC = () => {
             <h2 className="card-title text-center mb-4">Sign In 👋</h2>
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Mobile input with country code, connected to react-hook-form */}
-              {/* <div className="mb-3">
-                <PhoneInput
-                  country="in"
-                  value={mobile}
-                  onChange={(phone) => {
-                    const fullPhone = "+" + phone;
-                    setMobile(fullPhone);
-                    setValue("mobileNumber", fullPhone, { shouldValidate: true });
-                  }}
-                  inputClass={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
-                  inputStyle={{ width: "100%" }}
-                  placeholder="Enter mobile number"
-                />
-                {errors.mobileNumber && <div className="invalid-feedback">{errors.mobileNumber.message}</div>}
-              </div> */}
               <div className="mb-3">
+                <input
+                  type="hidden"
+                  {...register('mobileNumber', { required: 'Mobile number is required' })}
+                />
                 <PhoneInput
                   country="in"
                   onlyCountries={['in']}       // ✅ Restrict to India only
@@ -222,7 +221,7 @@ const SignUp: React.FC = () => {
                   onChange={(phone) => {
                     const fullPhone = "+" + phone;
                     setMobile(fullPhone);
-                    setValue("mobileNumber", fullPhone, { shouldValidate: true });
+                    setValue("mobileNumber", getIndianLocalNumber(fullPhone), { shouldValidate: true });
                   }}
                   inputClass={`form-control ${errors.mobileNumber ? 'is-invalid' : ''}`}
                   inputStyle={{ width: "100%" }}
@@ -235,6 +234,22 @@ const SignUp: React.FC = () => {
                   </div>
                 )}
 
+              </div>
+
+              <div className="mb-3">
+                <select
+                  className={`form-control ${errors.state ? 'is-invalid' : ''}`}
+                  {...register('state', { required: 'State is required' })}
+                  defaultValue=""
+                >
+                  <option value="" disabled>Select State</option>
+                  {Object.keys(STATE_DISTRICT_MAP).map((stateName) => (
+                    <option key={stateName} value={stateName}>
+                      {stateName}
+                    </option>
+                  ))}
+                </select>
+                {errors.state && <div className="invalid-feedback">{errors.state.message}</div>}
               </div>
 
               <div className="mb-3">

@@ -61,7 +61,7 @@ const Step4: React.FC<Props> = ({ methods }) => {
   } = methods;
 
   return (
-    <div>
+    <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
       {/* Caste Field */}
       <div className="mb-3">
         <label className="form-label">Enter Your Caste</label>

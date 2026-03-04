@@ -117,7 +117,7 @@ const Section = () => {
                     className="px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(1)}
                   >
-                    ✅ Do Register Now
+                    🚀 Did
                   </motion.button>
 
                   <motion.button
@@ -126,7 +126,7 @@ const Section = () => {
                     className=" px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(2)}
                   >
-                    🚀 Did
+                     ✅ Do Register Now
                   </motion.button>
                 </div>
               </motion.div>

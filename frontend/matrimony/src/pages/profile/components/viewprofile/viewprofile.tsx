@@ -6,6 +6,7 @@ import { closeViewPopup, openViewPopup } from "../../../../features/profileui/pr
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useDeleteUserAccountMutation } from '../../../../features/deleteaccount/deleteAccountApi';
+import { STATE_DISTRICT_MAP } from '../../../steps/step2';
 
 
 type ImageData = {
@@ -75,6 +76,7 @@ const countries = [
 ];
 
 const genders = ["Male", "Female", "Transgender"];
+const STATES = Object.keys(STATE_DISTRICT_MAP);
 
 
 
@@ -117,12 +119,6 @@ const ViewProfile: React.FC = () => {
   };
 
 
-  // Form inputs
-  const [countryInput, setCountryInput] = useState<string>('');
-  const [stateInput, setStateInput] = useState<string>('');
-  const [districtInput, setDistrictInput] = useState<string>('');
-  const [genderInput, setGenderInput] = useState<string>('');
-
   // Payload state for API query
   const [payload, setPayload] = useState<any>({
     page: 1,
@@ -130,8 +126,8 @@ const ViewProfile: React.FC = () => {
     filter: {
       country: '',
       state: '',
-      district: districtInput,
-      gender: genderInput
+      district: '',
+      gender: ''
     },
     // search: ""
   });
@@ -153,6 +149,7 @@ const ViewProfile: React.FC = () => {
   // };
 
   const dispatch = useDispatch();
+  const districts = formValues.state ? STATE_DISTRICT_MAP[formValues.state] || [] : [];
 
   const [deleteUserAccount] = useDeleteUserAccountMutation();
 
@@ -360,46 +357,17 @@ const ViewProfile: React.FC = () => {
                 {/* ✅ Dropdown for Indian States */}
                 <select
                   value={formValues.state}
-                  onChange={(e) => setFormValues({ ...formValues, state: e.target.value })}
+                  onChange={(e) =>
+                    setFormValues({ ...formValues, state: e.target.value, district: "" })
+                  }
                   className="form-control"
                 >
                   <option value="">Select State</option>
-                  <option value="Kerala">Kerala</option>
-                  {/* <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Andhra Pradesh">Andhra Pradesh</option>
-                  <option value="Telangana">Telangana</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                  <option value="Assam">Assam</option>
-                  <option value="Bihar">Bihar</option>
-                  <option value="Chhattisgarh">Chhattisgarh</option>
-                  <option value="Goa">Goa</option>
-                  <option value="Gujarat">Gujarat</option>
-                  <option value="Haryana">Haryana</option>
-                  <option value="Himachal Pradesh">Himachal Pradesh</option>
-                  <option value="Jharkhand">Jharkhand</option>
-                  <option value="Madhya Pradesh">Madhya Pradesh</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Manipur">Manipur</option>
-                  <option value="Meghalaya">Meghalaya</option>
-                  <option value="Mizoram">Mizoram</option>
-                  <option value="Nagaland">Nagaland</option>
-                  <option value="Odisha">Odisha</option>
-                  <option value="Punjab">Punjab</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                  <option value="Sikkim">Sikkim</option>
-                  <option value="Tripura">Tripura</option>
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
-                  <option value="Uttarakhand">Uttarakhand</option>
-                  <option value="West Bengal">West Bengal</option>
-                  <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                  <option value="Chandigarh">Chandigarh</option>
-                  <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                  <option value="Ladakh">Ladakh</option>
-                  <option value="Lakshadweep">Lakshadweep</option>
-                  <option value="Puducherry">Puducherry</option> */}
+                  {STATES.map((stateName) => (
+                    <option key={stateName} value={stateName}>
+                      {stateName}
+                    </option>
+                  ))}
                 </select>
 
                 {/* 👇 Clickable helper text */}
@@ -437,7 +405,7 @@ const ViewProfile: React.FC = () => {
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
                   {/* You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom? */}
-                  You can select your interest <span className='text-danger'> District</span> for get marraige ?
+                  From Which <span className='text-danger'> District</span> are you desiring to get marriage ?
                 </motion.h4>
                 {/* <input
                   type="text"
@@ -453,22 +421,14 @@ const ViewProfile: React.FC = () => {
                     setFormValues({ ...formValues, district: e.target.value })
                   }
                   className="form-control"
+                  disabled={!formValues.state}
                 >
-                  <option value="">Select District</option>
-                  <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-                  <option value="Kollam">Kollam</option>
-                  <option value="Pathanamthitta">Pathanamthitta</option>
-                  <option value="Alappuzha">Alappuzha</option>
-                  <option value="Kottayam">Kottayam</option>
-                  <option value="Idukki">Idukki</option>
-                  <option value="Ernakulam">Ernakulam</option>
-                  <option value="Thrissur">Thrissur</option>
-                  <option value="Palakkad">Palakkad</option>
-                  <option value="Malappuram">Malappuram</option>
-                  <option value="Kozhikode">Kozhikode</option>
-                  <option value="Wayanad">Wayanad</option>
-                  <option value="Kannur">Kannur</option>
-                  <option value="Kasaragod">Kasaragod</option>
+                  <option value="">{formValues.state ? "Select District" : "Select state first"}</option>
+                  {districts.map((districtName) => (
+                    <option key={districtName} value={districtName}>
+                      {districtName}
+                    </option>
+                  ))}
                 </select>
                 <p
                   className="text-primary mt-2 dont-have-text cursor-pointer"
@@ -503,7 +463,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>Gender</span> for get marraige ?
+                 Whose <span className='text-danger'>Profile</span> do you want to view ?
                 </motion.h4>
                 <label htmlFor="gender" className="form-label fw-bold fs-4 text-primary">
                   Select Now
@@ -656,14 +616,14 @@ const ViewProfile: React.FC = () => {
                 <p><strong>Weight:</strong> {selectedUser?.weight}</p> */}
                 <p><strong>Caste:</strong> {selectedUser?.caste}</p>
                 <p><strong>Religion:</strong> {selectedUser?.religion}</p>
-                <p><strong>District:</strong> {selectedUser?.district}</p>
-                <p><strong>State:</strong> {selectedUser?.state}</p>
+                <p><strong>District:</strong> {selectedUser?.district || selectedUser?.userDetails?.district || "N/A"}</p>
+                <p><strong>State:</strong> {selectedUser?.state || selectedUser?.userDetails?.state || "N/A"}</p>
                 <p><strong>Country:</strong> {selectedUser?.country}</p>
                 <p><strong>Mobile:</strong> {selectedUser?.phone_number}</p>
                 <p><strong>Whatsapp:</strong> {selectedUser?.whatsapp}</p>
                 <p><strong>Job:</strong> {selectedUser?.job}</p>
                 <p><strong>Salary:</strong> {selectedUser?.monthlySalary}</p>
-                <p><strong>Marriage status:</strong> {selectedUser?.userDetails?.count}</p>
+                <p><strong>Marriage status:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || "N/A"}</p>
                 <p><strong>Whose marriage:</strong> {selectedUser?.person}</p>
               </div>
             </motion.div>

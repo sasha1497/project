@@ -87,7 +87,7 @@ declare global {
 const getPriceLabel = (priceUSD: number, country?: string): string => {
   switch (country?.toLowerCase()) {
     // case 'india': return `₹${priceUSD * 294}`;
-    case 'india': return `₹${priceUSD * 40}`;
+    case 'india': return `₹${priceUSD * 30}`;
     case 'bahrain':
     case 'kuwait': return `د.ك 10`;
     case 'oman': return `﷼ 10`;
@@ -176,7 +176,7 @@ const getPriceLabel = (priceUSD: number, country?: string): string => {
 const getFinalPriceNumber = (priceUSD: number, country?: string): number => {
   switch (country?.toLowerCase()) {
     // case 'india': return priceUSD * 294;
-    case 'india': return priceUSD * 40;
+    case 'india': return priceUSD * 30;
     case 'bahrain':
     case 'kuwait': return 10;              // matches label د.ك 10
     case 'oman': return 10;                // ﷼ 10
@@ -319,9 +319,9 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         user_id: userId,
         plan_id: planId,
         order_id: `order_${Date.now()}`,
-        order_amount: amount,
+        order_amount: 30,
         // order_amount: 1,
-        order_currency: getCurrencyCode(country),
+        // order_currency: getCurrencyCode(country),
         customer_phone: "8610453387",
         customer_id: userId,
         order_note: "Subscription Upgrade",
@@ -344,15 +344,14 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
 
   // ------------------ CASHFREE CHECKOUT ------------------
   const startCashfreePayment = async (planId: number, priceUSD: number) => {
-
+   
     if (!cashfree) {
       alert("⚠ Cashfree Not Loaded Yet, wait 2 seconds!");
       return;
     }
-
-    const finalAmount = getFinalPriceNumber(priceUSD, country);
+    const finalAmount = getFinalPriceNumber(priceUSD, 'india');
     const sessionId = await getSessionId(planId, finalAmount);
-
+    
     if (!sessionId) return alert("❌ Failed to get Payment Session ID");
 
     await cashfree.checkout({
@@ -382,34 +381,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
     console.log("Payment Modal Launched!");
   };
 
-  const handleSelectPlan = async (planName: string, country?: string, priceUSD?: number) => {
-    const finalPrice = getFinalPriceNumber(priceUSD || 1, country);
-
-    const currencyCode = getCurrencyCode(country);
-
-
-    // const finalPrice = getPriceLabel(priceUSD || 1, country);
-
-
-    const payload = {
-      country: country ?? 'Not selected',
-      plan_id: planName,
-      amount: finalPrice,
-      receipt: "BAJOL MATRIMONY",
-      currency: currencyCode,
-      user_id: userId
-    };
-
-    try {
-      const response = await axios.post('https://usrapi.bajolmatrimony.com/razorpay/create-subscription-order', payload);
-      console.log('API Response:', response.data);
-
-      // Pass razorpay_order object to checkout
-      openRazorpayCheckout(response.data.razorpay_order);
-    } catch (error: any) {
-      console.error('API Error:', error.response?.data || error.message);
-    }
-  };
+  
 
   // Razorpay Checkout function
 

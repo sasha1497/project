@@ -56,7 +56,6 @@
 // export default React.memo(Profile);
 
 import React, { useEffect, useState } from "react";
-import ProfileImageCarousel from "./components/profileimage/profileimagecarosul";
 import './profile.css';
 import Plan from "./components/plan/plan";
 import UploadProfile from "./components/uploadprofileimage/uploadprofile";
@@ -66,6 +65,34 @@ import { skipToken } from '@reduxjs/toolkit/query';
 import { useSelector } from "react-redux";
 import Loader from "../../components/loader/loader";
 import ViewProfilePopup from "./components/popup/Profileview/ViewProfilePopup";
+import CompleteProfileForm from "./components/completeprofileform/CompleteProfileForm";
+
+const hasRequiredProfileData = (data: any) => {
+  if (!data) return false;
+  const requiredFields = [
+    "name",
+    "age",
+    "job",
+    "monthlySalary",
+    "country",
+    "state",
+    "district",
+    "phone_number",
+    "whatsapp",
+    "caste",
+    "religion",
+    "gender",
+    "count",
+    "person",
+    "height",
+    "weight",
+  ];
+
+  return requiredFields.every((field) => {
+    const value = data?.[field];
+    return value !== undefined && value !== null && String(value).trim() !== "";
+  });
+};
 
 const Profile = () => {
   const userId = useSelector((state: any) => state.auth.user?.id);
@@ -73,6 +100,7 @@ const Profile = () => {
 
   // Local state to hold the final userId once available
   const [finalUserId, setFinalUserId] = useState<any | null>(null);
+  const [profileFormCompleted, setProfileFormCompleted] = useState(false);
 
   // Show popup state
   const showPopup = useSelector((state: any) => state.profileUi.showViewPopup);
@@ -105,13 +133,29 @@ const Profile = () => {
 
   if (isLoading || !finalUserId) return <Loader />;
 
+  const hasImages = (data?.imageData?.length || 0) > 0;
+  const shouldShowProfileForm =
+    !!data?.hasPayments &&
+    !hasImages &&
+    !profileFormCompleted &&
+    !hasRequiredProfileData(data);
+
   return (
     <>
       {showPopup && <ViewProfilePopup />}
 
       <div className="container-fluid">
         {data?.hasPayments ? (
-          data?.imageData.length > 0 ? (
+          shouldShowProfileForm ? (
+            <CompleteProfileForm
+              userId={Number(finalUserId)}
+              initialData={data}
+              onCompleted={async () => {
+                setProfileFormCompleted(true);
+                await refetch();
+              }}
+            />
+          ) : hasImages ? (
             <ViewProfile />
           ) : (
             <UploadProfile />

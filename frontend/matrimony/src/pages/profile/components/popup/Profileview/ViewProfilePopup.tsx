@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { Controller, useForm } from "react-hook-form";
@@ -10,6 +10,7 @@ import { editFailure, editSuccess, startEdit } from "../../../../../features/edi
 import { toast } from "react-toastify";
 import { useEditFormMutation } from "../../../../../features/editform/editFormApi";
 import PhoneInput from "react-phone-input-2";
+import { STATE_DISTRICT_MAP } from "../../../../steps/step2";
 // import {
 //   startEdit,
 //   editSuccess,
@@ -36,6 +37,8 @@ const ViewProfilePopup = () => {
     handleSubmit,
     reset,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -59,6 +62,20 @@ const ViewProfilePopup = () => {
   });
 
   const [editForm] = useEditFormMutation();
+  const selectedState = watch("state");
+  const lockedState = useMemo(() => {
+    const rawState = String(data?.state || "").trim();
+    if (!rawState) return "";
+    const matchedState = Object.keys(STATE_DISTRICT_MAP).find(
+      (stateName) => stateName.toLowerCase() === rawState.toLowerCase()
+    );
+    return matchedState || rawState;
+  }, [data?.state]);
+  const stateOptions = lockedState ? [lockedState] : selectedState ? [selectedState] : [];
+  const districts = useMemo(
+    () => (selectedState ? STATE_DISTRICT_MAP[selectedState] || [] : []),
+    [selectedState]
+  );
 
 
   // ✅ Prefill form when profile data is fetched
@@ -67,6 +84,12 @@ const ViewProfilePopup = () => {
       reset(data);
     }
   }, [data, reset]);
+
+  useEffect(() => {
+    if (lockedState && selectedState !== lockedState) {
+      setValue("state", lockedState, { shouldValidate: true });
+    }
+  }, [lockedState, selectedState, setValue]);
 
   const onSubmit = async (formData: any) => {
     try {
@@ -439,22 +462,14 @@ const ViewProfilePopup = () => {
                 <select
                   className="form-control"
                   {...register("district", { required: "District is required" })}
+                  disabled={!selectedState}
                 >
-                  <option value="">Select District</option>
-                  <option value="Thiruvananthapuram">Thiruvananthapuram</option>
-                  <option value="Kollam">Kollam</option>
-                  <option value="Pathanamthitta">Pathanamthitta</option>
-                  <option value="Alappuzha">Alappuzha</option>
-                  <option value="Kottayam">Kottayam</option>
-                  <option value="Idukki">Idukki</option>
-                  <option value="Ernakulam">Ernakulam</option>
-                  <option value="Thrissur">Thrissur</option>
-                  <option value="Palakkad">Palakkad</option>
-                  <option value="Malappuram">Malappuram</option>
-                  <option value="Kozhikode">Kozhikode</option>
-                  <option value="Wayanad">Wayanad</option>
-                  <option value="Kannur">Kannur</option>
-                  <option value="Kasaragod">Kasaragod</option>
+                  <option value="">{selectedState ? "Select District" : "State is locked"}</option>
+                  {districts.map((districtName) => (
+                    <option key={districtName} value={districtName}>
+                      {districtName}
+                    </option>
+                  ))}
                 </select>
 
                 {errors.district && (
@@ -479,8 +494,12 @@ const ViewProfilePopup = () => {
                   className="form-select"
                   {...register("state", { required: "State is required" })}
                 >
-                  <option value="">-- Select State --</option>
-                  <option value="Kerala">Kerala</option>
+                  {!lockedState && <option value="">-- Select State --</option>}
+                  {stateOptions.map((stateName) => (
+                    <option key={stateName} value={stateName}>
+                      {stateName}
+                    </option>
+                  ))}
                   {/* <option value="Andhra Pradesh">Andhra Pradesh</option>
                   <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                   <option value="Assam">Assam</option>

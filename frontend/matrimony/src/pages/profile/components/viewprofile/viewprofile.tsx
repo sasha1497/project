@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './viewprofile.css';
 import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
@@ -155,7 +155,22 @@ const ViewProfile: React.FC = () => {
 
   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
 
-  const userId = useSelector((state: any) => state.auth.user?.id);
+  const authUser = useSelector((state: any) => state.auth.user);
+  const userId = authUser?.id;
+  const savedState = STATES.find(
+    (stateName) =>
+      stateName.toLowerCase() === String(authUser?.state || "").trim().toLowerCase()
+  ) || "";
+  const stateOptions = savedState ? [savedState] : STATES;
+
+  useEffect(() => {
+    if (savedState) {
+      setFormValues((prev) => ({
+        ...prev,
+        state: savedState,
+      }));
+    }
+  }, [savedState]);
 
 
   if (isLoading) return <div>Loading...</div>;
@@ -361,9 +376,10 @@ const ViewProfile: React.FC = () => {
                     setFormValues({ ...formValues, state: e.target.value, district: "" })
                   }
                   className="form-control"
+                  disabled={!!savedState}
                 >
-                  <option value="">Select State</option>
-                  {STATES.map((stateName) => (
+                  {!savedState && <option value="">Select State</option>}
+                  {stateOptions.map((stateName) => (
                     <option key={stateName} value={stateName}>
                       {stateName}
                     </option>

@@ -3,6 +3,7 @@ import { UseFormReturn } from 'react-hook-form';
 
 type Props = {
   methods: UseFormReturn<any>;
+  lockedState?: string;
 };
 
 export const STATE_DISTRICT_MAP: Record<string, string[]> = {
@@ -184,7 +185,7 @@ export const STATE_DISTRICT_MAP: Record<string, string[]> = {
 
 const STATES = Object.keys(STATE_DISTRICT_MAP);
 
-const Step2: React.FC<Props> = ({ methods }) => {
+const Step2: React.FC<Props> = ({ methods, lockedState }) => {
   const {
     register,
     watch,
@@ -192,12 +193,28 @@ const Step2: React.FC<Props> = ({ methods }) => {
     formState: { errors },
   } = methods;
 
+  const normalizedLockedState = useMemo(
+    () =>
+      STATES.find(
+        (stateName) =>
+          stateName.toLowerCase() === String(lockedState || "").trim().toLowerCase()
+      ) || "",
+    [lockedState],
+  );
+  const stateOptions = normalizedLockedState ? [normalizedLockedState] : STATES;
+
   const selectedState = watch('state');
   const selectedDistrict = watch('district');
   const districts = useMemo(
     () => (selectedState ? STATE_DISTRICT_MAP[selectedState] || [] : []),
     [selectedState],
   );
+
+  useEffect(() => {
+    if (normalizedLockedState && selectedState !== normalizedLockedState) {
+      setValue('state', normalizedLockedState, { shouldValidate: true });
+    }
+  }, [normalizedLockedState, selectedState, setValue]);
 
   useEffect(() => {
     if (selectedDistrict && !districts.includes(selectedDistrict)) {
@@ -230,9 +247,10 @@ const Step2: React.FC<Props> = ({ methods }) => {
           id="state"
           {...register('state', { required: 'State is required' })}
           style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+          disabled={!!normalizedLockedState}
         >
-          <option value="">Select Your State</option>
-          {STATES.map((stateName) => (
+          {!normalizedLockedState && <option value="">Select Your State</option>}
+          {stateOptions.map((stateName) => (
             <option key={stateName} value={stateName}>
               {stateName}
             </option>

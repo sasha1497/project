@@ -10,6 +10,7 @@ import Step5 from "../../../steps/step5";
 import Step6 from "../../../steps/step6";
 import Step7 from "../../../steps/step7";
 import Step8 from "../../../steps/step8";
+import { STATE_DISTRICT_MAP } from "../../../steps/step2";
 import './CompleteProfile.css';
 
 type CompleteProfileFormProps = {
@@ -24,6 +25,14 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
   onCompleted,
 }) => {
   const [editForm, { isLoading }] = useEditFormMutation();
+  const lockedState = useMemo(
+    () =>
+      Object.keys(STATE_DISTRICT_MAP).find(
+        (stateName) =>
+          stateName.toLowerCase() === String(initialData?.state || "").trim().toLowerCase()
+      ) || "",
+    [initialData?.state],
+  );
 
   const defaultValues = useMemo(
     () => ({
@@ -32,7 +41,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       job: initialData?.job || "",
       monthlySalary: initialData?.monthlySalary || "",
       country: initialData?.country || "India",
-      state: initialData?.state || "",
+      state: lockedState || initialData?.state || "",
       district: initialData?.district || "",
       mobile: initialData?.phone_number || initialData?.mobile || "",
       whatsapp: initialData?.whatsapp || "",
@@ -42,7 +51,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       count: initialData?.count || "",
       person: initialData?.person || "",
     }),
-    [initialData],
+    [initialData, lockedState],
   );
 
   const methods = useForm<any>({
@@ -75,7 +84,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
 
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <Step1 methods={methods} />
-            <Step2 methods={methods} />
+            <Step2 methods={methods} lockedState={lockedState} />
             <Step3 methods={methods} />
             <Step4 methods={methods} />
             <Step5 methods={methods} />

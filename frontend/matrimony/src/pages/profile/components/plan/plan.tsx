@@ -504,7 +504,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                   // onClick={() => handleSelectPlan(plan.plan_id, country, plan.price)}
                   onClick={() => startCashfreePayment(plan.plan_id, plan.price)}
                 >
-                  SELECT
+                  Payment Now
                 </button>
               </div>
             </div>

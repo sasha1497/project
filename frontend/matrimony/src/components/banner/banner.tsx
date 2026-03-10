@@ -95,8 +95,8 @@ const Banner = () => {
                         </div>
                     )}
                     <p className='mt-3'>
-                        {t('banner.trustedMatrimonyLine')}
-                        <b>&nbsp;{t('banner.downloadCount')}</b>
+                        BajolMatrimony® - Trusted Matrimony, Bajol App
+                        <b>&nbsp;20,000+ Downloads</b>
                     </p>
                 </div>
                 <div className="col-12 col-md-6 text-white p-4">

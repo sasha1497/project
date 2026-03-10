@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { persistLanguageFromState } from '../../i18n/language';
 
 type Props = {
   methods: UseFormReturn<any>;
@@ -215,6 +216,12 @@ const Step2: React.FC<Props> = ({ methods, lockedState }) => {
       setValue('state', normalizedLockedState, { shouldValidate: true });
     }
   }, [normalizedLockedState, selectedState, setValue]);
+
+  useEffect(() => {
+    if (selectedState) {
+      persistLanguageFromState(selectedState);
+    }
+  }, [selectedState]);
 
   useEffect(() => {
     if (selectedDistrict && !districts.includes(selectedDistrict)) {

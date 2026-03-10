@@ -3,50 +3,34 @@ import './plan.css';
 import { motion } from 'framer-motion';
 import axios from "axios";
 import { useSelector } from 'react-redux';
-import userEvent from '@testing-library/user-event';
 import { load } from '@cashfreepayments/cashfree-js'
+import { useAppLanguage } from '../../../../i18n/LanguageContext';
 
 
 
 interface Plan {
-  name: string;
-  description: string;
-  price: number; // base USD
-  features: string[];
+  nameKey: string;
+  descriptionKey: string;
+  price: number;
+  featureKeys: string[];
   colorClass: string;
-  plan_id: any,
-  // bgColor: any
+  plan_id: any;
 }
 
 const plans: Plan[] = [
-  // {
-  //   plan_id: 1,
-  //   name: 'SILVER',
-  //   description: 'Best for exploring the platform',
-  //   price: 1,
-  //   features: [
-  //     'Create and manage profile',
-  //     'Limited daily profile views',
-  //     'Send up to 5 interests per day',
-  //     'View basic contact info (limited)',
-  //     'Basic support',
-  //   ],
-  //   colorClass: 'text-white',
-  //   // bgColor: '#C0C0C0'
-  // },
   {
     plan_id: 2,
-    name: 'GOLD',
-    description: 'For serious users looking for quick matches',
+    nameKey: 'plan.gold.name',
+    descriptionKey: 'plan.gold.description',
     price: 1,
-    features: [
-      'All Gold features',
-      'Unlimited profile views',
-      'Send up to many interests per day',
-      'Trust with verified users',
-      'Priority listing in search',
-      'Access to full contact info',
-      'Customer support',
+    featureKeys: [
+      'plan.feature.allGoldFeatures',
+      'plan.feature.unlimitedViews',
+      'plan.feature.sendInterests',
+      'plan.feature.verifiedTrust',
+      'plan.feature.priorityListing',
+      'plan.feature.fullContact',
+      'plan.feature.customerSupport',
     ],
     colorClass: 'text-white',
     // bgColor: '#FFD700',
@@ -287,6 +271,7 @@ const getCurrencyCode = (country?: string): string => {
 const Plan: React.FC<PlanProps> = ({ country }) => {
 
   const userId = useSelector((state: any) => state.auth.user?.id);
+  const { t } = useAppLanguage();
 
   const [cashfree, setCashfree] = useState<any>(null);
   const [orderId, setOrderId] = useState(null);
@@ -322,7 +307,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         // order_amount: 30,
         order_amount: 1,
         // order_currency: getCurrencyCode(country),
-        customer_phone: "8610453387",
+        customer_phone: "8201779374",
         customer_id: userId,
         order_note: "Subscription Upgrade",
         order_meta: {
@@ -428,10 +413,8 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         >
           🚀 Unlock your matches by upgrading your plan! 💖✨
         </motion.p> */}
-        <p
-          className="mt-3 text-center pro_text"
-        >
-          🚀 After payment you can go to register page Fill your Bio-data  🚀
+        <p className="mt-3 text-center pro_text">
+          {t('plan.paymentReminder')}
         </p>
 
         {/* <motion.p
@@ -457,18 +440,17 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
             ease: 'easeInOut',
           }}
         >
-          {/* * After Payment On Reload Button to go Next page * */}
-          * After Payment You Touch On Reload Button *
+          {t('plan.reloadHint')}
         </motion.p>
 
         <>
-          <button
-            className="btn btn-success px-4 py-2 shadow-lg fw-bold"
-            onClick={() => window.location.reload()}
-            style={{
-              borderRadius: '50px',
-              transition: 'all 0.3s',
-            }}
+            <button
+              className="btn btn-success px-4 py-2 shadow-lg fw-bold"
+              onClick={() => window.location.reload()}
+              style={{
+                borderRadius: '50px',
+                transition: 'all 0.3s',
+              }}
             onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
             onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           >
@@ -485,17 +467,17 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
               style={{ backgroundColor: plan.bgColor }}
             > */}
               <div className="card-body d-flex flex-column">
-                <h4 className={`fw-normal ${plan.colorClass}`}>{plan.name}</h4>
-                <p className="text-white small">{plan.description}</p>
+                <h4 className={`fw-normal ${plan.colorClass}`}>{t(plan.nameKey)}</h4>
+                <p className="text-white small">{t(plan.descriptionKey)}</p>
                 <h1 className={`my-3 fw-bold ${plan.colorClass}`}>
                   {getPriceLabel(plan.price, country)}
                   {/* {<sub className="fs-6 text-white"> / 45 days</sub>} */}
                 </h1>
                 <ul className="list-unstyled text-start mt-3 flex-grow-1">
-                  {plan.features.map((feature: any, idx: any) => (
+                  {plan.featureKeys.map((featureKey: any, idx: any) => (
                     <li key={idx} className="mb-2">
                       <i className="fa-solid fa-check me-2 text-light" />
-                      <span className="text-light">{feature}</span>
+                      <span className="text-light">{t(featureKey)}</span>
                     </li>
                   ))}
                 </ul>
@@ -504,7 +486,7 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
                   // onClick={() => handleSelectPlan(plan.plan_id, country, plan.price)}
                   onClick={() => startCashfreePayment(plan.plan_id, plan.price)}
                 >
-                  Payment Now
+                  {t('plan.payNow')}
                 </button>
               </div>
             </div>
@@ -512,8 +494,8 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
         ))}
 
         <div className="flash-sale-banner bg-danger text-white py-2 mb-3 overflow-hidden">
-          <div className="scrolling-text text-center fw-bold">
-            🎉 Flash Sale: Get 50% OFF on Premium Plans — Limited Time Offer! ⏳
+            <div className="scrolling-text text-center fw-bold">
+            {t('plan.flashSaleText')}
           </div>
         </div>
       </div>
@@ -522,4 +504,3 @@ const Plan: React.FC<PlanProps> = ({ country }) => {
 };
 
 export default React.memo(Plan);
-

@@ -12,6 +12,8 @@ import './signup.css';
 import { useSendOtpMutation, useVerifyOtpMutation, useResetPasswordMutation } from '../../features/otp/otpApi';
 import { setOtpLoading, setOtpSent, setOtpVerified, setOtpError } from '../../features/otp/otpSlice';
 import { STATE_DISTRICT_MAP } from '../steps/step2';
+import { persistLanguageFromState } from '../../i18n/language';
+import { useAppLanguage } from '../../i18n/LanguageContext';
 
 interface FormData {
   mobileNumber: string;
@@ -20,6 +22,7 @@ interface FormData {
 }
 
 const SignUp: React.FC = () => {
+  const { t } = useAppLanguage();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     defaultValues: { mobileNumber: '', state: '', password: '' }
   });
@@ -72,8 +75,15 @@ const SignUp: React.FC = () => {
       const result = await loginUser(data).unwrap();
       if (result?.user?.token) {
         const { token, ...userData } = result.user;
+        const mergedUser = {
+          ...userData,
+          state: userData.state || data.state, // ensure state persists after login
+        };
+        if (mergedUser.state) {
+          localStorage.setItem('selected_state', mergedUser.state);
+        }
         dispatch(setToken(token));
-        dispatch(setUser(userData));
+        dispatch(setUser(mergedUser));
 
         toast.success(result.message || 'Login successful!', {
           autoClose: 1000,
@@ -204,7 +214,7 @@ const SignUp: React.FC = () => {
       ) : (
         <div className="card shadow" style={{ width: '400px' }}>
           <div className="card-body">
-            <h2 className="card-title text-center mb-4">Sign In 👋</h2>
+            <h2 className="card-title text-center mb-4">{t('signup.welcome')}</h2>
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Mobile input with country code, connected to react-hook-form */}
               <div className="mb-3">
@@ -239,10 +249,13 @@ const SignUp: React.FC = () => {
               <div className="mb-3">
                 <select
                   className={`form-control ${errors.state ? 'is-invalid' : ''}`}
-                  {...register('state', { required: 'State is required' })}
+                  {...register('state', {
+                    required: 'State is required',
+                    onChange: (event) => persistLanguageFromState(event.target.value),
+                  })}
                   defaultValue=""
                 >
-                  <option value="" disabled>Select State</option>
+                  <option value="" disabled>{t('signup.selectState')}</option>
                   {Object.keys(STATE_DISTRICT_MAP).map((stateName) => (
                     <option key={stateName} value={stateName}>
                       {stateName}
@@ -262,11 +275,11 @@ const SignUp: React.FC = () => {
                 {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
               </div>
 
-              <button type="submit" className="btn btn-primary w-100 mb-2 blinking-btn">Next →</button>
+              <button type="submit" className="btn btn-primary w-100 mb-2 blinking-btn">{t('signup.next')}</button>
             </form>
 
             <div className="text-center">
-              <button className="btn btn-link p-0" onClick={() => setShowForgotPopup(true)}>Forgot Password?</button>
+              <button className="btn btn-link p-0" onClick={() => setShowForgotPopup(true)}>{t('signup.forgotPassword')}</button>
             </div>
 
             {/* <div className="text-center mt-3">

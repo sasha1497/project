@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import './multi.css';
 import { useSubmitFormMutation } from '../../features/form/formApi';
 import Loader from '../../components/loader/loader';
+import { useAppLanguage } from '../../i18n/LanguageContext';
+import { persistLanguageFromState } from '../../i18n/language';
 
 import logo from '../../asset/bajollogo.jpeg';
 
@@ -60,6 +62,7 @@ const INDIAN_STATES_AND_UTS = [
 ];
 
 export default function App() {
+  const { t } = useAppLanguage();
   const {
     register,
     handleSubmit,
@@ -77,6 +80,13 @@ export default function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [submitForm, { isLoading }] = useSubmitFormMutation();
+  const handleStateChange = (stateName: string) => {
+    if (!stateName) {
+      return;
+    }
+
+    persistLanguageFromState(stateName);
+  };
 
   const onSubmit = async (data: any) => {
     try {
@@ -138,11 +148,12 @@ export default function App() {
                 className={`form-control ${errors.state ? 'is-invalid' : ''}`}
                 {...register('state', {
                   required: 'State is required',
+                  onChange: (event) => handleStateChange(event.target.value),
                 })}
                 defaultValue=""
               >
                 <option value="" disabled>
-                  Select State
+                  {t('multistep.selectState')}
                 </option>
                 {INDIAN_STATES_AND_UTS.map((stateName) => (
                   <option key={stateName} value={stateName}>

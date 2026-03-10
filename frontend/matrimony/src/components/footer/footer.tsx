@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAppLanguage } from '../../i18n/LanguageContext';
 
 
 const Footer = () => {
+  const { t } = useAppLanguage();
   return (
     <footer className="text-light pt-5 pb-3" style={{ background: 'linear-gradient(to right, #1e3c72, #2a5298)' }}>
       <div className="container-fluid">
@@ -10,32 +12,32 @@ const Footer = () => {
 
           {/* Services */}
           <div className="col-md-4 mb-4">
-            <h5 className="text-uppercase mb-3">Matrimony Services</h5>
+            <h5 className="text-uppercase mb-3">{t('footer.services')}</h5>
             <ul className="list-unstyled">
-              <li><a href="#" className="text-light text-decoration-none">Profile Creation</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Matchmaking Services</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Personalized Matches</a></li>
-              <li><a href="#" className="text-light text-decoration-none">Premium Member Assistance</a></li>
+              <li><a href="#" className="text-light text-decoration-none">{t('footer.profileCreation')}</a></li>
+              <li><a href="#" className="text-light text-decoration-none">{t('footer.matchmaking')}</a></li>
+              <li><a href="#" className="text-light text-decoration-none">{t('footer.personalizedMatches')}</a></li>
+              <li><a href="#" className="text-light text-decoration-none">{t('footer.premiumAssistance')}</a></li>
             </ul>
           </div>
 
           {/* Page Links */}
           <div className="col-md-4 mb-4">
-            <h5 className="text-uppercase mb-3">Page Links</h5>
+            <h5 className="text-uppercase mb-3">{t('footer.pageLinks')}</h5>
             <ul className="list-unstyled">
-              <li><Link to="/about" className="text-light text-decoration-none">About</Link></li>
-              <li><Link to="/terms" className="text-light text-decoration-none">The rules and directions </Link></li>
-              <li><a href="#" className="text-light text-decoration-none">Contact</a></li>
-              <li><Link to="/conclusion"  className="text-light text-decoration-none">Conclusion</Link></li>
+              <li><Link to="/about" className="text-light text-decoration-none">{t('footer.about')}</Link></li>
+              <li><Link to="/terms" className="text-light text-decoration-none">{t('footer.rules')}</Link></li>
+              <li><a href="#" className="text-light text-decoration-none">{t('footer.contact')}</a></li>
+              <li><Link to="/conclusion"  className="text-light text-decoration-none">{t('footer.conclusion')}</Link></li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div className="col-md-4 mb-4">
-            <h5 className="text-uppercase mb-3">Subscribe</h5>
+            <h5 className="text-uppercase mb-3">{t('footer.subscribe')}</h5>
             <form className="d-flex">
               <button className="btn btn-primary" type="submit">
-                Get started
+                {t('footer.getStarted')}
               </button>
             </form>
             <div className="mt-3">

@@ -10,8 +10,10 @@ import young2 from '../../asset/young2.jpg';
 
 
 import './couples.css';
+import { useAppLanguage } from "../../i18n/LanguageContext";
 
 const Couples = () => {
+    const { t } = useAppLanguage();
     // const coupleImages = [young1, pink1, young2, hair1, pink2, hair2, thatha, b1];
     const coupleImages = [young1, young2];
 
@@ -24,7 +26,7 @@ const Couples = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
-                ❤️ Alliances for Every Age | Bajol Matrimony ❤️
+                {t('couples.title')}
             </motion.h2>
 
             <motion.div
@@ -90,7 +92,7 @@ const Couples = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    See more photos touch on the photo more see
+                    {t('couples.morePhotos')}
                 </motion.h2>
             </motion.div>
         </div>

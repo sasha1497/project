@@ -43,19 +43,22 @@ import 'react-toastify/dist/ReactToastify.css';
 import AppRoutes from './routes/routes';
 import Loader from './components/loader/loader';
 import ErrorBoundary from './components/error/ErrorBoundary';
+import { LanguageProvider } from './i18n/LanguageContext';
 
 function App() {
   return (
     <>
-      <Router>
-        <ErrorBoundary>
-          <Suspense fallback={<Loader />}>
-            <div className="App">
-              <AppRoutes />
-            </div>
-          </Suspense>
-        </ErrorBoundary>
-      </Router>
+      <LanguageProvider>
+        <Router>
+          <ErrorBoundary>
+            <Suspense fallback={<Loader />}>
+              <div className="App">
+                <AppRoutes />
+              </div>
+            </Suspense>
+          </ErrorBoundary>
+        </Router>
+      </LanguageProvider>
 
       <ToastContainer position="top-right" autoClose={2000} />
     </>

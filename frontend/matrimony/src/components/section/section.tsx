@@ -6,12 +6,14 @@ import Couples from "../couples/couples";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { load } from '@cashfreepayments/cashfree-js'
+import { useAppLanguage } from "../../i18n/LanguageContext";
 
 
 
 
 
 const Section = () => {
+  const { t } = useAppLanguage();
 
   const [cashfree, setCashfree] = useState<any>(null);
   const [orderId, setOrderId] = useState("");
@@ -107,7 +109,7 @@ const Section = () => {
                 transition={{ duration: 0.6 }}
               >
                 <p className="fw-semibold text-light mb-3 blink-text fs-larger">
-                  Are you already registered in BAJOL ?
+                  {t('section.alreadyRegistered')}
                 </p>
 
                 <div className="d-flex justify-content-center gap-3">
@@ -117,7 +119,7 @@ const Section = () => {
                     className="px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(1)}
                   >
-                    🚀 Did
+                    {t('section.did')}
                   </motion.button>
 
                   <motion.button
@@ -126,7 +128,7 @@ const Section = () => {
                     className=" px-4 py-2 fw-bold shadow-sm rounded-pill cursor-pointer bg-white"
                     onClick={() => handleClick(2)}
                   >
-                     ✅ Do Register Now
+                    {t('section.registerNow')}
                   </motion.button>
                 </div>
               </motion.div>
@@ -137,7 +139,7 @@ const Section = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <p>💍 <span className="text-danger white-shadow-text">Dream</span> of <span className="text-danger white-shadow-text">Marriage</span></p>
+                <p>{t('section.dreamMarriage')}</p>
               </motion.h2>
               <motion.p
                 className="hero-subtext"
@@ -146,7 +148,7 @@ const Section = () => {
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
                 <span className="hero-subtext-inner">
-                  There are three ways to a happy marriage: The first way is to be kind. The second way is to be kind. The third way is to be kind.</span>
+                  {t('section.marriageQuote')}</span>
                
               </motion.p>
               <motion.div

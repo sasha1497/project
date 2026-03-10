@@ -1,46 +1,59 @@
 import { motion } from "framer-motion";
 import logo from "../../asset/bajollogo.jpeg";
 import './navbar.css';
-import { useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState } from "react";
 import { logout } from "../../features/auth/authSlice";
-import { openViewPopup } from "../../features/profileui/profileUISlice";
+import { useAppLanguage } from "../../i18n/LanguageContext";
+import {
+  persistLanguageFromState,
+  setAppLanguage,
+  STATE_LANGUAGE_OPTIONS,
+} from "../../i18n/language";
 
 const Navbar = () => {
-  const navigate = useNavigate(); // initialize it
+  const navigate = useNavigate();
+  const { t } = useAppLanguage();
 
   const [showHelpTooltip, setShowHelpTooltip] = useState(false);
-
+  const [showLanguagePopup, setShowLanguagePopup] = useState(false);
 
   const location = useLocation();
   const isSignupPage = location.pathname === '/signup';
-  const isProfilePage = location.pathname === '/profile'
+  const isProfilePage = location.pathname === '/profile';
 
-  const  {user}  = useSelector((state: any) => state.auth);
-  // const {authUserId} = useSelector((state: any) => state.form.authUser?.name);
-
-  // const finalUserId = user || authUserId;
-  
-
+  const { user } = useSelector((state: any) => state.auth);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    dispatch(logout()); // Clear Redux state
-    localStorage.removeItem('authToken'); // Remove token
-    navigate('/dashboard'); // Redirect
+    dispatch(logout());
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('selected_state');
+    navigate('/dashboard');
   };
 
   const toggleHelpTooltip = () => {
     setShowHelpTooltip(!showHelpTooltip);
   };
 
+  const toggleLanguagePopup = () => {
+    setShowLanguagePopup((prev) => !prev);
+  };
 
+  const handleEnglishSelect = () => {
+    setAppLanguage('en');
+    setShowLanguagePopup(false);
+  };
 
+  const handleStateLanguageSelect = (stateName: string) => {
+    if (!stateName) {
+      return;
+    }
 
+    persistLanguageFromState(stateName);
+    setShowLanguagePopup(false);
+  };
 
   return (
     <>
@@ -68,58 +81,63 @@ const Navbar = () => {
 
           {(isSignupPage || isProfilePage) ? (
             <div className="d-flex align-items-center justify-content-end parent-right-content">
+              <button
+                type="button"
+                className="btn btn-link text-dark text-decoration-none d-inline-flex align-items-center"
+                onClick={toggleLanguagePopup}
+                title="Change Language"
+              >
+                <span className="material-icons">public</span>
+              </button>
+
               {isSignupPage ? (
                 <>
                   <span className="dot"></span>
-                  <span className="mx-2">Welcome to Signup Page</span>
+                  <span className="mx-2">{t('navbar.signupWelcome')}</span>
                 </>
               ) : (
                 <div className="dropdown">
                   <button
-                    // className="btn btn-lg dropdown-toggle d-flex align-items-center border-0 bg-transparent text-primary"
                     className="btn btn-lg dropdown-toggle d-flex align-items-center border-0 bg-transparent text-primary"
                     type="button"
                     id="profileDropdown"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    {/* <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome, {user?.name }</b></span>}</span> */}
-                    <span className="mx-2 d-none d-sm-inline text-primary">{user && <span><b>Welcome to BAJOL</b></span>}</span>
+                    <span className="mx-2 d-none d-sm-inline text-primary">
+                      {user && <span><b>{t('navbar.welcomeBajol')}</b></span>}
+                    </span>
                   </button>
 
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    {/* <li><button className="dropdown-item" onClick={() => dispatch(openViewPopup())}>View profile</button></li>
-                    <li><button className="dropdown-item">Delete Account</button></li> */}
                     <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                   </ul>
                 </div>
-                // )
               )}
             </div>
           ) : (
             <div className="d-flex align-items-center justify-content-end parent-right-content">
-              {/* <span className="me-2">Already a member?</span>
-               <span className="me-2">then</span>
-              <button
-                type="button"
-                className="btn btn-primary blinking-btn"
-                onClick={() => navigate("/signup")}
-              >
-                Now Login
-              </button>
-              <span className="mx-2">|</span> */}
-              <div className="position-relative">
+              <div className="position-relative d-flex align-items-center">
+                <button
+                  type="button"
+                  className="btn btn-link text-dark text-decoration-none d-inline-flex align-items-center"
+                  onClick={toggleLanguagePopup}
+                  title="Change Language"
+                >
+                  <span className="material-icons">public</span>
+                </button>
+
                 <button
                   type="button"
                   className="btn btn-link text-dark text-decoration-none d-inline-flex align-items-center"
                   onClick={toggleHelpTooltip}
                 >
-                  Help
+                  {t('navbar.help')}
                   <span className="material-icons me-2 ms-1 jump-icon">contact_support</span>
                 </button>
 
                 {showHelpTooltip && (
-                  <div className="help-tooltip shadow-sm bg-white border rounded px-3 py-2 position-absolute" style={{ top: '120%', right: 0, zIndex: 999, border:'10px solid blue'}}>
+                  <div className="help-tooltip shadow-sm bg-white border rounded px-3 py-2 position-absolute" style={{ top: '120%', right: 0, zIndex: 999, border: '10px solid blue' }}>
                     <div><strong>Support : 24 x 5</strong></div>
                     <div>Email: <a href="mailto:support@bajolmatrimony.com">bajolonlinematrimony@gmail.com</a></div>
                   </div>
@@ -127,11 +145,63 @@ const Navbar = () => {
               </div>
             </div>
           )}
-
-
         </div>
       </motion.nav>
+
+      {showLanguagePopup && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.45)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+          }}
+          onClick={() => setShowLanguagePopup(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 420,
+              background: '#fff',
+              borderRadius: 12,
+              padding: '1rem',
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h5 style={{ marginBottom: '0.5rem' }}>Select your language</h5>
+            <p style={{ marginBottom: '0.75rem', color: '#666' }}>
+              Choose English or select your state language.
+            </p>
+
+            <button
+              type="button"
+              className="btn btn-outline-primary w-100 mb-3"
+              onClick={handleEnglishSelect}
+            >
+              English
+            </button>
+
+            <select
+              className="form-select"
+              defaultValue=""
+              onChange={(event) => handleStateLanguageSelect(event.target.value)}
+            >
+              <option value="" disabled>Select Your State</option>
+              {STATE_LANGUAGE_OPTIONS.map((stateName) => (
+                <option key={stateName} value={stateName}>
+                  {stateName}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
     </>
-  )
-}
+  );
+};
+
 export default Navbar;

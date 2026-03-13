@@ -60,12 +60,14 @@ import React from 'react';
 import { UseFormReturn, Controller } from 'react-hook-form';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { useAppLanguage } from '../../i18n/LanguageContext';
 
 type Props = {
   methods: UseFormReturn<any>;
 };
 
 const Step2: React.FC<Props> = ({ methods }) => {
+  const { t } = useAppLanguage();
   const {
     control,
     formState: { errors },
@@ -126,7 +128,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
         )}
       </div> */}
       <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="mobile">Enter your Mobile Number</label>
+        <label htmlFor="mobile">{t('profile.mobileLabel')}</label>
         <Controller
           name="mobile"
           control={control}
@@ -149,7 +151,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
               disableCountryCode={false}
               countryCodeEditable={false}
               inputStyle={{ width: '100%' }}
-              placeholder="Enter mobile number"
+              placeholder={t('profile.mobilePlaceholder')}
               inputProps={{
                 name: field.name,
                 ref: field.ref, // ✅ Attach ref here
@@ -192,7 +194,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
         )}
       </div> */}
       <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="whatsapp">Enter your WhatsApp Number</label>
+        <label htmlFor="whatsapp">{t('profile.whatsappLabel')}</label>
         <Controller
           name="whatsapp"
           control={control}
@@ -214,7 +216,7 @@ const Step2: React.FC<Props> = ({ methods }) => {
               disableCountryCode={false}
               countryCodeEditable={false}
               inputStyle={{ width: '100%' }}
-              placeholder="Enter WhatsApp number"
+              placeholder={t('profile.whatsappPlaceholder')}
               inputProps={{
                 name: field.name,
                 ref: field.ref, // ✅ Attach ref here
@@ -235,4 +237,3 @@ const Step2: React.FC<Props> = ({ methods }) => {
 };
 
 export default Step2;
-

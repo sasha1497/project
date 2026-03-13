@@ -38,6 +38,31 @@
   animation: blinkColor 1.5s infinite;
 }
 
+.lang-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  perspective: 800px;
+}
+
+.earth-spin {
+  font-size: 34px;
+  font-weight: bold;
+  display: inline-block;
+  animation: earthRotate 4s linear infinite;
+  transform-style: preserve-3d;
+}
+
+/* Earth spinning animation */
+@keyframes earthRotate {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
 /* Keyframes to change colors red -> yellow -> green -> red */
 @keyframes blinkColor {
   0% {

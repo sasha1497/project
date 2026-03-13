@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { useEditFormMutation } from "../../../../../features/editform/editFormApi";
 import PhoneInput from "react-phone-input-2";
 import { STATE_DISTRICT_MAP } from "../../../../steps/step2";
+import { useAppLanguage } from "../../../../../i18n/LanguageContext";
 // import {
 //   startEdit,
 //   editSuccess,
@@ -21,6 +22,7 @@ const ViewProfilePopup = () => {
   const dispatch = useDispatch();
   const showPopup = useSelector((state: RootState) => state.profileUi.showViewPopup);
   const userId = useSelector((state: RootState) => state.auth.user?.id);
+  const { t } = useAppLanguage();
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -100,12 +102,12 @@ const ViewProfilePopup = () => {
       await editForm({ id: userId, ...cleanedData }).unwrap();
 
       dispatch(editSuccess());
-      toast.success("Profile updated successfully!");
+      toast.success(t('profile.popup.updateSuccess'));
       refetch();
       setIsEditMode(false);
     } catch (error: any) {
-      dispatch(editFailure(error?.data?.message || "Failed to update profile"));
-      toast.error(error?.data?.message || "Update failed!");
+      dispatch(editFailure(error?.data?.message || t('profile.popup.updateFailed')));
+      toast.error(error?.data?.message || t('profile.popup.updateError'));
       console.error("Update failed:", error);
     }
   };
@@ -126,10 +128,10 @@ const ViewProfilePopup = () => {
           ×
         </div>
 
-        <h4>{isEditMode ? "Edit Profile" : "View Profile"}</h4>
+        <h4>{isEditMode ? t('profile.popup.editTitle') : t('profile.popup.viewTitle')}</h4>
 
         {isLoading ? (
-          <p>Loading...</p>
+          <p>{t('profile.popup.loading')}</p>
         ) : isEditMode ? (
           // ✅ EDIT MODE FORM
           <div className="view-profile-content">
@@ -137,34 +139,34 @@ const ViewProfilePopup = () => {
 
               {/* Name */}
               <div className="mb-3">
-                <label className="form-label">Name</label>
+                <label className="form-label">{t('profile.nameLabel')}</label>
                 <input
                   type="text"
                   className="form-control"
-                  {...register("name", { required: "Name is required" })}
+                  {...register("name", { required: t('profile.nameLabel') + " is required" })}
                 />
                 {errors.name && <small className="text-danger">{errors.name.message}</small>}
               </div>
 
               {/* Age */}
               <div className="mb-3">
-                <label className="form-label">Age</label>
+                <label className="form-label">{t('profile.ageLabel')}</label>
                 <input
                   type="number"
                   className="form-control"
-                  {...register("age", { required: "Age is required" })}
+                  {...register("age", { required: t('profile.ageLabel') + " is required" })}
                 />
                 {errors.age && <small className="text-danger">{errors.age.message}</small>}
               </div>
 
               {/* Gender */}
               <div className="mb-3">
-                <label className="form-label">Gender</label>
-                <select className="form-select" {...register("gender", { required: "Gender is required" })}>
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                <label className="form-label">{t('profile.view.label.gender')}</label>
+                <select className="form-select" {...register("gender", { required: t('profile.view.label.gender') + " is required" })}>
+                  <option value="">{t('profile.popup.genderPlaceholder')}</option>
+                  <option value="male">{t('profile.popup.gender.male')}</option>
+                  <option value="female">{t('profile.popup.gender.female')}</option>
+                  <option value="other">{t('profile.popup.gender.other')}</option>
                 </select>
                 {errors.gender && <small className="text-danger">{errors.gender.message}</small>}
               </div>
@@ -187,16 +189,16 @@ const ViewProfilePopup = () => {
 
               {/* Job */}
               <div className="mb-3">
-                <label className="form-label">Job</label>
-                <input type="text" className="form-control" {...register("job", { required: "job is required" })} />
+                <label className="form-label">{t('profile.jobLabel')}</label>
+                <input type="text" className="form-control" {...register("job", { required: t('profile.jobLabel') + " is required" })} />
                 {errors.job && <small className="text-danger">{errors.job.message}</small>}
 
               </div>
 
               {/* Monthly Salary */}
               <div className="mb-3">
-                <label className="form-label">Monthly Salary</label>
-                <input type="text" className="form-control" {...register("monthlySalary", { required: "monthlySalary is required" })} />
+                <label className="form-label">{t('profile.monthlySalaryLabel')}</label>
+                <input type="text" className="form-control" {...register("monthlySalary", { required: t('profile.monthlySalaryLabel') + " is required" })} />
                 {errors.monthlySalary && <small className="text-danger">{errors.monthlySalary.message}</small>}
 
               </div>
@@ -231,24 +233,24 @@ const ViewProfilePopup = () => {
               </div> */}
               {/* Caste */}
               <div className="mb-3">
-                <label className="form-label">Caste</label>
+                <label className="form-label">{t('profile.casteLabel')}</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter your caste"
-                  {...register("caste", { required: "Caste is required" })}
+                  placeholder={t('profile.castePlaceholder')}
+                  {...register("caste", { required: t('profile.casteLabel') + " is required" })}
                 />
                 {errors.caste && <small className="text-danger">{errors.caste.message}</small>}
               </div>
 
               {/* Religion */}
               <div className="mb-3">
-                <label className="form-label">Religion</label>
+                <label className="form-label">{t('profile.religionLabel')}</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Enter your religion"
-                  {...register("religion", { required: "Religion is required" })}
+                  placeholder={t('profile.religionPlaceholder')}
+                  {...register("religion", { required: t('profile.religionLabel') + " is required" })}
                 />
                 {errors.religion && <small className="text-danger">{errors.religion.message}</small>}
               </div>
@@ -327,7 +329,7 @@ const ViewProfilePopup = () => {
                 }}
                 render={({ field }) => (
                   <div className="mb-3">
-                    <label className="form-label">Mobile</label>
+                    <label className="form-label">{t('profile.popup.mobileLabel')}</label>
                     <PhoneInput
                       {...field}
                       country="in"
@@ -396,7 +398,7 @@ const ViewProfilePopup = () => {
                       containerClass="phone-input-container"
                       inputStyle={{ width: "100%", height: "45px" }}
                       onChange={(value) => field.onChange(value ? "+" + value : "")} // add + prefix
-                      placeholder="Enter mobile number"
+                      placeholder={t('profile.popup.mobilePlaceholder')}
                       inputProps={{
                         name: field.name,
                         required: true,
@@ -417,7 +419,7 @@ const ViewProfilePopup = () => {
                 }}
                 render={({ field }) => (
                   <div className="mb-3">
-                    <label className="form-label">Whatsapp Number</label>
+                    <label className="form-label">{t('profile.popup.whatsappLabel')}</label>
                     <PhoneInput
                       {...field}
                       country="in"
@@ -429,7 +431,7 @@ const ViewProfilePopup = () => {
                       containerClass="phone-input-container"
                       inputStyle={{ width: "100%", height: "45px" }}
                       onChange={(value) => field.onChange(value ? "+" + value : "")}
-                      placeholder="Enter whatsapp number"
+                      placeholder={t('profile.popup.whatsappPlaceholder')}
                       inputProps={{
                         name: field.name,
                         required: true,
@@ -457,14 +459,16 @@ const ViewProfilePopup = () => {
                 {errors.district && <small className="text-danger">{errors.district.message}</small>}
               </div> */}
               <div className="mb-3">
-                <label className="form-label">District</label>
+                <label className="form-label">{t('profile.popup.districtLabel')}</label>
 
                 <select
                   className="form-control"
-                  {...register("district", { required: "District is required" })}
+                  {...register("district", { required: t('profile.popup.districtLabel') + " is required" })}
                   disabled={!selectedState}
                 >
-                  <option value="">{selectedState ? "Select District" : "State is locked"}</option>
+                  <option value="">
+                    {selectedState ? t('profile.popup.districtPlaceholder') : t('profile.popup.stateLocked')}
+                  </option>
                   {districts.map((districtName) => (
                     <option key={districtName} value={districtName}>
                       {districtName}
@@ -487,14 +491,14 @@ const ViewProfilePopup = () => {
                 {errors.state && <small className="text-danger">{errors.state.message}</small>}
               </div> */}
               <div className="mb-3">
-                <label htmlFor="state" className="form-label">State</label>
+                <label htmlFor="state" className="form-label">{t('profile.popup.stateLabel')}</label>
 
                 <select
                   id="state"
                   className="form-select"
-                  {...register("state", { required: "State is required" })}
+                  {...register("state", { required: t('profile.popup.stateLabel') + " is required" })}
                 >
-                  {!lockedState && <option value="">-- Select State --</option>}
+                  {!lockedState && <option value="">{t('profile.popup.statePlaceholder')}</option>}
                   {stateOptions.map((stateName) => (
                     <option key={stateName} value={stateName}>
                       {stateName}
@@ -548,9 +552,9 @@ const ViewProfilePopup = () => {
 
               {/* Country */}
               <div className="mb-3">
-                <label className="form-label">Country</label>
-                <select className="form-select" {...register("country", { required: "country is required" })}>
-                  <option value="">You can select your interest country to get Bride / Groom </option>
+                <label className="form-label">{t('profile.popup.countryLabel')}</label>
+                <select className="form-select" {...register("country", { required: t('profile.popup.countryLabel') + " is required" })}>
+                  <option value="">{t('profile.popup.countryPlaceholder')}</option>
                   <option value="India">India</option>
                   {/* <option value="USA">USA</option>
                   <option value="England">England</option>
@@ -603,26 +607,26 @@ const ViewProfilePopup = () => {
 
               {/* {count} */}
               <div className="mb-3">
-                <label className="form-label">which Marraige this for you ?</label>
-                <select className="form-select" {...register("count", { required: "count is required" })}>
-                  <option value="">Select number of marraige</option>
-                  <option value="first">First</option>
-                  <option value="second">Second</option>
-                  <option value="third">Third</option>
+                <label className="form-label">{t('profile.popup.marriageCountLabel')}</label>
+                <select className="form-select" {...register("count", { required: t('profile.popup.marriageCountLabel') + " is required" })}>
+                  <option value="">{t('profile.popup.marriageCountPlaceholder')}</option>
+                  <option value="first">{t('profile.popup.marriageCount.first')}</option>
+                  <option value="second">{t('profile.popup.marriageCount.second')}</option>
+                  <option value="third">{t('profile.popup.marriageCount.third')}</option>
                 </select>
                 {errors.count && <small className="text-danger">{errors.count.message}</small>}
               </div>
 
               {/* {person} */}
               <div className="mb-3">
-                <label className="form-label">Who are you going to marry ?</label>
-                <select className="form-select" {...register("person", { required: "person is required" })}>
-                  <option value="">Select your person</option>
-                  <option value="me">me</option>
-                  <option value="sister">sister</option>
-                  <option value="brother">brother</option>
-                  <option value="son">son</option>
-                  <option value="daughter">daughter</option>
+                <label className="form-label">{t('profile.popup.marriagePersonLabel')}</label>
+                <select className="form-select" {...register("person", { required: t('profile.popup.marriagePersonLabel') + " is required" })}>
+                  <option value="">{t('profile.popup.marriagePersonPlaceholder')}</option>
+                  <option value="me">{t('profile.popup.marriagePerson.me')}</option>
+                  <option value="sister">{t('profile.popup.marriagePerson.sister')}</option>
+                  <option value="brother">{t('profile.popup.marriagePerson.brother')}</option>
+                  <option value="son">{t('profile.popup.marriagePerson.son')}</option>
+                  <option value="daughter">{t('profile.popup.marriagePerson.daughter')}</option>
 
                 </select>
                 {errors.person && <small className="text-danger">{errors.person.message}</small>}
@@ -632,10 +636,10 @@ const ViewProfilePopup = () => {
               <div className="d-flex justify-content-end mt-4 gap-2">
 
                 <button type="submit" className="btn btn-primary px-4" >
-                  Save Changes
+                  {t('profile.popup.saveChanges')}
                 </button>
                 <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
-                  Cancel
+                  {t('profile.popup.cancel')}
                 </button>
                 {/* <button type="button" className="btn btn-danger px-4 mt-3 mx-0" onClick={() => dispatch(closeViewPopup())}>
                   delete account
@@ -668,20 +672,20 @@ const ViewProfilePopup = () => {
           // ✅ VIEW MODE CONTENT
           <>
             <div className="view-profile-content">
-              <p><strong>Name :</strong> {data?.name}</p>
-              <p><strong>Age :</strong> {data?.age}</p>
-              <p><strong>Gender :</strong> {data?.gender}</p>
-              <p><strong>Caste:</strong> {data?.caste}</p>
-              <p><strong>Religion:</strong> {data?.religion}</p>
-              <p><strong>District:</strong> {data?.district}</p>
-              <p><strong>State:</strong> {data?.state}</p>
-              <p><strong>Country:</strong> {data?.country}</p>
-              <p><strong>Mobile:</strong> {data?.phone_number}</p>
-              <p><strong>Whatsapp:</strong> {data?.whatsapp}</p>
-              <p><strong>Job:</strong> {data?.job}</p>
-              <p><strong>Salary:</strong> {data?.monthlySalary}</p>
-              <p><strong>Marriage status:</strong> {data?.count}</p>
-              <p><strong>Whose marriage:</strong> {data?.person}</p>
+              <p><strong>{t('profile.view.label.name')} :</strong> {data?.name}</p>
+              <p><strong>{t('profile.view.label.age')} :</strong> {data?.age}</p>
+              <p><strong>{t('profile.view.label.gender')} :</strong> {data?.gender}</p>
+              <p><strong>{t('profile.view.label.caste')}:</strong> {data?.caste}</p>
+              <p><strong>{t('profile.view.label.religion')}:</strong> {data?.religion}</p>
+              <p><strong>{t('profile.view.label.district')}:</strong> {data?.district}</p>
+              <p><strong>{t('profile.view.label.state')}:</strong> {data?.state}</p>
+              <p><strong>{t('profile.view.label.country')}:</strong> {data?.country}</p>
+              <p><strong>{t('profile.view.label.mobile')}:</strong> {data?.phone_number}</p>
+              <p><strong>{t('profile.view.label.whatsapp')}:</strong> {data?.whatsapp}</p>
+              <p><strong>{t('profile.view.label.job')}:</strong> {data?.job}</p>
+              <p><strong>{t('profile.view.label.salary')}:</strong> {data?.monthlySalary}</p>
+              <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {data?.count}</p>
+              <p><strong>{t('profile.view.label.whoseMarriage')}:</strong> {data?.person}</p>
             </div>
             <div className="d-flex justify-content-end mt-3 gap-2">
               <button
@@ -689,7 +693,7 @@ const ViewProfilePopup = () => {
                 className="btn btn-primary px-4"
                 onClick={() => setIsEditMode(true)}
               >
-                Edit Profile
+                {t('profile.popup.editProfile')}
               </button>
 
               <button
@@ -697,7 +701,7 @@ const ViewProfilePopup = () => {
                 className="btn btn-danger px-4"
                 onClick={() => dispatch(closeViewPopup())}
               >
-                Cancel
+                {t('profile.popup.cancel')}
               </button>
             </div>
           </>

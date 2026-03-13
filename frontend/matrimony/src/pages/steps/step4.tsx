@@ -49,12 +49,14 @@
 // export default Step4;
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
+import { useAppLanguage } from '../../i18n/LanguageContext';
 
 type Props = {
   methods: UseFormReturn<any>;
 };
 
 const Step4: React.FC<Props> = ({ methods }) => {
+  const { t } = useAppLanguage();
   const {
     register,
     formState: { errors },
@@ -64,10 +66,10 @@ const Step4: React.FC<Props> = ({ methods }) => {
     <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
       {/* Caste Field */}
       <div className="mb-3">
-        <label className="form-label">Enter Your Caste</label>
+        <label className="form-label">{t('profile.casteLabel')}</label>
         <input
           type="text"
-          placeholder="Enter your caste"
+          placeholder={t('profile.castePlaceholder')}
           className={`form-control ${errors.caste ? "is-invalid" : ""}`}
           {...register("caste", { required: "Caste is required" })}
         />
@@ -80,10 +82,10 @@ const Step4: React.FC<Props> = ({ methods }) => {
 
       {/* Religion Field */}
       <div className="mb-3">
-        <label className="form-label">Enter your Religion</label>
+        <label className="form-label">{t('profile.religionLabel')}</label>
         <input
           type="text"
-          placeholder="Enter your religion"
+          placeholder={t('profile.religionPlaceholder')}
           className={`form-control ${errors.religion ? "is-invalid" : ""}`}
           {...register("religion", { required: "Religion is required" })}
         />

@@ -83,11 +83,11 @@ const Navbar = () => {
             <div className="d-flex align-items-center justify-content-end parent-right-content">
               <button
                 type="button"
-                className="btn btn-link text-dark text-decoration-none d-inline-flex align-items-center"
+                className="btn btn-link text-dark text-decoration-none d-inline-flex align-items-center lang-btn"
                 onClick={toggleLanguagePopup}
                 title="Change Language"
               >
-                <span className="material-icons">public</span>
+                <span className="material-icons earth-spin">public</span>
               </button>
 
               {isSignupPage ? (

@@ -4,12 +4,14 @@ import './uploadprofile.css';
 import { useUploadImagesMutation } from '../../../../features/image/imageApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetImages, addImage } from '../../../../features/image/imageslice';
+import { useAppLanguage } from '../../../../i18n/LanguageContext';
 
 const UploadProfile: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const dispatch = useDispatch();
+  const { t } = useAppLanguage();
   const [uploadImages, { isLoading }] = useUploadImagesMutation();
 
   const userId = useSelector((state: any) => state.auth.user?.id);
@@ -32,7 +34,7 @@ const UploadProfile: React.FC = () => {
     event.preventDefault();
 
     if (!image) {
-      setError('You must upload an image.');
+      setError(t('profile.uploadErrorMissing'));
       return;
     }
 
@@ -48,7 +50,7 @@ const UploadProfile: React.FC = () => {
         dispatch(addImage(result.uploadedUrls[0]));
       }
 
-      setSuccess('Image uploaded successfully!');
+      setSuccess(t('profile.uploadSuccess'));
       console.log('Upload success:', result);
       setImage(null);
 
@@ -57,7 +59,7 @@ const UploadProfile: React.FC = () => {
       }, 1000);
     } catch (err: any) {
       console.error('Upload failed', err);
-      setError('Upload failed. Please try again.');
+      setError(t('profile.uploadFailed'));
     }
   };
 
@@ -68,7 +70,7 @@ const UploadProfile: React.FC = () => {
       animate={{ borderColor: image ? '#28a745' : '#007bff' }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
     >
-      <h3>Upload Profile Image</h3>
+      <h3>{t('profile.uploadTitle')}</h3>
 
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" onChange={handleImageChange} />
@@ -81,7 +83,7 @@ const UploadProfile: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <img src={URL.createObjectURL(image)} alt="Uploaded Preview" />
+              <img src={URL.createObjectURL(image)} alt={t('profile.uploadedPreviewAlt')} />
               <button type="button" onClick={removeImage}>
                 &times;
               </button>
@@ -93,10 +95,10 @@ const UploadProfile: React.FC = () => {
         {success && <p className="success-message">{success}</p>}
 
         <button type="submit" disabled={!image || isLoading}>
-          {isLoading ? 'Uploading...' : 'Submit'}
+          {isLoading ? t('profile.uploading') : t('profile.submit')}
         </button>
         <h3 className="blinking-btn mt-3 text-primary">
-          {isLoading && 'please wait'}
+          {isLoading && t('profile.pleaseWait')}
         </h3>
       </form>
     </motion.div>

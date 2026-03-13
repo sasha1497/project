@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useDeleteUserAccountMutation } from '../../../../features/deleteaccount/deleteAccountApi';
 import { STATE_DISTRICT_MAP } from '../../../steps/step2';
+import { useAppLanguage } from '../../../../i18n/LanguageContext';
 
 
 type ImageData = {
@@ -75,7 +76,6 @@ const countries = [
   // "Norway"
 ];
 
-const genders = ["Male", "Female", "Transgender"];
 const STATES = Object.keys(STATE_DISTRICT_MAP);
 
 
@@ -83,6 +83,7 @@ const STATES = Object.keys(STATE_DISTRICT_MAP);
 const ViewProfile: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const { t } = useAppLanguage();
 
 
   const [step, setStep] = useState<number>(1);
@@ -114,7 +115,7 @@ const ViewProfile: React.FC = () => {
       district: "N/A",
     }));
 
-    toast.info("District skipped");
+    toast.info(t('profile.view.districtSkipped'));
     handleNextStep();
   };
 
@@ -173,8 +174,8 @@ const ViewProfile: React.FC = () => {
   }, [savedState]);
 
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading users.</div>;
+  if (isLoading) return <div>{t('profile.view.loading')}</div>;
+  if (error) return <div>{t('profile.view.errorLoading')}</div>;
 
   const openUserImages = (user: User) => {
     setSelectedUser(user);
@@ -236,16 +237,16 @@ const ViewProfile: React.FC = () => {
   const handleDeleteAccount = async () => {
 
     if (!userId) {
-      toast.error("User ID not found");
+      toast.error(t('profile.view.userIdMissing'));
       return;
     }
 
-    const confirmDelete = window.confirm("Are you sure you want to delete your account?");
+    const confirmDelete = window.confirm(t('profile.view.confirmDelete'));
     if (!confirmDelete) return;
 
     try {
       await deleteUserAccount(userId).unwrap();
-      toast.success("Account deleted successfully");
+      toast.success(t('profile.view.deleteSuccess'));
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -253,7 +254,7 @@ const ViewProfile: React.FC = () => {
       dispatch(closeViewPopup());
       window.location.href = "/dashboard"; // redirect
     } catch (err: any) {
-      toast.error("Failed to delete account");
+      toast.error(t('profile.view.deleteFailed'));
       console.error(err);
     }
   };
@@ -292,14 +293,14 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>Country</span> for get marraige ?
+                  {t('profile.view.step1Title')}
                 </motion.h4>
                 <select
                   value={formValues.country}
                   onChange={(e) => setFormValues({ ...formValues, country: e.target.value })}
                   className="form-select"
                 >
-                  <option value="">Select Country</option>
+                  <option value="">{t('profile.view.selectCountry')}</option>
                   {countries.map((c) => (
                     <option key={c} value={c.toLowerCase()}>
                       {c}
@@ -312,7 +313,7 @@ const ViewProfile: React.FC = () => {
                     onClick={handleNextStep}
                     className="btn btn-primary blinking-btn"
                   >
-                    Next →
+                    {t('profile.view.next')}
                   </button>
                 </div>
               </div>
@@ -366,7 +367,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  You can select your interest <span className='text-danger'>State</span> for get marraige ?
+                  {t('profile.view.step2Title')}
                 </motion.h4>
 
                 {/* ✅ Dropdown for Indian States */}
@@ -378,7 +379,7 @@ const ViewProfile: React.FC = () => {
                   className="form-control"
                   disabled={!!savedState}
                 >
-                  {!savedState && <option value="">Select State</option>}
+                  {!savedState && <option value="">{t('profile.view.selectState')}</option>}
                   {stateOptions.map((stateName) => (
                     <option key={stateName} value={stateName}>
                       {stateName}
@@ -397,14 +398,14 @@ const ViewProfile: React.FC = () => {
                 {/* Navigation Buttons */}
                 <div className="d-flex justify-content-between mt-3">
                   <button onClick={handlePrevStep} className="btn btn-outline-secondary">
-                    Back
+                    {t('profile.view.back')}
                   </button>
                   <button
                     disabled={!formValues.state}
                     onClick={handleNextStep}
                     className="btn btn-primary blinking-btn"
                   >
-                    Next →
+                    {t('profile.view.next')}
                   </button>
                 </div>
               </div>
@@ -420,8 +421,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                  {/* You can select your interest <span className='text-danger'> District / Territory</span> to get bride or groom? */}
-                  From Which <span className='text-danger'> District</span> are you desiring to get marriage ?
+                  {t('profile.view.step3Title')}
                 </motion.h4>
                 {/* <input
                   type="text"
@@ -439,7 +439,9 @@ const ViewProfile: React.FC = () => {
                   className="form-control"
                   disabled={!formValues.state}
                 >
-                  <option value="">{formValues.state ? "Select District" : "Select state first"}</option>
+                  <option value="">
+                    {formValues.state ? t('profile.view.selectDistrict') : t('profile.view.selectStateFirst')}
+                  </option>
                   {districts.map((districtName) => (
                     <option key={districtName} value={districtName}>
                       {districtName}
@@ -452,19 +454,18 @@ const ViewProfile: React.FC = () => {
                   onClick={handleNoDistrict}
 
                 >
-                  {/* I don’t have a District / Territory */}
-                  I don’t have a District
+                  {t('profile.view.noDistrict')}
                 </p>
                 <div className="d-flex justify-content-between mt-3">
                   <button onClick={handlePrevStep} className="btn btn-outline-secondary">
-                    Back
+                    {t('profile.view.back')}
                   </button>
                   <button
                     disabled={!formValues.district}
                     onClick={handleNextStep}
                     className="btn btn-primary blinking-btn"
                   >
-                    Next →
+                    {t('profile.view.next')}
                   </button>
                 </div>
               </div>
@@ -479,33 +480,31 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                 Whose <span className='text-danger'>Profile</span> do you want to view ?
+                 {t('profile.view.step4Title')}
                 </motion.h4>
                 <label htmlFor="gender" className="form-label fw-bold fs-4 text-primary">
-                  Select Now
+                  {t('profile.view.selectNow')}
                 </label>
                 <select
                   value={formValues.gender}
                   onChange={(e) => setFormValues({ ...formValues, gender: e.target.value })}
                   className="form-select"
                 >
-                  <option value="">Select Gender</option>
-                  {genders.map((g) => (
-                    <option key={g} value={g.toLowerCase()}>
-                      {g}
-                    </option>
-                  ))}
+                  <option value="">{t('profile.view.selectGender')}</option>
+                  <option value="male">{t('profile.gender.male')}</option>
+                  <option value="female">{t('profile.gender.female')}</option>
+                  <option value="transgender">{t('profile.gender.transgender')}</option>
                 </select>
                 <div className="d-flex justify-content-between mt-3">
                   <button onClick={handlePrevStep} className="btn btn-outline-secondary">
-                    Back
+                    {t('profile.view.back')}
                   </button>
                   <button
                     disabled={!formValues.gender}
                     onClick={handleSubmitSearch}
                     className="btn btn-success blinking-btn"
                   >
-                    Next →
+                    {t('profile.view.next')}
                   </button>
                 </div>
               </div>
@@ -528,7 +527,7 @@ const ViewProfile: React.FC = () => {
                 onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
-                View My Profile
+                {t('profile.view.viewMyProfile')}
               </button>
 
               <button
@@ -541,7 +540,7 @@ const ViewProfile: React.FC = () => {
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 onClick={handleDeleteAccount}
               >
-                Delete My Account
+                {t('profile.view.deleteMyAccount')}
               </button>
               {/* 🔄 Reload Button */}
               <button
@@ -554,7 +553,7 @@ const ViewProfile: React.FC = () => {
                 onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
-                🔄 Reload
+                {t('profile.view.reload')}
               </button>
             </div>
             <div className="gallery-grid">
@@ -572,13 +571,15 @@ const ViewProfile: React.FC = () => {
                   >
                     <motion.img
                       src={firstImage.url}
-                      alt={`Name: ${user.name}`}
+                      alt={`${t('profile.view.label.name')}: ${user.name}`}
                       className="gallery-image"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.5 }}
                     />
-                    <div className="gallery-description">Name: {user.name}</div>
+                    <div className="gallery-description">
+                      {t('profile.view.label.name')}: {user.name}
+                    </div>
                   </motion.div>
                 );
               })}
@@ -587,8 +588,8 @@ const ViewProfile: React.FC = () => {
         ) : (
           <div className="no-users-container">
             <div className="no-users-card">
-              <h3>No Users Found</h3>
-              <p>We couldn’t find any matching users. Try adjusting your search or filters.</p>
+              <h3>{t('profile.view.noUsersTitle')}</h3>
+              <p>{t('profile.view.noUsersBody')}</p>
             </div>
           </div>
         )}
@@ -625,22 +626,22 @@ const ViewProfile: React.FC = () => {
               />
 
               <div className="view-profile-content">
-                <p><strong>Name :</strong> {selectedUser?.name}</p>
-                <p><strong>Age :</strong> {selectedUser?.age}</p>
-                <p><strong>Gender :</strong> {selectedUser?.gender}</p>
+                <p><strong>{t('profile.view.label.name')} :</strong> {selectedUser?.name}</p>
+                <p><strong>{t('profile.view.label.age')} :</strong> {selectedUser?.age}</p>
+                <p><strong>{t('profile.view.label.gender')} :</strong> {selectedUser?.gender}</p>
                 {/* <p><strong>Height:</strong> {selectedUser?.height}</p>
                 <p><strong>Weight:</strong> {selectedUser?.weight}</p> */}
-                <p><strong>Caste:</strong> {selectedUser?.caste}</p>
-                <p><strong>Religion:</strong> {selectedUser?.religion}</p>
-                <p><strong>District:</strong> {selectedUser?.district || selectedUser?.userDetails?.district || "N/A"}</p>
-                <p><strong>State:</strong> {selectedUser?.state || selectedUser?.userDetails?.state || "N/A"}</p>
-                <p><strong>Country:</strong> {selectedUser?.country}</p>
-                <p><strong>Mobile:</strong> {selectedUser?.phone_number}</p>
-                <p><strong>Whatsapp:</strong> {selectedUser?.whatsapp}</p>
-                <p><strong>Job:</strong> {selectedUser?.job}</p>
-                <p><strong>Salary:</strong> {selectedUser?.monthlySalary}</p>
-                <p><strong>Marriage status:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || "N/A"}</p>
-                <p><strong>Whose marriage:</strong> {selectedUser?.person}</p>
+                <p><strong>{t('profile.view.label.caste')}:</strong> {selectedUser?.caste}</p>
+                <p><strong>{t('profile.view.label.religion')}:</strong> {selectedUser?.religion}</p>
+                <p><strong>{t('profile.view.label.district')}:</strong> {selectedUser?.district || selectedUser?.userDetails?.district || t('profile.view.notAvailable')}</p>
+                <p><strong>{t('profile.view.label.state')}:</strong> {selectedUser?.state || selectedUser?.userDetails?.state || t('profile.view.notAvailable')}</p>
+                <p><strong>{t('profile.view.label.country')}:</strong> {selectedUser?.country}</p>
+                <p><strong>{t('profile.view.label.mobile')}:</strong> {selectedUser?.phone_number}</p>
+                <p><strong>{t('profile.view.label.whatsapp')}:</strong> {selectedUser?.whatsapp}</p>
+                <p><strong>{t('profile.view.label.job')}:</strong> {selectedUser?.job}</p>
+                <p><strong>{t('profile.view.label.salary')}:</strong> {selectedUser?.monthlySalary}</p>
+                <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || t('profile.view.notAvailable')}</p>
+                <p><strong>{t('profile.view.label.whoseMarriage')}:</strong> {selectedUser?.person}</p>
               </div>
             </motion.div>
           </motion.div>

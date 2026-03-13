@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { persistLanguageFromState } from '../../i18n/language';
+import { useAppLanguage } from '../../i18n/LanguageContext';
 
 type Props = {
   methods: UseFormReturn<any>;
@@ -187,6 +188,7 @@ export const STATE_DISTRICT_MAP: Record<string, string[]> = {
 const STATES = Object.keys(STATE_DISTRICT_MAP);
 
 const Step2: React.FC<Props> = ({ methods, lockedState }) => {
+  const { t } = useAppLanguage();
   const {
     register,
     watch,
@@ -232,13 +234,13 @@ const Step2: React.FC<Props> = ({ methods, lockedState }) => {
   return (
     <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
       <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="country">Select Your Country</label>
+        <label htmlFor="country">{t('profile.countryLabel')}</label>
         <select
           id="country"
           {...register('country', { required: 'country is required' })}
           style={{ width: '100%', padding: '8px', marginTop: '4px' }}
         >
-          <option value="">select your country</option>
+          <option value="">{t('profile.countryPlaceholder')}</option>
           <option value="India">India</option>
         </select>
         {errors.country && (
@@ -249,14 +251,14 @@ const Step2: React.FC<Props> = ({ methods, lockedState }) => {
       </div>
 
       <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="state">Select Your State</label>
+        <label htmlFor="state">{t('profile.stateLabel')}</label>
         <select
           id="state"
           {...register('state', { required: 'State is required' })}
           style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           disabled={!!normalizedLockedState}
         >
-          {!normalizedLockedState && <option value="">Select Your State</option>}
+          {!normalizedLockedState && <option value="">{t('profile.statePlaceholder')}</option>}
           {stateOptions.map((stateName) => (
             <option key={stateName} value={stateName}>
               {stateName}
@@ -272,14 +274,16 @@ const Step2: React.FC<Props> = ({ methods, lockedState }) => {
       </div>
 
       <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="district">Select Your District</label>
+        <label htmlFor="district">{t('profile.districtLabel')}</label>
         <select
           id="district"
           {...register('district', { required: 'District is required' })}
           style={{ width: '100%', padding: '8px', marginTop: '4px' }}
           disabled={!selectedState}
         >
-          <option value="">{selectedState ? 'Select Your District' : 'Select state first'}</option>
+          <option value="">
+            {selectedState ? t('profile.districtPlaceholder') : t('profile.selectStateFirst')}
+          </option>
           {districts.map((districtName) => (
             <option key={districtName} value={districtName}>
               {districtName}

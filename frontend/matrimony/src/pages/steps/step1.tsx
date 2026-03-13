@@ -1,11 +1,13 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { useAppLanguage } from '../../i18n/LanguageContext';
 
 type Props = {
     methods: UseFormReturn<any>;
 };
 
 const Step1: React.FC<Props> = ({ methods }) => {
+    const { t } = useAppLanguage();
     const {
         register,
         formState: { errors }
@@ -15,7 +17,7 @@ const Step1: React.FC<Props> = ({ methods }) => {
         <div style={{ maxWidth: 400, margin: '0 auto', padding: '1rem' }}>
             {/* Name */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="name">Name</label>
+                <label htmlFor="name">{t('profile.nameLabel')}</label>
                 <input
                     id="name"
                     {...register('name', { required: 'Name is required' })}
@@ -30,7 +32,7 @@ const Step1: React.FC<Props> = ({ methods }) => {
 
             {/* Age */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="age">Age</label>
+                <label htmlFor="age">{t('profile.ageLabel')}</label>
                 <input
                     id="age"
                     type="number"
@@ -49,7 +51,7 @@ const Step1: React.FC<Props> = ({ methods }) => {
 
             {/* Job */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="job">Job</label>
+                <label htmlFor="job">{t('profile.jobLabel')}</label>
                 <input
                     id="job"
                     {...register('job', { required: 'Job is required' })}
@@ -64,7 +66,7 @@ const Step1: React.FC<Props> = ({ methods }) => {
 
             {/* Monthly Salary */}
             <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="monthlySalary">Monthly Salary</label>
+                <label htmlFor="monthlySalary">{t('profile.monthlySalaryLabel')}</label>
                 <input
                     id="monthlySalary"
                     type="number"
@@ -85,4 +87,3 @@ const Step1: React.FC<Props> = ({ methods }) => {
 };
 
 export default Step1;
-

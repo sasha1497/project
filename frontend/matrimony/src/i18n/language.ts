@@ -142,6 +142,8 @@ type TranslationKey =
   | 'profile.ageLabel'
   | 'profile.jobLabel'
   | 'profile.monthlySalaryLabel'
+  | 'profile.notesLabel'
+  | 'profile.notesPlaceholder'
   | 'profile.countryLabel'
   | 'profile.countryPlaceholder'
   | 'profile.stateLabel'
@@ -220,9 +222,24 @@ type TranslationKey =
   | 'profile.view.label.whatsapp'
   | 'profile.view.label.job'
   | 'profile.view.label.salary'
+  | 'profile.view.label.notes'
   | 'profile.view.label.marriageStatus'
   | 'profile.view.label.whoseMarriage'
   | 'profile.view.notAvailable'
+  | 'profile.comments.title'
+  | 'profile.comments.nameLabel'
+  | 'profile.comments.namePlaceholder'
+  | 'profile.comments.messageLabel'
+  | 'profile.comments.messagePlaceholder'
+  | 'profile.comments.replyPlaceholder'
+  | 'profile.comments.post'
+  | 'profile.comments.posting'
+  | 'profile.comments.reply'
+  | 'profile.comments.replyTo'
+  | 'profile.comments.cancelReply'
+  | 'profile.comments.noComments'
+  | 'profile.comments.loading'
+  | 'profile.comments.error'
   | 'profile.popup.viewTitle'
   | 'profile.popup.editTitle'
   | 'profile.popup.loading'
@@ -240,6 +257,8 @@ type TranslationKey =
   | 'profile.popup.mobilePlaceholder'
   | 'profile.popup.whatsappLabel'
   | 'profile.popup.whatsappPlaceholder'
+  | 'profile.popup.notesLabel'
+  | 'profile.popup.notesPlaceholder'
   | 'profile.popup.districtLabel'
   | 'profile.popup.districtPlaceholder'
   | 'profile.popup.stateLocked'
@@ -351,6 +370,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'പ്രായം',
     'profile.jobLabel': 'ജോലി',
     'profile.monthlySalaryLabel': 'മാസ ശമ്പളം',
+    'profile.notesLabel': 'കുറിപ്പുകൾ',
+    'profile.notesPlaceholder': 'കൂടുതൽ വിവരങ്ങൾ ചേർക്കുക',
     'profile.countryLabel': 'രാജ്യം തിരഞ്ഞെടുക്കുക',
     'profile.countryPlaceholder': 'രാജ്യം തിരഞ്ഞെടുക്കുക',
     'profile.stateLabel': 'സംസ്ഥാനം തിരഞ്ഞെടുക്കുക',
@@ -542,6 +563,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'வயது',
     'profile.jobLabel': 'வேலை',
     'profile.monthlySalaryLabel': 'மாத சம்பளம்',
+    'profile.notesLabel': 'குறிப்புகள்',
+    'profile.notesPlaceholder': 'கூடுதல் விவரங்களை சேர்க்கவும்',
     'profile.countryLabel': 'உங்கள் நாட்டை தேர்வு செய்யவும்',
     'profile.countryPlaceholder': 'உங்கள் நாட்டை தேர்வு செய்யவும்',
     'profile.stateLabel': 'உங்கள் மாநிலத்தை தேர்வு செய்யவும்',
@@ -734,6 +757,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'వయస్సు',
     'profile.jobLabel': 'ఉద్యోగం',
     'profile.monthlySalaryLabel': 'నెల జీతం',
+    'profile.notesLabel': 'గమనికలు',
+    'profile.notesPlaceholder': 'అదనపు వివరాలను జోడించండి',
     'profile.countryLabel': 'మీ దేశాన్ని ఎంచుకోండి',
     'profile.countryPlaceholder': 'దేశాన్ని ఎంచుకోండి',
     'profile.stateLabel': 'మీ రాష్ట్రాన్ని ఎంచుకోండి',
@@ -926,6 +951,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'ವಯಸ್ಸು',
     'profile.jobLabel': 'ಉದ್ಯೋಗ',
     'profile.monthlySalaryLabel': 'ಮಾಸಿಕ ಸಂಬಳ',
+    'profile.notesLabel': 'ಟಿಪ್ಪಣಿಗಳು',
+    'profile.notesPlaceholder': 'ಹೆಚ್ಚುವರಿ ವಿವರಗಳನ್ನು ಸೇರಿಸಿ',
     'profile.countryLabel': 'ನಿಮ್ಮ ದೇಶವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
     'profile.countryPlaceholder': 'ದೇಶವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
     'profile.stateLabel': 'ನಿಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
@@ -1119,6 +1146,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'उम्र',
     'profile.jobLabel': 'नौकरी',
     'profile.monthlySalaryLabel': 'मासिक वेतन',
+    'profile.notesLabel': 'नोट्स',
+    'profile.notesPlaceholder': 'अतिरिक्त विवरण जोड़ें',
     'profile.countryLabel': 'अपना देश चुनें',
     'profile.countryPlaceholder': 'देश चुनें',
     'profile.stateLabel': 'अपना राज्य चुनें',
@@ -1311,6 +1340,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'ਉਮਰ',
     'profile.jobLabel': 'ਨੌਕਰੀ',
     'profile.monthlySalaryLabel': 'ਮਾਸਿਕ ਤਨਖਾਹ',
+    'profile.notesLabel': 'ਨੋਟਸ',
+    'profile.notesPlaceholder': 'ਵਾਧੂ ਵੇਰਵੇ ਸ਼ਾਮਲ ਕਰੋ',
     'profile.countryLabel': 'ਆਪਣਾ ਦੇਸ਼ ਚੁਣੋ',
     'profile.countryPlaceholder': 'ਦੇਸ਼ ਚੁਣੋ',
     'profile.stateLabel': 'ਆਪਣਾ ਰਾਜ ਚੁਣੋ',
@@ -1499,6 +1530,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'চহি',
     'profile.jobLabel': 'থবক',
     'profile.monthlySalaryLabel': 'নুমিৎ থাবা লৌবা',
+    'profile.notesLabel': 'ꯅꯣꯠꯁ',
+    'profile.notesPlaceholder': 'ꯑꯃꯁꯨꯡ ꯑꯩꯈꯣꯜ ꯑꯃꯁꯨꯡ ꯑꯩꯈꯣꯜ ꯁꯦꯠꯄꯤ',
     'profile.countryLabel': 'নখোয়গী দেশ খল্লো',
     'profile.stateLabel': 'নখোয়গী স্টেট খল্লো',
     'profile.districtLabel': 'নখোয়গী জেলা খল্লো',
@@ -1701,6 +1734,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'ઉંમર',
     'profile.jobLabel': 'નોકરી',
     'profile.monthlySalaryLabel': 'માસિક પગાર',
+    'profile.notesLabel': 'નોંધો',
+    'profile.notesPlaceholder': 'વધારાની વિગતો ઉમેરો',
 
     'profile.countryLabel': 'દેશ પસંદ કરો',
     'profile.countryPlaceholder': 'દેશ પસંદ કરો',
@@ -1946,6 +1981,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'বয়স',
     'profile.jobLabel': 'চাকৰি',
     'profile.monthlySalaryLabel': 'মাহিলি দৰমহা',
+    'profile.notesLabel': 'টোকা',
+    'profile.notesPlaceholder': 'অতিৰিক্ত বিৱৰণ যোগ কৰক',
 
     'profile.countryLabel': 'দেশ বাছনি কৰক',
     'profile.countryPlaceholder': 'দেশ বাছনি কৰক',
@@ -2190,6 +2227,8 @@ const TRANSLATIONS: Record<AppLanguage, Partial<Record<TranslationKey, string>>>
     'profile.ageLabel': 'ବୟସ',
     'profile.jobLabel': 'ଚାକିରି',
     'profile.monthlySalaryLabel': 'ମାସିକ ଦରମା',
+    'profile.notesLabel': 'ଟୀକା',
+    'profile.notesPlaceholder': 'ଅତିରିକ୍ତ ବିବରଣୀ ଯୋଗ କରନ୍ତୁ',
 
     'profile.countryLabel': 'ଦେଶ ବାଛନ୍ତୁ',
     'profile.countryPlaceholder': 'ଦେଶ ବାଛନ୍ତୁ',
@@ -2396,6 +2435,8 @@ const ENGLISH_FALLBACKS: any = {
   'profile.ageLabel': 'Age',
   'profile.jobLabel': 'Job',
   'profile.monthlySalaryLabel': 'Monthly Salary',
+  'profile.notesLabel': 'Notes',
+  'profile.notesPlaceholder': 'Add any extra details',
   'profile.countryLabel': 'Select Your Country',
   'profile.countryPlaceholder': 'select your country',
   'profile.stateLabel': 'Select Your State',
@@ -2474,9 +2515,24 @@ const ENGLISH_FALLBACKS: any = {
   'profile.view.label.whatsapp': 'Whatsapp',
   'profile.view.label.job': 'Job',
   'profile.view.label.salary': 'Salary',
+  'profile.view.label.notes': 'Notes',
   'profile.view.label.marriageStatus': 'Marriage status',
   'profile.view.label.whoseMarriage': 'Whose marriage',
   'profile.view.notAvailable': 'N/A',
+  'profile.comments.title': 'Comments',
+  'profile.comments.nameLabel': 'Your name',
+  'profile.comments.namePlaceholder': 'Enter your name',
+  'profile.comments.messageLabel': 'Comment',
+  'profile.comments.messagePlaceholder': 'Write your comment',
+  'profile.comments.replyPlaceholder': 'Write your reply',
+  'profile.comments.post': 'Post',
+  'profile.comments.posting': 'Posting...',
+  'profile.comments.reply': 'Reply',
+  'profile.comments.replyTo': 'Reply to',
+  'profile.comments.cancelReply': 'Cancel',
+  'profile.comments.noComments': 'No comments yet. Start the conversation.',
+  'profile.comments.loading': 'Loading comments...',
+  'profile.comments.error': 'Failed to load comments.',
   'profile.popup.viewTitle': 'View Profile',
   'profile.popup.editTitle': 'Edit Profile',
   'profile.popup.loading': 'Loading...',
@@ -2494,6 +2550,8 @@ const ENGLISH_FALLBACKS: any = {
   'profile.popup.mobilePlaceholder': 'Enter mobile number',
   'profile.popup.whatsappLabel': 'Whatsapp Number',
   'profile.popup.whatsappPlaceholder': 'Enter whatsapp number',
+  'profile.popup.notesLabel': 'Notes',
+  'profile.popup.notesPlaceholder': 'Add any extra details',
   'profile.popup.districtLabel': 'District',
   'profile.popup.districtPlaceholder': 'Select District',
   'profile.popup.stateLocked': 'State is locked',

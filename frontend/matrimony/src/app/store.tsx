@@ -71,6 +71,7 @@ import { deleteAccountApi } from "../features/deleteaccount/deleteAccountApi";
 import { otpApi } from '../features/otp/otpApi';
 import viewReducer from '../features/view/viewSlice';
 import { viewApi } from '../features/view/viewApi';
+import { commentsApi } from '../features/comments/commentsApi';
 
 
 export const store = configureStore({
@@ -95,6 +96,7 @@ export const store = configureStore({
     [otpApi.reducerPath]: otpApi.reducer,
     [viewApi.reducerPath]: viewApi.reducer,
     [deleteAccountApi.reducerPath]: deleteAccountApi.reducer,
+    [commentsApi.reducerPath]: commentsApi.reducer,
 
 
   },
@@ -107,7 +109,8 @@ export const store = configureStore({
       editFormApi.middleware,
       otpApi.middleware,
       viewApi.middleware,
-      deleteAccountApi.middleware
+      deleteAccountApi.middleware,
+      commentsApi.middleware
     ),
 });
 

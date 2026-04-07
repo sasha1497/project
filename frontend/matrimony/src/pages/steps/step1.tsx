@@ -82,6 +82,17 @@ const Step1: React.FC<Props> = ({ methods }) => {
                     </p>
                 )}
             </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+                <label htmlFor="notes">{t('profile.notesLabel')}</label>
+                <textarea
+                    id="notes"
+                    {...register('notes')}
+                    placeholder={t('profile.notesPlaceholder')}
+                    rows={4}
+                    style={{ width: '100%', padding: '8px', marginTop: '4px', resize: 'vertical' }}
+                />
+            </div>
         </div>
     );
 };

@@ -6,6 +6,7 @@ import { StorageService } from '@app/main/services/storage.service';
 import { MailService } from './mail.service';
 import * as jwt from 'jsonwebtoken';
 import { register } from 'module';
+import { CommentModel } from '../model/comment.model';
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 
@@ -14,6 +15,7 @@ export class UserService {
   constructor(
     private mcurdSerRef: McrudService,
     private userModRef: UserModel,
+    private commentModRef: CommentModel,
     private storageSerRef: StorageService,
     private mailSerRef: MailService
   ) { }
@@ -207,6 +209,64 @@ export class UserService {
     };
   }
 
+  /******************** PROFILE COMMENTS ****************************/
+  async getProfileComments(profileUserId: string) {
+    const profileId = Number(profileUserId);
+    if (!profileId) {
+      throw new BadRequestException('Valid profile user id is required');
+    }
+
+    const user = await this.mcurdSerRef.get('*', 'users', { id: profileId });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const comments = await this.commentModRef.listByProfileUserId(profileId);
+    return this.buildCommentTree(comments);
+  }
+
+  async addProfileComment(profileUserId: string, data: any) {
+    const profileId = Number(profileUserId);
+    if (!profileId) {
+      throw new BadRequestException('Valid profile user id is required');
+    }
+
+    const targetUser = await this.mcurdSerRef.get('*', 'users', { id: profileId });
+    if (!targetUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    const content = String(data?.content || '').trim();
+    const commenterName = String(data?.commenter_name || data?.commenterName || '').trim();
+    const commenterUserId = data?.commenter_user_id ? Number(data.commenter_user_id) : null;
+    const parentCommentId = data?.parent_comment_id ? Number(data.parent_comment_id) : null;
+
+    if (!commenterName) {
+      throw new BadRequestException('Commenter name is required');
+    }
+
+    if (!content) {
+      throw new BadRequestException('Comment content is required');
+    }
+
+    if (parentCommentId) {
+      const parentComment = await this.commentModRef.getById(parentCommentId);
+      if (!parentComment || Number(parentComment.profile_user_id) !== profileId) {
+        throw new BadRequestException('Parent comment not found for this profile');
+      }
+    }
+
+    const createdComment = await this.commentModRef.create({
+      profile_user_id: profileId,
+      parent_comment_id: parentCommentId,
+      commenter_user_id: commenterUserId,
+      commenter_name: commenterName,
+      content,
+    });
+
+    return createdComment;
+  }
+
   // ---------------- Private function ----------------
   private async parseUserImages(userId: string, rawPhotoData: any) {
     let imageKeys: string[] = [];
@@ -255,6 +315,29 @@ export class UserService {
 
     return await this.mcurdSerRef.delete('users', { id: id });
 
+  }
+
+  private buildCommentTree(comments: any[]) {
+    const commentMap = new Map<number, any>();
+    const roots: any[] = [];
+
+    comments.forEach((comment) => {
+      commentMap.set(Number(comment.id), {
+        ...comment,
+        replies: [],
+      });
+    });
+
+    commentMap.forEach((comment) => {
+      const parentId = comment.parent_comment_id ? Number(comment.parent_comment_id) : null;
+      if (parentId && commentMap.has(parentId)) {
+        commentMap.get(parentId).replies.push(comment);
+      } else {
+        roots.push(comment);
+      }
+    });
+
+    return roots;
   }
 
 }

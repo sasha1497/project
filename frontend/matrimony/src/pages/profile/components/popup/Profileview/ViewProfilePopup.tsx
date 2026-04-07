@@ -58,6 +58,7 @@ const ViewProfilePopup = () => {
       whatsapp: "",
       job: "",
       monthlySalary: "",
+      notes: "",
       count: "",
       person: "",
     },
@@ -201,6 +202,16 @@ const ViewProfilePopup = () => {
                 <input type="text" className="form-control" {...register("monthlySalary", { required: t('profile.monthlySalaryLabel') + " is required" })} />
                 {errors.monthlySalary && <small className="text-danger">{errors.monthlySalary.message}</small>}
 
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">{t('profile.notesLabel')}</label>
+                <textarea
+                  className="form-control"
+                  rows={4}
+                  placeholder={t('profile.notesPlaceholder')}
+                  {...register("notes")}
+                />
               </div>
 
               {/* {caste} */}
@@ -684,6 +695,7 @@ const ViewProfilePopup = () => {
               <p><strong>{t('profile.view.label.whatsapp')}:</strong> {data?.whatsapp}</p>
               <p><strong>{t('profile.view.label.job')}:</strong> {data?.job}</p>
               <p><strong>{t('profile.view.label.salary')}:</strong> {data?.monthlySalary}</p>
+              <p><strong>{t('profile.notesLabel')}:</strong> {data?.notes || t('profile.view.notAvailable')}</p>
               <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {data?.count}</p>
               <p><strong>{t('profile.view.label.whoseMarriage')}:</strong> {data?.person}</p>
             </div>

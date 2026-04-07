@@ -42,6 +42,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       age: initialData?.age || "",
       job: initialData?.job || "",
       monthlySalary: initialData?.monthlySalary || "",
+      notes: initialData?.notes || "",
       country: initialData?.country || "India",
       state: lockedState || initialData?.state || "",
       district: initialData?.district || "",

@@ -65,6 +65,20 @@ export class UserController {
     return this.userService.getUserData(id);
   }
 
+  @Get(':id/comments')
+  async getProfileComments(@Param('id') id: string) {
+    return this.userService.getProfileComments(id);
+  }
+
+  @Post(':id/comments')
+  async addProfileComment(@Param('id') id: string, @Body() data: any) {
+    const result = await this.userService.addProfileComment(id, data);
+    return {
+      message: 'Comment created successfully',
+      data: result,
+    };
+  }
+
 
   @Delete('delete/:id')
   async deleteUser(@Param('id') id: string) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './viewprofile.css';
 import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useDeleteUserAccountMutation } from '../../../../features/deleteaccount/deleteAccountApi';
 import { STATE_DISTRICT_MAP } from '../../../steps/step2';
 import { useAppLanguage } from '../../../../i18n/LanguageContext';
+import { useAddProfileCommentMutation, useGetProfileCommentsQuery } from '../../../../features/comments/commentsApi';
 
 
 type ImageData = {
@@ -24,6 +25,18 @@ type User = {
   id: number;
   name: string;
   userDetails: UserDetails;
+};
+
+type ProfileComment = {
+  id: number;
+  profile_user_id: number;
+  parent_comment_id: number | null;
+  commenter_user_id: number | null;
+  commenter_name: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  replies: ProfileComment[];
 };
 
 // const countries = ['India', 'USA']; // Example countries, update as needed
@@ -83,6 +96,11 @@ const STATES = Object.keys(STATE_DISTRICT_MAP);
 const ViewProfile: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [guestCommenterName, setGuestCommenterName] = useState('');
+  const [replyDrafts, setReplyDrafts] = useState<Record<number, string>>({});
+  const [activeReplyId, setActiveReplyId] = useState<number | null>(null);
+  const [replyGuestNames, setReplyGuestNames] = useState<Record<number, string>>({});
   const { t } = useAppLanguage();
 
 
@@ -153,11 +171,20 @@ const ViewProfile: React.FC = () => {
   const districts = formValues.state ? STATE_DISTRICT_MAP[formValues.state] || [] : [];
 
   const [deleteUserAccount] = useDeleteUserAccountMutation();
+  const [addProfileComment, { isLoading: isPostingComment }] = useAddProfileCommentMutation();
 
   const { data: users = [], isLoading, error } = useGetAllUsersQuery(payload);
 
   const authUser = useSelector((state: any) => state.auth.user);
   const userId = authUser?.id;
+  const selectedProfileId = selectedUser?.id ? Number(selectedUser.id) : undefined;
+  const {
+    data: comments = [],
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+  } = useGetProfileCommentsQuery(selectedProfileId as number, {
+    skip: !selectedProfileId,
+  });
   const savedState = STATES.find(
     (stateName) =>
       stateName.toLowerCase() === String(authUser?.state || "").trim().toLowerCase()
@@ -173,6 +200,9 @@ const ViewProfile: React.FC = () => {
     }
   }, [savedState]);
 
+  const resolvedCommenterName = useMemo(() => {
+    return String(authUser?.name || '').trim();
+  }, [authUser?.name]);
 
   if (isLoading) return <div>{t('profile.view.loading')}</div>;
   if (error) return <div>{t('profile.view.errorLoading')}</div>;
@@ -180,6 +210,9 @@ const ViewProfile: React.FC = () => {
   const openUserImages = (user: User) => {
     setSelectedUser(user);
     setCurrentIndex(0);
+    setCommentDraft('');
+    setReplyDrafts({});
+    setActiveReplyId(null);
   };
 
   const nextImage = () => {
@@ -257,6 +290,121 @@ const ViewProfile: React.FC = () => {
       toast.error(t('profile.view.deleteFailed'));
       console.error(err);
     }
+  };
+
+  const formatCommentDate = (value: string) => {
+    if (!value) return '';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return value;
+    return parsed.toLocaleString();
+  };
+
+  const submitComment = async (parentCommentId?: number) => {
+    if (!selectedProfileId) return;
+
+    const content = parentCommentId
+      ? String(replyDrafts[parentCommentId] || '').trim()
+      : String(commentDraft || '').trim();
+    const commenter_name = parentCommentId
+      ? String(resolvedCommenterName || replyGuestNames[parentCommentId] || '').trim()
+      : String(resolvedCommenterName || guestCommenterName || '').trim();
+
+    if (!commenter_name) {
+      toast.error(t('profile.comments.nameLabel'));
+      return;
+    }
+
+    if (!content) {
+      toast.error(t('profile.comments.messageLabel'));
+      return;
+    }
+
+    try {
+      await addProfileComment({
+        profileUserId: selectedProfileId,
+        commenter_name,
+        commenter_user_id: authUser?.id ? Number(authUser.id) : undefined,
+        content,
+        parent_comment_id: parentCommentId || null,
+      }).unwrap();
+
+      if (parentCommentId) {
+        setReplyDrafts((prev) => ({ ...prev, [parentCommentId]: '' }));
+        setActiveReplyId(null);
+      } else {
+        setCommentDraft('');
+      }
+
+      toast.success(t('profile.comments.post'));
+    } catch (submitError: any) {
+      toast.error(submitError?.data?.message || t('profile.comments.error'));
+    }
+  };
+
+  const renderComment = (comment: ProfileComment, depth = 0) => {
+    const showReplyForm = activeReplyId === comment.id;
+
+    return (
+      <div
+        key={comment.id}
+        className="comment-card"
+        style={{ marginLeft: depth > 0 ? `${Math.min(depth, 3) * 16}px` : 0 }}
+      >
+        <div className="comment-header">
+          <strong>{comment.commenter_name}</strong>
+          <span>{formatCommentDate(comment.created_at)}</span>
+        </div>
+        <p className="comment-body">{comment.content}</p>
+        <button
+          type="button"
+          className="comment-reply-button"
+          onClick={() => setActiveReplyId(showReplyForm ? null : comment.id)}
+        >
+          {showReplyForm ? t('profile.comments.cancelReply') : t('profile.comments.reply')}
+        </button>
+
+        {showReplyForm && (
+          <div className="comment-reply-form">
+            {!resolvedCommenterName && (
+              <input
+                type="text"
+                className="form-control"
+                value={replyGuestNames[comment.id] || ''}
+                onChange={(e) =>
+                  setReplyGuestNames((prev) => ({ ...prev, [comment.id]: e.target.value }))
+                }
+                placeholder={t('profile.comments.namePlaceholder')}
+              />
+            )}
+            <textarea
+              className="form-control"
+              rows={3}
+              value={replyDrafts[comment.id] || ''}
+              onChange={(e) =>
+                setReplyDrafts((prev) => ({ ...prev, [comment.id]: e.target.value }))
+              }
+              placeholder={`${t('profile.comments.replyTo')} ${comment.commenter_name}`}
+            />
+            <div className="comment-actions">
+              <button
+                type="button"
+                className="btn btn-sm btn-primary"
+                disabled={isPostingComment}
+                onClick={() => submitComment(comment.id)}
+              >
+                {isPostingComment ? t('profile.comments.posting') : t('profile.comments.post')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {comment.replies?.length > 0 && (
+          <div className="comment-replies">
+            {comment.replies.map((reply) => renderComment(reply, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
 
@@ -640,8 +788,60 @@ const ViewProfile: React.FC = () => {
                 <p><strong>{t('profile.view.label.whatsapp')}:</strong> {selectedUser?.whatsapp}</p>
                 <p><strong>{t('profile.view.label.job')}:</strong> {selectedUser?.job}</p>
                 <p><strong>{t('profile.view.label.salary')}:</strong> {selectedUser?.monthlySalary}</p>
+                <p><strong>{t('profile.notesLabel')}:</strong> {selectedUser?.notes || selectedUser?.userDetails?.notes || t('profile.view.notAvailable')}</p>
                 <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || t('profile.view.notAvailable')}</p>
                 <p><strong>{t('profile.view.label.whoseMarriage')}:</strong> {selectedUser?.person}</p>
+              </div>
+
+              <div className="profile-comments-section">
+                <h5>{t('profile.comments.title')}</h5>
+
+                <div className="comment-form-card">
+                  {!resolvedCommenterName && (
+                    <div className="mb-2">
+                      <label className="form-label">{t('profile.comments.nameLabel')}</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={guestCommenterName}
+                        onChange={(e) => setGuestCommenterName(e.target.value)}
+                        placeholder={t('profile.comments.namePlaceholder')}
+                      />
+                    </div>
+                  )}
+                  <div className="mb-2">
+                    <label className="form-label">{t('profile.comments.messageLabel')}</label>
+                    <textarea
+                      className="form-control"
+                      rows={3}
+                      value={commentDraft}
+                      onChange={(e) => setCommentDraft(e.target.value)}
+                      placeholder={t('profile.comments.messagePlaceholder')}
+                    />
+                  </div>
+                  <div className="comment-actions">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      disabled={isPostingComment}
+                      onClick={() => submitComment()}
+                    >
+                      {isPostingComment ? t('profile.comments.posting') : t('profile.comments.post')}
+                    </button>
+                  </div>
+                </div>
+
+                {isCommentsLoading ? (
+                  <p className="comment-state">{t('profile.comments.loading')}</p>
+                ) : isCommentsError ? (
+                  <p className="comment-state text-danger">{t('profile.comments.error')}</p>
+                ) : comments.length === 0 ? (
+                  <p className="comment-state">{t('profile.comments.noComments')}</p>
+                ) : (
+                  <div className="comment-list">
+                    {comments.map((comment: ProfileComment) => renderComment(comment))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

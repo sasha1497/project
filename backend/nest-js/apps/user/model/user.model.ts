@@ -104,6 +104,7 @@ export class UserModel {
       'users.mobile',
       'users.whatsapp',
       'users.monthlySalary',
+      'users.notes',
       'users.religion',
       'users.caste',
       'users.mother_tongue',

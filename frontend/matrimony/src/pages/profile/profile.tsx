@@ -57,7 +57,6 @@
 
 import React, { useEffect, useState } from "react";
 import './profile.css';
-import Plan from "./components/plan/plan";
 import UploadProfile from "./components/uploadprofileimage/uploadprofile";
 import ViewProfile from "./components/viewprofile/viewprofile";
 import { useGetUserProfileQuery } from "../../features/profile/profileApi";
@@ -135,8 +134,6 @@ const Profile = () => {
 
   const hasImages = (data?.imageData?.length || 0) > 0;
   const shouldShowProfileForm =
-    !!data?.hasPayments &&
-    !hasImages &&
     !profileFormCompleted &&
     !hasRequiredProfileData(data);
 
@@ -145,23 +142,19 @@ const Profile = () => {
       {showPopup && <ViewProfilePopup />}
 
       <div className="container-fluid">
-        {data?.hasPayments ? (
-          shouldShowProfileForm ? (
-            <CompleteProfileForm
-              userId={Number(finalUserId)}
-              initialData={data}
-              onCompleted={async () => {
-                setProfileFormCompleted(true);
-                await refetch();
-              }}
-            />
-          ) : hasImages ? (
-            <ViewProfile />
-          ) : (
-            <UploadProfile />
-          )
+        {shouldShowProfileForm ? (
+          <CompleteProfileForm
+            userId={Number(finalUserId)}
+            initialData={data}
+            onCompleted={async () => {
+              setProfileFormCompleted(true);
+              await refetch();
+            }}
+          />
+        ) : hasImages ? (
+          <ViewProfile />
         ) : (
-          <Plan country={data?.country} />
+          <UploadProfile />
         )}
       </div>
     </>

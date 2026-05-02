@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import young1 from '../../asset/young1.jpg';
-import young2 from '../../asset/young2.jpg';
+import { useEffect, useState } from "react";
 // import pink1 from '../../asset/pink1.jpg';
 // import pink2 from '../../asset/pink2.jpg';
 // import hair1 from '../../asset/hair1.jpg';
@@ -14,9 +13,32 @@ import { useAppLanguage } from "../../i18n/LanguageContext";
 
 const Couples = () => {
     const { t } = useAppLanguage();
-    // const coupleImages = [young1, pink1, young2, hair1, pink2, hair2, thatha, b1];
-    const coupleImages = [young1, young2];
+    const [subscriptionsCount, setSubscriptionsCount] = useState(1);
+    const [marriagesCount, setMarriagesCount] = useState(1);
 
+    useEffect(() => {
+        const subscriptionsTarget = 12000;
+        const marriagesTarget = 1000;
+        const duration = 2200;
+        let animationFrame = 0;
+        const startTime = performance.now();
+
+        const animateCounts = (currentTime: number) => {
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+            setSubscriptionsCount(Math.max(1, Math.floor(subscriptionsTarget * easedProgress)));
+            setMarriagesCount(Math.max(1, Math.floor(marriagesTarget * easedProgress)));
+
+            if (progress < 1) {
+                animationFrame = requestAnimationFrame(animateCounts);
+            }
+        };
+
+        animationFrame = requestAnimationFrame(animateCounts);
+
+        return () => cancelAnimationFrame(animationFrame);
+    }, []);
 
     return (
         <div className="container-fluid my-4">
@@ -26,74 +48,44 @@ const Couples = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
-                {t('couples.title')}
+                {/* {t('couples.title')} */}
+                💖 Bajol world wide plateform 💖
             </motion.h2>
 
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
+                className="golden-globe-wrapper"
             >
-                <div
-                    id="couplesCarousel"
-                    className="carousel slide"
-                    data-bs-ride="carousel"
-                    data-bs-interval="3000"
+                <motion.div
+                    className="golden-globe-shell"
+                    animate={{ rotateY: 360 }}
+                    transition={{
+                        duration: 14,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
                 >
-                    <div className="carousel-inner">
-                        {coupleImages.map((image, index) => (
-                            <motion.div
-                                key={index}
-                                className={`carousel-item ${index === 0 ? "active" : ""}`}
-                                initial={{ scale: 0.95, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ duration: 0.6 }}
-                            >
-                                <img
-                                    src={image}
-                                    className="d-block w-100 carousel-img"
-                                    alt={`Couple ${index + 1}`}
-                                />
-                            </motion.div>
-                        ))}
+                    <div className="golden-globe-core">
+                        <div className="golden-globe-shine" aria-hidden="true"></div>
+                        <div className="golden-globe-ring golden-globe-ring-x" aria-hidden="true"></div>
+                        <div className="golden-globe-ring golden-globe-ring-y" aria-hidden="true"></div>
+                        <i className="fa fa-globe golden-globe-icon" aria-hidden="true"></i>
                     </div>
-
-                    {/* Carousel Controls */}
-                    {/* <button
-                        className="carousel-control-prev"
-                        type="button"
-                        data-bs-target="#couplesCarousel"
-                        data-bs-slide="prev"
-                    >
-                        <span className="carousel-control-prev-icon custom-arrow" aria-hidden="true"></span>
-                        <span className="visually-hidden">Previous</span>
-                    </button>
-                    <button
-                        className="carousel-control-next"
-                        type="button"
-                        data-bs-target="#couplesCarousel"
-                        data-bs-slide="next"
-                    >
-                        <span className="carousel-control-next-icon custom-arrow" aria-hidden="true"></span>
-                        <span className="visually-hidden">Next</span>
-                    </button> */}
-                    <button className="carousel-control-prev" type="button" data-bs-target="#couplesCarousel" data-bs-slide="prev">
-                        <i className="fa fa-chevron-left fs-1 text-primary"></i>
-                        <span className="visually-hidden">Previous</span>
-                    </button>
-                    <button className="carousel-control-next" type="button" data-bs-target="#couplesCarousel" data-bs-slide="next">
-                        <i className="fa fa-chevron-right fs-1 text-primary"></i>
-                        <span className="visually-hidden">Next</span>
-                    </button>
-                </div>
-                <motion.h2
-                    className="text-center mb-2 fw-bold hero mt-2"
-                    initial={{ opacity: 0, y: -30 }}
+                </motion.div>
+                <motion.div
+                    className="couples-stats-card"
+                    initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
                 >
-                    {t('couples.morePhotos')}
-                </motion.h2>
+                    <p className="couples-stats-title">Our growing matrimony network</p>
+                    <p className="couples-stats-text">
+                        <span className="couples-stat-number">{subscriptionsCount.toLocaleString()}+</span> total subscriptions and{" "}
+                        <span className="couples-stat-number">{marriagesCount.toLocaleString()}+</span> successful marriages.
+                    </p>
+                </motion.div>
             </motion.div>
         </div>
     );

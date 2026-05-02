@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { RegisterService } from '../services/register.service';
 
@@ -61,8 +61,8 @@ export class UserController {
 
   /******************** GET USER BY ID ****************************/
   @Get('get/:id')
-  async getUser(@Param('id') id: string) {
-    return this.userService.getUserData(id);
+  async getUser(@Param('id') id: string, @Query('viewerUserId') viewerUserId?: string) {
+    return this.userService.getUserData(id, viewerUserId);
   }
 
   @Get(':id/comments')

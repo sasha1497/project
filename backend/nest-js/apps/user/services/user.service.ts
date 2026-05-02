@@ -124,7 +124,7 @@ export class UserService {
   //   return detailedData;
   // }
   async listUsers(payload: any) {
-  const { filter } = payload;
+  const { filter, viewerUserId } = payload;
 
   // Check if all filter values are empty
   const isFilterEmpty = Object.values(filter).every((value: any) => !value || value === "");
@@ -140,8 +140,13 @@ export class UserService {
   // Fetch additional data for each user
   const detailedData = await Promise.all(
     data.map(async (user: any) => {
-      const userDetails = await this.getUserData(user.id);
-      return { ...user, userDetails }; // merge user info with additional details
+      const userDetails = await this.getUserData(user.id, viewerUserId);
+      return {
+        ...userDetails,
+        userDetails: {
+          imageData: userDetails.imageData,
+        },
+      };
     })
   );
 
@@ -151,7 +156,28 @@ export class UserService {
 
 
   /******************** GET USER DATA ****************************/
-  async getUserData(id: string) {
+  private async hasProfileContactAccess(viewerUserId: string | number | null | undefined, profileUserId: string | number) {
+    if (!viewerUserId) return false;
+
+    if (Number(viewerUserId) === Number(profileUserId)) {
+      return true;
+    }
+
+    const unlockPayment = await this.mcurdSerRef.get(
+      '*',
+      'payments',
+      {
+        user_id: viewerUserId,
+        target_user_id: profileUserId,
+        payment_type: 'profile_contact',
+        captured: 1,
+      }
+    );
+
+    return !!unlockPayment;
+  }
+
+  async getUserData(id: string, viewerUserId?: string | number) {
     // Get user info
     const user: any = await this.mcurdSerRef.get('*', 'users', { id });
     if (!user) throw new BadRequestException('User not found');
@@ -199,13 +225,23 @@ export class UserService {
 
     // Get user images
     const imageData = await this.parseUserImages(id, user.photo);
+    const contactUnlocked = viewerUserId
+      ? await this.hasProfileContactAccess(viewerUserId, id)
+      : true;
+    const maskedUser = {
+      ...user,
+      phone_number: contactUnlocked ? user.phone_number : null,
+      whatsapp: contactUnlocked ? user.whatsapp : null,
+    };
 
     // Return full user data
     return {
-      ...user,
+      ...maskedUser,
       hasPayments,
       paymentExpiryInfo,
       imageData,
+      contactUnlocked,
+      contactLocked: !contactUnlocked,
     };
   }
 

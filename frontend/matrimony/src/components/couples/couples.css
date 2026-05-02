@@ -1,33 +1,136 @@
-/* Default Desktop Styling */
-.carousel-img {
-    width: 100%;
-    height: 500px;           /* Default height for larger screens */
-    object-fit: contain;     /* Show full image on desktop */
-    background-color: white; /* Set background for empty space */
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Make carousel full width */
 .container-fluid {
     padding: 0 15px;
 }
 
-/* Custom arrow color */
-.custom-arrow {
-    filter: invert(1) !important; /* Change arrow color to black */
+.hero {
+    font-family: 'Cinzel Decorative', cursive;
 }
 
-.hero{
-     font-family:'Cinzel Decorative', cursive;
+.golden-globe-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    perspective: 1600px;
 }
 
-/* Responsive for Mobile Screens */
+.golden-globe-shell {
+    width: min(78vw, 360px);
+    height: min(78vw, 360px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 18px;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255, 245, 184, 0.95), rgba(201, 137, 18, 0.85) 45%, rgba(102, 62, 0, 0.95) 100%);
+    box-shadow:
+        0 0 22px rgba(255, 208, 92, 0.55),
+        0 18px 45px rgba(120, 76, 6, 0.28),
+        inset -18px -24px 32px rgba(84, 47, 1, 0.34),
+        inset 14px 10px 24px rgba(255, 245, 204, 0.4);
+    transform-style: preserve-3d;
+}
+
+.golden-globe-core {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 32% 28%, #fff8d9 0%, #ffe28a 18%, #dba126 48%, #9f6508 72%, #5e3800 100%);
+    border: 4px solid rgba(255, 243, 194, 0.75);
+    box-shadow:
+        inset 0 0 24px rgba(255, 251, 230, 0.55),
+        inset 0 -14px 26px rgba(98, 58, 3, 0.32),
+        inset -20px -20px 28px rgba(88, 48, 0, 0.28);
+    backface-visibility: visible;
+    overflow: hidden;
+    transform: translateZ(20px);
+}
+
+.golden-globe-shine {
+    position: absolute;
+    inset: 12% 48% 40% 14%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+    filter: blur(4px);
+    transform: translateZ(34px) rotate(-16deg);
+}
+
+.golden-globe-ring {
+    position: absolute;
+    inset: 14%;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 240, 183, 0.45);
+    box-shadow: 0 0 18px rgba(255, 220, 120, 0.18);
+}
+
+.golden-globe-ring-x {
+    transform: rotateX(74deg) translateZ(22px);
+}
+
+.golden-globe-ring-y {
+    transform: rotateY(74deg) translateZ(12px);
+}
+
+.golden-globe-icon {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(7rem, 18vw, 11rem);
+    background: linear-gradient(180deg, #fff9d6 0%, #ffd86b 35%, #d79517 68%, #8c5600 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow:
+        0 0 18px rgba(255, 222, 116, 0.28),
+        10px 14px 18px rgba(103, 62, 1, 0.22);
+    transform: translateZ(38px);
+}
+
+.couples-stats-card {
+    width: min(100%, 720px);
+    padding: 1.5rem 1.75rem;
+    border-radius: 24px;
+    text-align: center;
+    background: linear-gradient(145deg, rgba(255, 249, 224, 0.96), rgba(255, 229, 163, 0.92));
+    border: 1px solid rgba(183, 125, 8, 0.22);
+    box-shadow:
+        0 16px 40px rgba(128, 83, 7, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.couples-stats-title {
+    margin: 0 0 0.75rem;
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: clamp(1rem, 2.4vw, 1.35rem);
+    color: #8d5600;
+}
+
+.couples-stats-text {
+    margin: 0;
+    font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.7;
+    color: #5f3a00;
+}
+
+.couples-stat-number {
+    color: #ba7808;
+    font-size: 1.15em;
+}
+
 @media (max-width: 768px) {
-    .carousel-img {
-        height: auto;           /* Auto adjust height */
-        max-height: 350px;      /* Optional: prevent huge images */
-        object-fit: cover;      /* Remove extra white spaces */
-        background-color: transparent;
+    .golden-globe-shell {
+        width: min(84vw, 280px);
+        height: min(84vw, 280px);
+        padding: 14px;
+    }
+
+    .couples-stats-card {
+        padding: 1.25rem 1rem;
     }
 }

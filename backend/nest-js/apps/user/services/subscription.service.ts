@@ -1,9 +1,13 @@
 import { McrudService } from '@app/main/services/mcurd.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 @Injectable()
 export class SubscriptionService {
   constructor(private readonly mcurdService: McrudService) {}
+
+  private isMissingProfileContactColumn(error: any) {
+    return error?.code === 'ER_BAD_FIELD_ERROR' && String(error?.sqlMessage || '').includes('target_user_id');
+  }
 
   async createPendingPayment(payload: {
     user_id: string;
@@ -16,39 +20,57 @@ export class SubscriptionService {
     customer_email?: string | null;
     customer_phone?: string | null;
   }) {
-    const [payment] = await this.mcurdService.create(
-      'payments',
-      {
-        user_id: payload.user_id,
-        plan_id: payload.plan_id || null,
-        cashfree_order_id: payload.cashfree_order_id,
-        payment_type: payload.payment_type || 'subscription',
-        target_user_id: payload.target_user_id || null,
-        method: 'cashfree',
-        status: 1, // pending
-        amount: payload.order_amount,
-        currency: payload.order_currency,
-        email: payload.customer_email || null,
-        contact: payload.customer_phone || null,
-        captured: false,
-      },
-      'id'
-    );
+    try {
+      const [payment] = await this.mcurdService.create(
+        'payments',
+        {
+          user_id: payload.user_id,
+          plan_id: payload.plan_id || null,
+          cashfree_order_id: payload.cashfree_order_id,
+          payment_type: payload.payment_type || 'subscription',
+          target_user_id: payload.target_user_id || null,
+          method: 'cashfree',
+          status: 1,
+          amount: payload.order_amount,
+          currency: payload.order_currency,
+          email: payload.customer_email || null,
+          contact: payload.customer_phone || null,
+          captured: false,
+        },
+        'id'
+      );
 
-    return payment;
+      return payment;
+    } catch (error: any) {
+      if (this.isMissingProfileContactColumn(error)) {
+        throw new InternalServerErrorException(
+          'Database migration required: run sqls/init/alter-payments-profile-contact.sql to add target_user_id, payment_type, and cashfree_order_id columns to payments.'
+        );
+      }
+      throw error;
+    }
   }
 
   async markPaymentCaptured(cashfreeOrderId: string) {
-    await this.mcurdService.update(
-      'payments',
-      {
-        status: 2,
-        captured: true,
-      },
-      { cashfree_order_id: cashfreeOrderId }
-    );
+    try {
+      await this.mcurdService.update(
+        'payments',
+        {
+          status: 2,
+          captured: true,
+        },
+        { cashfree_order_id: cashfreeOrderId }
+      );
 
-    return this.mcurdService.get('*', 'payments', { cashfree_order_id: cashfreeOrderId });
+      return this.mcurdService.get('*', 'payments', { cashfree_order_id: cashfreeOrderId });
+    } catch (error: any) {
+      if (this.isMissingProfileContactColumn(error)) {
+        throw new InternalServerErrorException(
+          'Database migration required: run sqls/init/alter-payments-profile-contact.sql to add target_user_id, payment_type, and cashfree_order_id columns to payments.'
+        );
+      }
+      throw error;
+    }
   }
 
   async getPaymentByCashfreeOrderId(cashfreeOrderId: string) {

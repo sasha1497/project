@@ -81,6 +81,14 @@ const countries = [
 const STATES = Object.keys(STATE_DISTRICT_MAP);
 const API_BASE_URL = String(process.env.REACT_APP_API_BASE_URL || 'https://usrapi.bajolmatrimony.com').replace(/\/+$/, '');
 
+const maskContactValue = (value?: string | null) => {
+  const raw = String(value || '').trim();
+  if (!raw) return 'XXXXXXXXXX';
+
+  const visibleDigits = raw.replace(/\D/g, '').slice(-2);
+  return `XXXXXX${visibleDigits || 'XX'}`;
+};
+
 
 
 const ViewProfile: React.FC = () => {
@@ -165,20 +173,6 @@ const ViewProfile: React.FC = () => {
 
   const authUser = useSelector((state: any) => state.auth.user);
   const userId = authUser?.id;
-  const savedState = STATES.find(
-    (stateName) =>
-      stateName.toLowerCase() === String(authUser?.state || "").trim().toLowerCase()
-  ) || "";
-  const stateOptions = savedState ? [savedState] : STATES;
-
-  useEffect(() => {
-    if (savedState) {
-      setFormValues((prev) => ({
-        ...prev,
-        state: savedState,
-      }));
-    }
-  }, [savedState]);
 
   useEffect(() => {
     (async () => {
@@ -484,10 +478,9 @@ const ViewProfile: React.FC = () => {
                     setFormValues({ ...formValues, state: e.target.value, district: "" })
                   }
                   className="form-control"
-                  disabled={!!savedState}
                 >
-                  {!savedState && <option value="">{t('profile.view.selectState')}</option>}
-                  {stateOptions.map((stateName) => (
+                  <option value="">{t('profile.view.selectState')}</option>
+                  {STATES.map((stateName) => (
                     <option key={stateName} value={stateName}>
                       {stateName}
                     </option>
@@ -743,25 +736,38 @@ const ViewProfile: React.FC = () => {
                 <p><strong>{t('profile.view.label.district')}:</strong> {selectedUser?.district || selectedUser?.userDetails?.district || t('profile.view.notAvailable')}</p>
                 <p><strong>{t('profile.view.label.state')}:</strong> {selectedUser?.state || selectedUser?.userDetails?.state || t('profile.view.notAvailable')}</p>
                 <p><strong>{t('profile.view.label.country')}:</strong> {selectedUser?.country}</p>
-                {!selectedUser?.contactUnlocked ? (
-                  <div className="contact-unlock-card mt-3 mb-3 p-3 border rounded text-center">
-                    <p className="mb-2"><strong>Mobile and WhatsApp are hidden for this profile.</strong></p>
-                    <p className="mb-3">Pay now to unlock this profile contact details only.</p>
-                    <button
-                      type="button"
-                      className="btn btn-warning"
-                      disabled={unlockingProfileId === Number(selectedUser?.id)}
-                      onClick={handleUnlockContact}
-                    >
-                      {unlockingProfileId === Number(selectedUser?.id) ? 'Processing...' : 'Pay Now'}
-                    </button>
+                <div
+                  className="contact-unlock-card mt-3 mb-3 p-3 border rounded"
+                  style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
+                >
+                  <h6 className="mb-3" style={{ color: '#8a5a00' }}>Contact Details</h6>
+                  <div className="mb-2">
+                    <strong>{t('profile.view.label.mobile')}:</strong>{' '}
+                    {selectedUser?.contactUnlocked
+                      ? (selectedUser?.phone_number || t('profile.view.notAvailable'))
+                      : maskContactValue(selectedUser?.phone_number)}
                   </div>
-                ) : (
-                  <>
-                    <p><strong>{t('profile.view.label.mobile')}:</strong> {selectedUser?.phone_number || t('profile.view.notAvailable')}</p>
-                    <p><strong>{t('profile.view.label.whatsapp')}:</strong> {selectedUser?.whatsapp || t('profile.view.notAvailable')}</p>
-                  </>
-                )}
+                  <div className="mb-3">
+                    <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
+                    {selectedUser?.contactUnlocked
+                      ? (selectedUser?.whatsapp || t('profile.view.notAvailable'))
+                      : maskContactValue(selectedUser?.whatsapp)}
+                  </div>
+
+                  {!selectedUser?.contactUnlocked && (
+                    <>
+                      <p className="mb-3">Pay now to unlock this profile mobile number and WhatsApp number.</p>
+                      <button
+                        type="button"
+                        className="btn btn-warning"
+                        disabled={unlockingProfileId === Number(selectedUser?.id)}
+                        onClick={handleUnlockContact}
+                      >
+                        {unlockingProfileId === Number(selectedUser?.id) ? 'Processing...' : 'Pay Now'}
+                      </button>
+                    </>
+                  )}
+                </div>
                 <p><strong>{t('profile.view.label.job')}:</strong> {selectedUser?.job}</p>
                 <p><strong>{t('profile.view.label.salary')}:</strong> {selectedUser?.monthlySalary}</p>
                 <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || t('profile.view.notAvailable')}</p>

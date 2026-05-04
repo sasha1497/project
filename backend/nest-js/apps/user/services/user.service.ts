@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '../model/user.model';
 import { McrudService } from '@app/main/services/mcurd.service';
@@ -163,24 +163,38 @@ export class UserService {
       return true;
     }
 
-    const unlockPayment = await this.mcurdSerRef.get(
-      '*',
-      'payments',
-      {
-        user_id: viewerUserId,
-        target_user_id: profileUserId,
-        payment_type: 'profile_contact',
-        captured: 1,
-      }
-    );
+    try {
+      const unlockPayment = await this.mcurdSerRef.get(
+        '*',
+        'payments',
+        {
+          user_id: viewerUserId,
+          target_user_id: profileUserId,
+          payment_type: 'profile_contact',
+          captured: 1,
+        }
+      );
 
-    return !!unlockPayment;
+      return !!unlockPayment;
+    } catch (error: any) {
+      if (error?.code === 'ER_BAD_FIELD_ERROR' && String(error?.sqlMessage || '').includes('target_user_id')) {
+        console.error(
+          'payments table is missing target_user_id/payment_type columns. Run sqls/init/alter-payments-profile-contact.sql'
+        );
+        return false;
+      }
+      throw error;
+    }
   }
 
   async getUserData(id: string, viewerUserId?: string | number) {
+    if (!id || Number.isNaN(Number(id))) {
+      throw new BadRequestException('Valid user id is required');
+    }
+
     // Get user info
     const user: any = await this.mcurdSerRef.get('*', 'users', { id });
-    if (!user) throw new BadRequestException('User not found');
+    if (!user) throw new NotFoundException('User not found');
 
     // Get payments
     const payments: any = await this.mcurdSerRef.get('*', 'payments', { user_id: id });
@@ -327,21 +341,28 @@ export class UserService {
     }
 
     // Build image metadata list
-    return await Promise.all(
+    const imageResults = await Promise.all(
       imageKeys.map(async (fileName) => {
-        const filePath = `${userId}/users/${fileName}`;
-        const url = await this.storageSerRef.getImageUrl(filePath);
+        try {
+          const filePath = `${userId}/users/${fileName}`;
+          const url = await this.storageSerRef.getImageUrl(filePath);
 
-        const dateMatch = fileName.match(/\d{4}-\d{2}-\d{2}/);
-        const date = dateMatch ? dateMatch[0] : null;
+          const dateMatch = fileName.match(/\d{4}-\d{2}-\d{2}/);
+          const date = dateMatch ? dateMatch[0] : null;
 
-        return {
-          name: fileName,
-          url,
-          date,
-        };
+          return {
+            name: fileName,
+            url,
+            date,
+          };
+        } catch (error) {
+          console.error(`Failed to resolve image URL for user ${userId}:`, fileName, error);
+          return null;
+        }
       }),
     );
+
+    return imageResults.filter(Boolean);
   }
 
 

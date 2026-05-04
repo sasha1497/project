@@ -103,6 +103,7 @@ const Profile = () => {
 
   // Show popup state
   const showPopup = useSelector((state: any) => state.profileUi.showViewPopup);
+  const uploadedProfileImage = localStorage.getItem('profileImageUploaded') === 'true';
 
   // Update finalUserId when Redux or localStorage changes
   useEffect(() => {
@@ -121,28 +122,27 @@ const Profile = () => {
   }, [userId, authUserId]);
 
   // RTK Query, skip if no userId yet
-  const { data, isLoading, error, refetch } = useGetUserProfileQuery(finalUserId ?? skipToken);
-
-  // Retry if 400 error
-  useEffect(() => {
-    if (error && 'status' in error && error.status === 400) {
-       window.location.reload();
-    }
-  }, [error, refetch]);
+  const { data, isLoading, refetch } = useGetUserProfileQuery(finalUserId ?? skipToken);
 
   if (isLoading || !finalUserId) return <Loader />;
 
-  const hasImages = (data?.imageData?.length || 0) > 0;
+  const hasImages = uploadedProfileImage || (data?.imageData?.length || 0) > 0;
   const shouldShowProfileForm =
     !profileFormCompleted &&
     !hasRequiredProfileData(data);
+
+  if (uploadedProfileImage && (data?.imageData?.length || 0) > 0) {
+    localStorage.removeItem('profileImageUploaded');
+  }
 
   return (
     <>
       {showPopup && <ViewProfilePopup />}
 
       <div className="container-fluid">
-        {shouldShowProfileForm ? (
+        {hasImages ? (
+          <ViewProfile />
+        ) : shouldShowProfileForm ? (
           <CompleteProfileForm
             userId={Number(finalUserId)}
             initialData={data}
@@ -151,10 +151,8 @@ const Profile = () => {
               await refetch();
             }}
           />
-        ) : hasImages ? (
-          <ViewProfile />
         ) : (
-          <UploadProfile />
+          <UploadProfile userId={finalUserId} />
         )}
       </div>
     </>

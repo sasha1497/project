@@ -147,8 +147,13 @@ const Section = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                <span className="hero-subtext-inner">
-                  {t('section.marriageQuote')}</span>
+                {/* <span className="hero-subtext-inner">
+                  {t('section.marriageQuote')}</span> */}
+
+                  <span className="hero-subtext-inner">
+                   There are three ways to a happy marriage: The first way to select BAJOL. The second way is to be kind. The third way is to be integrity.</span>
+
+                 
                
               </motion.p>
               <motion.div

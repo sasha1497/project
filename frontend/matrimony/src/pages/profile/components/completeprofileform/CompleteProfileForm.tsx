@@ -27,7 +27,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
 }) => {
   const [editForm, { isLoading }] = useEditFormMutation();
   const { t } = useAppLanguage();
-  const lockedState = useMemo(
+  const initialState = useMemo(
     () =>
       Object.keys(STATE_DISTRICT_MAP).find(
         (stateName) =>
@@ -42,9 +42,8 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       age: initialData?.age || "",
       job: initialData?.job || "",
       monthlySalary: initialData?.monthlySalary || "",
-      notes: initialData?.notes || "",
       country: initialData?.country || "India",
-      state: lockedState || initialData?.state || "",
+      state: initialState || initialData?.state || "",
       district: initialData?.district || "",
       mobile: initialData?.phone_number || initialData?.mobile || "",
       whatsapp: initialData?.whatsapp || "",
@@ -54,7 +53,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       count: initialData?.count || "",
       person: initialData?.person || "",
     }),
-    [initialData, lockedState],
+    [initialData, initialState],
   );
 
   const methods = useForm<any>({
@@ -87,7 +86,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
 
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <Step1 methods={methods} />
-            <Step2 methods={methods} lockedState={lockedState} />
+            <Step2 methods={methods} />
             <Step3 methods={methods} />
             <Step4 methods={methods} />
             <Step5 methods={methods} />

@@ -12,11 +12,15 @@ import { useEditFormMutation } from "../../../../../features/editform/editFormAp
 import PhoneInput from "react-phone-input-2";
 import { STATE_DISTRICT_MAP } from "../../../../steps/step2";
 import { useAppLanguage } from "../../../../../i18n/LanguageContext";
+import axios from "axios";
+import { load } from "@cashfreepayments/cashfree-js";
 // import {
 //   startEdit,
 //   editSuccess,
 //   editFailure,
 // } from "../../features/editForm/editFormSlice";
+
+const API_BASE_URL = String(process.env.REACT_APP_API_BASE_URL || 'https://usrapi.bajolmatrimony.com').replace(/\/+$/, '');
 
 const ViewProfilePopup = () => {
   const dispatch = useDispatch();
@@ -26,6 +30,9 @@ const ViewProfilePopup = () => {
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [cashfree, setCashfree] = useState<any>(null);
+  const [unlockingContact, setUnlockingContact] = useState(false);
+  const [contactVisible, setContactVisible] = useState(false);
 
   // ✅ Fetch user profile
   const { data, isLoading, refetch } = useGetUserProfileQuery(userId, {
@@ -80,6 +87,12 @@ const ViewProfilePopup = () => {
     [selectedState]
   );
 
+  useEffect(() => {
+    (async () => {
+      const cfInstance = await load({ mode: 'production' });
+      setCashfree(cfInstance);
+    })();
+  }, []);
 
   // ✅ Prefill form when profile data is fetched
   useEffect(() => {
@@ -93,6 +106,82 @@ const ViewProfilePopup = () => {
       setValue("state", lockedState, { shouldValidate: true });
     }
   }, [lockedState, selectedState, setValue]);
+
+  useEffect(() => {
+    setContactVisible(false);
+  }, [showPopup, data?.id]);
+
+  const handleUnlockContact = async () => {
+    if (!userId) {
+      toast.error('Unable to start payment');
+      return;
+    }
+
+    if (!cashfree) {
+      toast.error('Payment is loading. Please wait a moment.');
+      return;
+    }
+
+    try {
+      setUnlockingContact(true);
+
+      const orderResponse = await axios.post(
+        `${API_BASE_URL}/cashfree/create-profile-access-order`,
+        {
+          viewer_user_id: userId,
+          target_user_id: userId,
+          order_amount: 1,
+          order_currency: 'INR',
+          receipt: `profile_popup_${userId}_${Date.now()}`,
+          customer_phone: data?.phone_number || '',
+          customer_email: data?.email || '',
+        }
+      );
+
+      const sessionId = orderResponse?.data?.cashfree_order?.payment_session_id;
+      const cashfreeOrderId = orderResponse?.data?.cashfree_order?.order_id;
+
+      if (!sessionId || !cashfreeOrderId) {
+        throw new Error('Failed to create payment order');
+      }
+
+      await cashfree.checkout({
+        paymentSessionId: sessionId,
+        redirectTarget: '_modal',
+        onSuccess: async () => {
+          try {
+            await axios.post(
+              `${API_BASE_URL}/cashfree/confirm-profile-access-order`,
+              { cashfree_order_id: cashfreeOrderId }
+            );
+            await refetch();
+            setContactVisible(true);
+            toast.success('Contact unlocked successfully');
+          } catch (confirmError) {
+            console.error(confirmError);
+            toast.error('Payment succeeded but contact unlock failed');
+          } finally {
+            setUnlockingContact(false);
+          }
+        },
+        onFailure: () => {
+          toast.error('Payment failed, please try again');
+          setUnlockingContact(false);
+        },
+        onClose: () => {
+          setUnlockingContact(false);
+        },
+      });
+    } catch (paymentError: any) {
+      console.error(paymentError);
+      toast.error(
+        paymentError?.response?.data?.message ||
+        paymentError?.message ||
+        'Unable to start profile payment'
+      );
+      setUnlockingContact(false);
+    }
+  };
 
   const onSubmit = async (formData: any) => {
     try {
@@ -691,8 +780,24 @@ const ViewProfilePopup = () => {
               <p><strong>{t('profile.view.label.district')}:</strong> {data?.district}</p>
               <p><strong>{t('profile.view.label.state')}:</strong> {data?.state}</p>
               <p><strong>{t('profile.view.label.country')}:</strong> {data?.country}</p>
-              <p><strong>{t('profile.view.label.mobile')}:</strong> {data?.phone_number}</p>
-              <p><strong>{t('profile.view.label.whatsapp')}:</strong> {data?.whatsapp}</p>
+              {!contactVisible ? (
+                <div className="contact-unlock-card mt-3 mb-3 p-3 border rounded text-center">
+                  <p className="mb-3"><strong>Contact details are locked.</strong></p>
+                  <button
+                    type="button"
+                    className="btn btn-warning"
+                    disabled={unlockingContact}
+                    onClick={handleUnlockContact}
+                  >
+                    {unlockingContact ? 'Processing...' : 'Pay Now'}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p><strong>{t('profile.view.label.mobile')}:</strong> {data?.phone_number}</p>
+                  <p><strong>{t('profile.view.label.whatsapp')}:</strong> {data?.whatsapp}</p>
+                </>
+              )}
               <p><strong>{t('profile.view.label.job')}:</strong> {data?.job}</p>
               <p><strong>{t('profile.view.label.salary')}:</strong> {data?.monthlySalary}</p>
               <p><strong>{t('profile.notesLabel')}:</strong> {data?.notes || t('profile.view.notAvailable')}</p>

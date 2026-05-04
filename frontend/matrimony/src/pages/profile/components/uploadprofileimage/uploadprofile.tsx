@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetImages, addImage } from '../../../../features/image/imageslice';
 import { useAppLanguage } from '../../../../i18n/LanguageContext';
 
-const UploadProfile: React.FC = () => {
+type UploadProfileProps = {
+  userId?: number | string | null;
+};
+
+const UploadProfile: React.FC<UploadProfileProps> = ({ userId: providedUserId }) => {
   const [image, setImage] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
@@ -14,8 +18,8 @@ const UploadProfile: React.FC = () => {
   const { t } = useAppLanguage();
   const [uploadImages, { isLoading }] = useUploadImagesMutation();
 
-  const userId = useSelector((state: any) => state.auth.user?.id);
-  console.log(userId, 'userId++++');
+  const authUserId = useSelector((state: any) => state.auth.user?.id);
+  const resolvedUserId = providedUserId || authUserId;
 
   // ✅ Handle single image change
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,15 +45,20 @@ const UploadProfile: React.FC = () => {
     const formData = new FormData();
     formData.append('dpfile', image);
 
-    try {
-      const result = await uploadImages({ formData, userId }).unwrap();
+    if (!resolvedUserId) {
+      setError('User ID not found');
+      return;
+    }
 
-      // ✅ Handle uploaded image URL
-      if (result?.uploadedUrls && Array.isArray(result.uploadedUrls)) {
+    try {
+      const result = await uploadImages({ formData, userId: String(resolvedUserId) }).unwrap();
+
+      if (result?.uploadedUrls && Array.isArray(result.uploadedUrls) && result.uploadedUrls.length > 0) {
         dispatch(resetImages());
         dispatch(addImage(result.uploadedUrls[0]));
       }
 
+      localStorage.setItem('profileImageUploaded', 'true');
       setSuccess(t('profile.uploadSuccess'));
       console.log('Upload success:', result);
       setImage(null);

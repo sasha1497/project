@@ -200,12 +200,18 @@ type TranslationKey =
   | 'profile.view.step4Title'
   | 'profile.view.selectNow'
   | 'profile.view.selectGender'
+  | 'profile.view.step5Title'
+  | 'profile.view.selectJob'
+  | 'profile.view.noJob'
+  | 'profile.view.searchingProfiles'
+  | 'profile.view.foundProfiles'
   | 'profile.view.viewMyProfile'
   | 'profile.view.deleteMyAccount'
   | 'profile.view.reload'
   | 'profile.view.noUsersTitle'
   | 'profile.view.noUsersBody'
   | 'profile.view.districtSkipped'
+  | 'profile.view.jobSkipped'
   | 'profile.view.confirmDelete'
   | 'profile.view.deleteSuccess'
   | 'profile.view.deleteFailed'
@@ -2493,12 +2499,18 @@ const ENGLISH_FALLBACKS: any = {
   'profile.view.step4Title': 'Whose Profile do you want to view ?',
   'profile.view.selectNow': 'Select Now',
   'profile.view.selectGender': 'Select Gender',
+  'profile.view.step5Title': 'Which type of job want for your bride / groom ?',
+  'profile.view.selectJob': 'Search and select job',
+  'profile.view.noJob': 'I not select job',
+  'profile.view.searchingProfiles': 'Searching profiles...',
+  'profile.view.foundProfiles': 'Found Profiles',
   'profile.view.viewMyProfile': 'View My Profile',
   'profile.view.deleteMyAccount': 'Delete My Account',
   'profile.view.reload': '🔄 Reload',
   'profile.view.noUsersTitle': 'No Users Found',
   'profile.view.noUsersBody': 'We couldn’t find any matching users. Try adjusting your search or filters.',
   'profile.view.districtSkipped': 'District skipped',
+  'profile.view.jobSkipped': 'Job skipped',
   'profile.view.confirmDelete': 'Are you sure you want to delete your account?',
   'profile.view.deleteSuccess': 'Account deleted successfully',
   'profile.view.deleteFailed': 'Failed to delete account',

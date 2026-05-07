@@ -57,7 +57,7 @@ export class SubscriptionService {
         'payments',
         {
           status: 2,
-          captured: true,
+          captured: 1,
         },
         { cashfree_order_id: cashfreeOrderId }
       );

@@ -97,7 +97,7 @@ export default function App() {
 
       toast.success(result?.message || 'User created successfully', {
         autoClose: 500,
-        onClose: () => navigate('/profile'),
+        onClose: () => navigate('/profile', { state: { fromRegistration: true } }),
       });
     } catch (error: any) {
       const errorMessage =

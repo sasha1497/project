@@ -8,9 +8,10 @@ import { useAppLanguage } from '../../../../i18n/LanguageContext';
 
 type UploadProfileProps = {
   userId?: number | string | null;
+  onUploaded?: () => void | Promise<void>;
 };
 
-const UploadProfile: React.FC<UploadProfileProps> = ({ userId: providedUserId }) => {
+const UploadProfile: React.FC<UploadProfileProps> = ({ userId: providedUserId, onUploaded }) => {
   const [image, setImage] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
@@ -63,9 +64,7 @@ const UploadProfile: React.FC<UploadProfileProps> = ({ userId: providedUserId })
       console.log('Upload success:', result);
       setImage(null);
 
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      await onUploaded?.();
     } catch (err: any) {
       console.error('Upload failed', err);
       setError(t('profile.uploadFailed'));

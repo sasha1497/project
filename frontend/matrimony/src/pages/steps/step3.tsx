@@ -64,9 +64,10 @@ import { useAppLanguage } from '../../i18n/LanguageContext';
 
 type Props = {
   methods: UseFormReturn<any>;
+  mobileReadOnly?: boolean;
 };
 
-const Step2: React.FC<Props> = ({ methods }) => {
+const Step2: React.FC<Props> = ({ methods, mobileReadOnly = false }) => {
   const { t } = useAppLanguage();
   const {
     control,
@@ -150,12 +151,22 @@ const Step2: React.FC<Props> = ({ methods }) => {
               disableDropdown={true}
               disableCountryCode={false}
               countryCodeEditable={false}
-              inputStyle={{ width: '100%' }}
+              disabled={mobileReadOnly}
+              inputStyle={{
+                width: '100%',
+                backgroundColor: mobileReadOnly ? '#e9ecef' : undefined,
+                cursor: mobileReadOnly ? 'not-allowed' : undefined,
+              }}
+              buttonStyle={{
+                cursor: mobileReadOnly ? 'not-allowed' : undefined,
+              }}
               placeholder={t('profile.mobilePlaceholder')}
               inputProps={{
                 name: field.name,
                 ref: field.ref, // ✅ Attach ref here
                 required: true,
+                readOnly: mobileReadOnly,
+                disabled: mobileReadOnly,
               }}
               onChange={(value) => field.onChange("+" + value)}
             />

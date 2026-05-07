@@ -62,6 +62,7 @@ import ViewProfile from "./components/viewprofile/viewprofile";
 import { useGetUserProfileQuery } from "../../features/profile/profileApi";
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import Loader from "../../components/loader/loader";
 import ViewProfilePopup from "./components/popup/Profileview/ViewProfilePopup";
 import CompleteProfileForm from "./components/completeprofileform/CompleteProfileForm";
@@ -83,8 +84,6 @@ const hasRequiredProfileData = (data: any) => {
     "gender",
     "count",
     "person",
-    "height",
-    "weight",
   ];
 
   return requiredFields.every((field) => {
@@ -96,10 +95,12 @@ const hasRequiredProfileData = (data: any) => {
 const Profile = () => {
   const userId = useSelector((state: any) => state.auth.user?.id);
   const authUserId = useSelector((state: any) => state.form.authUser?.id);
+  const location = useLocation();
 
   // Local state to hold the final userId once available
   const [finalUserId, setFinalUserId] = useState<any | null>(null);
   const [profileFormCompleted, setProfileFormCompleted] = useState(false);
+  const [imageUploaded, setImageUploaded] = useState(false);
 
   // Show popup state
   const showPopup = useSelector((state: any) => state.profileUi.showViewPopup);
@@ -126,7 +127,8 @@ const Profile = () => {
 
   if (isLoading || !finalUserId) return <Loader />;
 
-  const hasImages = uploadedProfileImage || (data?.imageData?.length || 0) > 0;
+  const hasImages = imageUploaded || uploadedProfileImage || (data?.imageData?.length || 0) > 0;
+  const isFirstVisitAfterRegistration = location.state?.fromRegistration === true;
   const shouldShowProfileForm =
     !profileFormCompleted &&
     !hasRequiredProfileData(data);
@@ -140,9 +142,7 @@ const Profile = () => {
       {showPopup && <ViewProfilePopup />}
 
       <div className="container-fluid">
-        {hasImages ? (
-          <ViewProfile />
-        ) : shouldShowProfileForm ? (
+        {shouldShowProfileForm ? (
           <CompleteProfileForm
             userId={Number(finalUserId)}
             initialData={data}
@@ -151,8 +151,24 @@ const Profile = () => {
               await refetch();
             }}
           />
+        ) : isFirstVisitAfterRegistration && !hasImages ? (
+          <UploadProfile
+            userId={finalUserId}
+            onUploaded={async () => {
+              setImageUploaded(true);
+              await refetch();
+            }}
+          />
+        ) : hasImages ? (
+          <ViewProfile />
         ) : (
-          <UploadProfile userId={finalUserId} />
+          <UploadProfile
+            userId={finalUserId}
+            onUploaded={async () => {
+              setImageUploaded(true);
+              await refetch();
+            }}
+          />
         )}
       </div>
     </>

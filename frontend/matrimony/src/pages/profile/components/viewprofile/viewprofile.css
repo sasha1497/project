@@ -13,6 +13,21 @@
   margin-bottom: 2rem;
 }
 
+.profile-count-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  margin: 1rem auto;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #d7e7ff;
+  border-radius: 8px;
+  background: #f5faff;
+  color: #0d6efd;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 /* Gallery Grid */
 .gallery-grid {
   display: grid;
@@ -489,5 +504,4 @@
 .cursor-pointer{
   cursor: pointer;
 }
-
 

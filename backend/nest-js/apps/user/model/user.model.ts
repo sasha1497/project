@@ -136,6 +136,7 @@ export class UserModel {
   if (normalizedFilter.country) query.where('users.country', normalizedFilter.country);
   if (normalizedFilter.state) query.where('users.state', normalizedFilter.state);
   if (normalizedFilter.district) query.where('users.district', normalizedFilter.district);
+  if (normalizedFilter.job) query.where('users.job', 'like', `%${normalizedFilter.job}%`);
 
   // ✅ Global search
   if (search) {

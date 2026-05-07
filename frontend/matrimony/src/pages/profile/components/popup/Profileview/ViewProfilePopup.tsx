@@ -29,7 +29,6 @@ const ViewProfilePopup = () => {
   const { t } = useAppLanguage();
 
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [cashfree, setCashfree] = useState<any>(null);
   const [unlockingContact, setUnlockingContact] = useState(false);
   const [contactVisible, setContactVisible] = useState(false);
@@ -188,6 +187,7 @@ const ViewProfilePopup = () => {
       dispatch(startEdit());
 
       const { password, confirmPassword, imageData, hasPayments, paymentExpiryInfo, ...cleanedData } = formData;
+      cleanedData.phone_number = data?.phone_number || formData.phone_number;
 
       await editForm({ id: userId, ...cleanedData }).unwrap();
 
@@ -494,14 +494,18 @@ const ViewProfilePopup = () => {
                       onlyCountries={['in']}        // ✅ restrict to India only
                       disableDropdown={true}        // ✅ hide country dropdown
                       countryCodeEditable={false}
+                      disabled
                       inputClass="form-control phone-input"
                       containerClass="phone-input-container"
-                      inputStyle={{ width: "100%", height: "45px" }}
+                      inputStyle={{ width: "100%", height: "45px", backgroundColor: "#e9ecef", cursor: "not-allowed" }}
+                      buttonStyle={{ cursor: "not-allowed" }}
                       onChange={(value) => field.onChange(value ? "+" + value : "")} // add + prefix
                       placeholder={t('profile.popup.mobilePlaceholder')}
                       inputProps={{
                         name: field.name,
                         required: true,
+                        readOnly: true,
+                        disabled: true,
                       }}
                     />
                     {errors.phone_number && (

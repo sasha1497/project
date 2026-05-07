@@ -80,6 +80,21 @@ const countries = [
 
 const STATES = Object.keys(STATE_DISTRICT_MAP);
 const API_BASE_URL = String(process.env.REACT_APP_API_BASE_URL || 'https://usrapi.bajolmatrimony.com').replace(/\/+$/, '');
+const JOB_OPTIONS = [
+  'Accountant',
+  'Business',
+  'Doctor',
+  'Driver',
+  'Engineer',
+  'Farmer',
+  'Government Job',
+  'IT Professional',
+  'Lawyer',
+  'Nurse',
+  'Police',
+  'Private Job',
+  'Teacher',
+];
 
 const maskContactValue = (value?: string | null) => {
   const raw = String(value || '').trim();
@@ -89,6 +104,19 @@ const maskContactValue = (value?: string | null) => {
   return `XXXXXX${visibleDigits || 'XX'}`;
 };
 
+const clearClientStorage = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  document.cookie.split(';').forEach((cookie) => {
+    const cookieName = cookie.split('=')[0]?.trim();
+    if (!cookieName) return;
+
+    document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`;
+  });
+};
+
 
 
 const ViewProfile: React.FC = () => {
@@ -96,6 +124,7 @@ const ViewProfile: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [cashfree, setCashfree] = useState<any>(null);
   const [unlockingProfileId, setUnlockingProfileId] = useState<number | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const { t } = useAppLanguage();
 
 
@@ -106,21 +135,27 @@ const ViewProfile: React.FC = () => {
     country: "",
     state: "",
     district: "",
-    gender: ""
+    gender: "",
+    job: ""
   });
 
   const handleNextStep = () => setStep((prev) => prev + 1);
   const handlePrevStep = () => setStep((prev) => prev - 1);
 
 
-  const handleSubmitSearch = () => {
+  const submitSearch = (nextValues = formValues) => {
+    setHasSearched(true);
     setPayload({
       page: 1,
       limit: 1000,
       viewerUserId: userId || null,
-      filter: { ...formValues },
+      filter: { ...nextValues },
       // search: ""
     });
+  };
+
+  const handleSubmitSearch = () => {
+    submitSearch();
   };
 
   const handleNoDistrict = () => {
@@ -133,6 +168,17 @@ const ViewProfile: React.FC = () => {
     handleNextStep();
   };
 
+  const handleNoJob = () => {
+    const nextValues = {
+      ...formValues,
+      job: "N/A",
+    };
+
+    setFormValues(nextValues);
+    toast.info(t('profile.view.jobSkipped'));
+    submitSearch(nextValues);
+  };
+
 
   // Payload state for API query
   const [payload, setPayload] = useState<any>({
@@ -143,7 +189,8 @@ const ViewProfile: React.FC = () => {
       country: '',
       state: '',
       district: '',
-      gender: ''
+      gender: '',
+      job: ''
     },
     // search: ""
   });
@@ -169,7 +216,7 @@ const ViewProfile: React.FC = () => {
 
   const [deleteUserAccount] = useDeleteUserAccountMutation();
 
-  const { data: users = [], isLoading, error, refetch: refetchUsers } = useGetAllUsersQuery(payload);
+  const { data: users = [], isLoading, isFetching, error, refetch: refetchUsers } = useGetAllUsersQuery(payload);
 
   const authUser = useSelector((state: any) => state.auth.user);
   const userId = authUser?.id;
@@ -191,6 +238,8 @@ const ViewProfile: React.FC = () => {
 
   if (isLoading) return <div>{t('profile.view.loading')}</div>;
   if (error) return <div>{t('profile.view.errorLoading')}</div>;
+
+  const visibleUsers = users.filter((user: any) => user?.userDetails?.imageData?.[0]);
 
   const openUserImages = (user: User) => {
     setSelectedUser(user);
@@ -263,8 +312,7 @@ const ViewProfile: React.FC = () => {
       await deleteUserAccount(userId).unwrap();
       toast.success(t('profile.view.deleteSuccess'));
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      clearClientStorage();
 
       dispatch(closeViewPopup());
       window.location.href = "/dashboard"; // redirect
@@ -315,26 +363,34 @@ const ViewProfile: React.FC = () => {
         throw new Error('Failed to create payment order');
       }
 
-      await cashfree.checkout({
+      let contactConfirmed = false;
+      const confirmContactUnlock = async () => {
+        if (contactConfirmed) return;
+        contactConfirmed = true;
+
+        const confirmResponse = await axios.post(
+          `${API_BASE_URL}/cashfree/confirm-profile-access-order`,
+          {
+            cashfree_order_id: cashfreeOrderId,
+          }
+        );
+
+        const unlockedProfile = confirmResponse?.data?.unlockedProfile;
+
+        if (unlockedProfile) {
+          setSelectedUser(normalizeUnlockedProfile(unlockedProfile));
+        }
+
+        await refetchUsers();
+        toast.success('Contact unlocked successfully');
+      };
+
+      const checkoutResult = await cashfree.checkout({
         paymentSessionId: sessionId,
         redirectTarget: '_modal',
         onSuccess: async () => {
           try {
-            const confirmResponse = await axios.post(
-              `${API_BASE_URL}/cashfree/confirm-profile-access-order`,
-              {
-                cashfree_order_id: cashfreeOrderId,
-              }
-            );
-
-            const unlockedProfile = confirmResponse?.data?.unlockedProfile;
-
-            if (unlockedProfile) {
-              setSelectedUser(normalizeUnlockedProfile(unlockedProfile));
-            }
-
-            await refetchUsers();
-            toast.success('Contact unlocked successfully');
+            await confirmContactUnlock();
           } catch (confirmError) {
             console.error(confirmError);
             toast.error('Payment succeeded but contact unlock failed');
@@ -350,6 +406,25 @@ const ViewProfile: React.FC = () => {
           setUnlockingProfileId(null);
         },
       });
+
+      const checkoutSucceeded =
+        checkoutResult?.paymentDetails ||
+        checkoutResult?.order?.status === 'PAID' ||
+        checkoutResult?.order?.status === 'ACTIVE' ||
+        checkoutResult?.txStatus === 'SUCCESS';
+
+      if (checkoutSucceeded) {
+        try {
+          await confirmContactUnlock();
+        } catch (confirmError) {
+          console.error(confirmError);
+          toast.error('Payment succeeded but contact unlock failed');
+        } finally {
+          setUnlockingProfileId(null);
+        }
+      } else if (!contactConfirmed) {
+        setUnlockingProfileId(null);
+      }
     } catch (paymentError: any) {
       console.error(paymentError);
       toast.error(
@@ -379,8 +454,8 @@ const ViewProfile: React.FC = () => {
               <div
                 className="progress-bar bg-primary"
                 role="progressbar"
-                style={{ width: `${(step / 4) * 100}%` }}
-                aria-valuenow={(step / 4) * 100}
+                style={{ width: `${(step / 5) * 100}%` }}
+                aria-valuenow={(step / 5) * 100}
                 aria-valuemin={0}
                 aria-valuemax={100}
               ></div>
@@ -601,6 +676,51 @@ const ViewProfile: React.FC = () => {
                   </button>
                   <button
                     disabled={!formValues.gender}
+                    onClick={handleNextStep}
+                    className="btn btn-primary blinking-btn"
+                  >
+                    {t('profile.view.next')}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Job */}
+            {step === 5 && (
+              <div className="mb-3">
+                <motion.h4
+                  className="form-label fw-bold mb-5 text-primary jump-heading"
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  {t('profile.view.step5Title')}
+                </motion.h4>
+                <input
+                  type="search"
+                  list="job-options"
+                  value={formValues.job}
+                  onChange={(e) => setFormValues({ ...formValues, job: e.target.value })}
+                  className="form-control"
+                  placeholder={t('profile.view.selectJob')}
+                />
+                <datalist id="job-options">
+                  {JOB_OPTIONS.map((jobName) => (
+                    <option key={jobName} value={jobName} />
+                  ))}
+                </datalist>
+                <p
+                  className="text-primary mt-2 dont-have-text cursor-pointer"
+                  onClick={handleNoJob}
+                >
+                  {t('profile.view.noJob')}
+                </p>
+                <div className="d-flex justify-content-between mt-3">
+                  <button onClick={handlePrevStep} className="btn btn-outline-secondary">
+                    {t('profile.view.back')}
+                  </button>
+                  <button
+                    disabled={!formValues.job}
                     onClick={handleSubmitSearch}
                     className="btn btn-success blinking-btn"
                   >
@@ -613,8 +733,16 @@ const ViewProfile: React.FC = () => {
         </motion.div>
       </div>
 
+      {hasSearched && (
+        <div className="profile-count-card">
+          {isFetching
+            ? t('profile.view.searchingProfiles')
+            : `${t('profile.view.foundProfiles')}: ${visibleUsers.length}`}
+        </div>
+      )}
+
       <>
-        {users.length > 0 ? (
+        {visibleUsers.length > 0 ? (
           <>
             <div className="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 my-3">
               <button
@@ -658,9 +786,8 @@ const ViewProfile: React.FC = () => {
             </div>
             <div className="gallery-grid">
               {/* <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li> */}
-              {users.map((user: any) => {
+              {visibleUsers.map((user: any) => {
                 const firstImage = user?.userDetails?.imageData?.[0];
-                if (!firstImage) return null;
 
                 return (
                   <motion.div
@@ -736,7 +863,7 @@ const ViewProfile: React.FC = () => {
                 <p><strong>{t('profile.view.label.district')}:</strong> {selectedUser?.district || selectedUser?.userDetails?.district || t('profile.view.notAvailable')}</p>
                 <p><strong>{t('profile.view.label.state')}:</strong> {selectedUser?.state || selectedUser?.userDetails?.state || t('profile.view.notAvailable')}</p>
                 <p><strong>{t('profile.view.label.country')}:</strong> {selectedUser?.country}</p>
-                <div
+                {/* <div
                   className="contact-unlock-card mt-3 mb-3 p-3 border rounded"
                   style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
                 >
@@ -767,7 +894,57 @@ const ViewProfile: React.FC = () => {
                       </button>
                     </>
                   )}
-                </div>
+                </div> */}
+                <div className="contact-unlock-card mt-3 mb-3 p-3 border rounded"
+  style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
+>
+  <h6 className="mb-3" style={{ color: '#8a5a00' }}>
+    Contact Details
+  </h6>
+
+  {/* hasPayment true na details show pannum */}
+  {selectedUser?.hasPayment ? (
+    <>
+      <div className="mb-2">
+        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
+        {selectedUser?.phone_number || t('profile.view.notAvailable')}
+      </div>
+
+      <div className="mb-3">
+        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
+        {selectedUser?.whatsapp || t('profile.view.notAvailable')}
+      </div>
+    </>
+  ) : (
+    <>
+      {/* Payment illa na masked number + pay button */}
+      <div className="mb-2">
+        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
+        {maskContactValue(selectedUser?.phone_number)}
+      </div>
+
+      <div className="mb-3">
+        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
+        {maskContactValue(selectedUser?.whatsapp)}
+      </div>
+
+      <p className="mb-3">
+        Pay now to unlock this profile mobile number and WhatsApp number.
+      </p>
+
+      <button
+        type="button"
+        className="btn btn-warning"
+        disabled={unlockingProfileId === Number(selectedUser?.id)}
+        onClick={handleUnlockContact}
+      >
+        {unlockingProfileId === Number(selectedUser?.id)
+          ? 'Processing...'
+          : 'Pay Now'}
+      </button>
+    </>
+  )}
+</div>
                 <p><strong>{t('profile.view.label.job')}:</strong> {selectedUser?.job}</p>
                 <p><strong>{t('profile.view.label.salary')}:</strong> {selectedUser?.monthlySalary}</p>
                 <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || t('profile.view.notAvailable')}</p>

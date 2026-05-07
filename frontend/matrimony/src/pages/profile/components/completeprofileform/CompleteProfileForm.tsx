@@ -9,7 +9,6 @@ import Step3 from "../../../steps/step3";
 import Step4 from "../../../steps/step4";
 import Step5 from "../../../steps/step5";
 import Step6 from "../../../steps/step6";
-import Step7 from "../../../steps/step7";
 import Step8 from "../../../steps/step8";
 import { STATE_DISTRICT_MAP } from "../../../steps/step2";
 import './CompleteProfile.css';
@@ -20,6 +19,18 @@ type CompleteProfileFormProps = {
   onCompleted: () => void;
 };
 
+const getRegisteredMobile = () => {
+  try {
+    const storedUser = localStorage.getItem("authUser");
+    if (!storedUser) return "";
+
+    const parsedUser = JSON.parse(storedUser);
+    return parsedUser?.phone_number || parsedUser?.mobile || parsedUser?.mobileNumber || "";
+  } catch {
+    return "";
+  }
+};
+
 const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
   userId,
   initialData,
@@ -27,6 +38,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
 }) => {
   const [editForm, { isLoading }] = useEditFormMutation();
   const { t } = useAppLanguage();
+  const registeredMobile = useMemo(() => getRegisteredMobile(), []);
   const initialState = useMemo(
     () =>
       Object.keys(STATE_DISTRICT_MAP).find(
@@ -45,7 +57,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       country: initialData?.country || "India",
       state: initialState || initialData?.state || "",
       district: initialData?.district || "",
-      mobile: initialData?.phone_number || initialData?.mobile || "",
+      mobile: initialData?.phone_number || initialData?.mobile || registeredMobile,
       whatsapp: initialData?.whatsapp || "",
       caste: initialData?.caste || "",
       religion: initialData?.religion || "",
@@ -53,7 +65,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
       count: initialData?.count || "",
       person: initialData?.person || "",
     }),
-    [initialData, initialState],
+    [initialData, initialState, registeredMobile],
   );
 
   const methods = useForm<any>({
@@ -65,7 +77,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
     try {
       const payload = {
         ...values,
-        phone_number: values.mobile,
+        phone_number: defaultValues.mobile,
       };
       delete payload.mobile;
 
@@ -87,7 +99,7 @@ const CompleteProfileForm: React.FC<CompleteProfileFormProps> = ({
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <Step1 methods={methods} />
             <Step2 methods={methods} />
-            <Step3 methods={methods} />
+            <Step3 methods={methods} mobileReadOnly />
             <Step4 methods={methods} />
             <Step5 methods={methods} />
             <Step6 methods={methods} />

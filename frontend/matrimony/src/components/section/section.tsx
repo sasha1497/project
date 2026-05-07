@@ -151,7 +151,7 @@ const Section = () => {
                   {t('section.marriageQuote')}</span> */}
 
                   <span className="hero-subtext-inner">
-                   There are three ways to a happy marriage: The first way to select BAJOL. The second way is to be kind. The third way is to be integrity.</span>
+                   nattu three ways to a happy marriage: The first way to select BAJOL. The second way is to be kind. The third way is to be integrity.</span>
 
                  
                

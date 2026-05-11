@@ -348,7 +348,8 @@ const ViewProfile: React.FC = () => {
       const orderResponse = await axios.post(
         `${API_BASE_URL}/cashfree/create-profile-access-order`,
         {
-          viewer_user_id: userId,
+          // viewer_user_id: userId,
+          viewer_user_id: selectedUser?.id,
           target_user_id: selectedUser?.id,
           order_amount: 1,
           order_currency: 'INR',

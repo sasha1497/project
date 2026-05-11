@@ -242,10 +242,15 @@ export class UserService {
     const contactUnlocked = viewerUserId
       ? await this.hasProfileContactAccess(viewerUserId, id)
       : true;
+
+    console.log(contactUnlocked,'contactUnlocked');
+
     const maskedUser = {
       ...user,
-      phone_number: contactUnlocked ? user.phone_number : null,
-      whatsapp: contactUnlocked ? user.whatsapp : null,
+      // phone_number: contactUnlocked ? user.phone_number : null,
+      // whatsapp: contactUnlocked ? user.whatsapp : null,
+      phone_number: user?.phone_number,
+      whatsapp: user?.whatsapp,
     };
 
     // Return full user data

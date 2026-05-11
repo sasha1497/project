@@ -85,7 +85,7 @@ const SignUp: React.FC = () => {
         dispatch(setToken(token));
         dispatch(setUser(mergedUser));
 
-        toast.success(result.message || 'Login successful!', {
+        toast.success(result.message || ' successful!', {
           autoClose: 1000,
           onClose: () => navigate('/profile'),
         });

@@ -330,6 +330,8 @@ const ViewProfile: React.FC = () => {
   });
 
   const handleUnlockContact = async () => {
+    console.log('Initiating contact unlock for user:', selectedUser);
+  
     if (!selectedUser?.id || !userId) {
       toast.error('Unable to start payment');
       return;
@@ -347,12 +349,14 @@ const ViewProfile: React.FC = () => {
         `${API_BASE_URL}/cashfree/create-profile-access-order`,
         {
           viewer_user_id: userId,
-          target_user_id: selectedUser.id,
+          target_user_id: selectedUser?.id,
           order_amount: 1,
           order_currency: 'INR',
           receipt: `profile_${userId}_${selectedUser.id}_${Date.now()}`,
-          customer_phone: authUser?.phone_number || authUser?.mobile || '',
-          customer_email: authUser?.email || '',
+          // customer_phone: authUser?.phone_number || authUser?.mobile || '',
+          // customer_email: authUser?.email || '',
+           customer_phone: '7200979798',
+          customer_email:'jobnatti@gmail.com'
         }
       );
 
@@ -655,7 +659,7 @@ const ViewProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 >
-                 {t('profile.view.step4Title')}
+                  {t('profile.view.step4Title')}
                 </motion.h4>
                 <label htmlFor="gender" className="form-label fw-bold fs-4 text-primary">
                   {t('profile.view.selectNow')}
@@ -896,55 +900,55 @@ const ViewProfile: React.FC = () => {
                   )}
                 </div> */}
                 <div className="contact-unlock-card mt-3 mb-3 p-3 border rounded"
-  style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
->
-  <h6 className="mb-3" style={{ color: '#8a5a00' }}>
-    Contact Details
-  </h6>
+                  style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
+                >
+                  <h6 className="mb-3" style={{ color: '#8a5a00' }}>
+                    Contact Details
+                  </h6>
 
-  {/* hasPayment true na details show pannum */}
-  {selectedUser?.hasPayment ? (
-    <>
-      <div className="mb-2">
-        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
-        {selectedUser?.phone_number || t('profile.view.notAvailable')}
-      </div>
+                  {/* hasPayment true na details show pannum */}
+                  {selectedUser?.hasPayments ? (
+                    <>
+                      <div className="mb-2">
+                        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
+                        {selectedUser?.phone_number || t('profile.view.notAvailable')}
+                      </div>
 
-      <div className="mb-3">
-        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
-        {selectedUser?.whatsapp || t('profile.view.notAvailable')}
-      </div>
-    </>
-  ) : (
-    <>
-      {/* Payment illa na masked number + pay button */}
-      <div className="mb-2">
-        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
-        {maskContactValue(selectedUser?.phone_number)}
-      </div>
+                      <div className="mb-3">
+                        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
+                        {selectedUser?.whatsapp || t('profile.view.notAvailable')}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Payment illa na masked number + pay button */}
+                      <div className="mb-2">
+                        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
+                        {maskContactValue(selectedUser?.phone_number)}
+                      </div>
 
-      <div className="mb-3">
-        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
-        {maskContactValue(selectedUser?.whatsapp)}
-      </div>
+                      <div className="mb-3">
+                        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
+                        {maskContactValue(selectedUser?.whatsapp)}
+                      </div>
 
-      <p className="mb-3">
-        Pay now to unlock this profile mobile number and WhatsApp number.
-      </p>
+                      <p className="mb-3">
+                        Pay 49 RS to Bajol for this mobile number and WhatsApp number. We use Cashfree for secure payments.
+                      </p>
 
-      <button
-        type="button"
-        className="btn btn-warning"
-        disabled={unlockingProfileId === Number(selectedUser?.id)}
-        onClick={handleUnlockContact}
-      >
-        {unlockingProfileId === Number(selectedUser?.id)
-          ? 'Processing...'
-          : 'Pay Now'}
-      </button>
-    </>
-  )}
-</div>
+                      <button
+                        type="button"
+                        className="btn btn-warning fs-5"
+                        disabled={unlockingProfileId === Number(selectedUser?.id)}
+                        onClick={handleUnlockContact}
+                      >
+                        {unlockingProfileId === Number(selectedUser?.id)
+                          ? 'Processing...'
+                          : 'Pay Now'}
+                      </button>
+                    </>
+                  )}
+                </div>
                 <p><strong>{t('profile.view.label.job')}:</strong> {selectedUser?.job}</p>
                 <p><strong>{t('profile.view.label.salary')}:</strong> {selectedUser?.monthlySalary}</p>
                 <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || t('profile.view.notAvailable')}</p>

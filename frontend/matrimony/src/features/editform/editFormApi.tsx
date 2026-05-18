@@ -16,7 +16,7 @@ export const editFormApi = createApi({
     editForm: builder.mutation<any, any>({
       query: ({ id, ...formData }) => ({
         url: `user/update/${id}`, // assuming you're passing user id
-        method: "PATCH",
+        method: "POST",
         body: formData,
       }),
     }),

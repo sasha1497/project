@@ -239,18 +239,12 @@ export class UserService {
 
     // Get user images
     const imageData = await this.parseUserImages(id, user.photo);
-    const contactUnlocked = viewerUserId
-      ? await this.hasProfileContactAccess(viewerUserId, id)
-      : true;
-
-    console.log(contactUnlocked,'contactUnlocked');
+    const contactUnlocked = await this.hasProfileContactAccess(viewerUserId, id);
 
     const maskedUser = {
       ...user,
-      // phone_number: contactUnlocked ? user.phone_number : null,
-      // whatsapp: contactUnlocked ? user.whatsapp : null,
-      phone_number: user?.phone_number,
-      whatsapp: user?.whatsapp,
+      phone_number: contactUnlocked ? user.phone_number : null,
+      whatsapp: contactUnlocked ? user.whatsapp : null,
     };
 
     // Return full user data

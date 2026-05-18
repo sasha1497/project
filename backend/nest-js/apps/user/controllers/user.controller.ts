@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { RegisterService } from '../services/register.service';
 
@@ -21,6 +21,7 @@ export class UserController {
 
   /******************** UPDATE USER ****************************/
   @Post('update/:id')
+  @Patch('update/:id')
   async updateUser(@Param('id') id: string, @Body() data: any) {
     const result = await this.userService.upsertUser(id, data);
     return {

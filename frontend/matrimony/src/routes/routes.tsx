@@ -30,6 +30,7 @@ import Navbar from '../components/navbar/navbar';
 import Dashboard from '../pages/dashboard/dashboard';
 import SignUp from '../pages/signup/signup';
 import Profile from '../pages/profile/profile';
+import ProfileDetail from '../pages/profile/components/viewprofile/ProfileDetail';
 import Footer from '../components/footer/footer';
 import NotFound from '../pages/notfound/notfound';
 import PrivateRoute from '../routes/components/privateroute';
@@ -39,7 +40,7 @@ import Conclusion from '../pages/conclusion/conclusion';
 
 const AppRoutes = () => {
   const { pathname } = useLocation();
-  const showLayout = ['/', '/dashboard', '/signup', '/profile' ].includes(pathname);
+  const showLayout = ['/', '/dashboard', '/signup', '/profile' ].includes(pathname) || pathname.startsWith('/profile/');
   const showLayoutFooter = ['/', '/dashboard', '/signup' ].includes(pathname);
 
 
@@ -62,6 +63,14 @@ const AppRoutes = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/profile/:id"
+          element={
+            <PrivateRoute>
+              <ProfileDetail />
+            </PrivateRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {showLayoutFooter && <Footer />}
@@ -70,4 +79,3 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
-

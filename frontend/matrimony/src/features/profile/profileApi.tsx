@@ -1,6 +1,13 @@
 // src/features/profile/profileApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+type UserProfileQueryArg =
+  | number
+  | {
+      id: number;
+      viewerUserId?: number | string | null;
+    };
+
 export const profileApi = createApi({
   reducerPath: 'profileApi',
   baseQuery: fetchBaseQuery({
@@ -12,8 +19,17 @@ export const profileApi = createApi({
     }
   }),
   endpoints: (builder) => ({
-    getUserProfile: builder.query<any, number>({
-      query: (id) => `user/get/${id}`,
+    getUserProfile: builder.query<any, UserProfileQueryArg>({
+      query: (arg) => {
+        if (typeof arg === 'number') {
+          return `user/get/${arg}`;
+        }
+
+        return {
+          url: `user/get/${arg.id}`,
+          params: arg.viewerUserId ? { viewerUserId: arg.viewerUserId } : undefined,
+        };
+      },
     }),
   }),
   

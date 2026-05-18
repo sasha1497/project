@@ -50,6 +50,7 @@
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { useAppLanguage } from '../../i18n/LanguageContext';
+import { RELIGION_OPTIONS } from "../../constants/religionOptions";
 
 type Props = {
   methods: UseFormReturn<any>;
@@ -83,12 +84,17 @@ const Step4: React.FC<Props> = ({ methods }) => {
       {/* Religion Field */}
       <div className="mb-3">
         <label className="form-label">{t('profile.religionLabel')}</label>
-        <input
-          type="text"
-          placeholder={t('profile.religionPlaceholder')}
+        <select
           className={`form-control ${errors.religion ? "is-invalid" : ""}`}
           {...register("religion", { required: "Religion is required" })}
-        />
+        >
+          <option value="">{t('profile.religionPlaceholder')}</option>
+          {RELIGION_OPTIONS.map((religion) => (
+            <option key={religion} value={religion}>
+              {religion}
+            </option>
+          ))}
+        </select>
         {errors.religion && (
           <div className="invalid-feedback">
             {errors.religion.message as string}

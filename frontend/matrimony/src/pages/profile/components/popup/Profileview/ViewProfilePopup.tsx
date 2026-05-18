@@ -14,6 +14,7 @@ import { STATE_DISTRICT_MAP } from "../../../../steps/step2";
 import { useAppLanguage } from "../../../../../i18n/LanguageContext";
 import axios from "axios";
 import { load } from "@cashfreepayments/cashfree-js";
+import { RELIGION_OPTIONS } from "../../../../../constants/religionOptions";
 // import {
 //   startEdit,
 //   editSuccess,
@@ -22,10 +23,40 @@ import { load } from "@cashfreepayments/cashfree-js";
 
 const API_BASE_URL = String(process.env.REACT_APP_API_BASE_URL || 'https://usrapi.bajolmatrimony.com').replace(/\/+$/, '');
 
+const getStoredAuthUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("authUser") || "null");
+  } catch {
+    return null;
+  }
+};
+
+const buildEditableProfilePayload = (formData: any, currentData: any) => ({
+  name: formData.name,
+  age: formData.age,
+  gender: formData.gender,
+  caste: formData.caste,
+  religion: formData.religion,
+  district: formData.district,
+  state: formData.state,
+  country: formData.country,
+  phone_number: currentData?.phone_number || formData.phone_number,
+  whatsapp: formData.whatsapp,
+  job: formData.job,
+  monthlySalary: formData.monthlySalary,
+  notes: formData.notes,
+  count: formData.count,
+  person: formData.person,
+});
+
 const ViewProfilePopup = () => {
   const dispatch = useDispatch();
   const showPopup = useSelector((state: RootState) => state.profileUi.showViewPopup);
-  const userId = useSelector((state: RootState) => state.auth.user?.id);
+  const authUser = useSelector((state: RootState) => state.auth.user);
+  const formAuthUser = useSelector((state: any) => state.form.authUser);
+  const storedAuthUser = useMemo(() => getStoredAuthUser(), []);
+  const resolvedUser = authUser || formAuthUser || storedAuthUser;
+  const userId = resolvedUser?.id;
   const { t } = useAppLanguage();
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -34,7 +65,7 @@ const ViewProfilePopup = () => {
   const [contactVisible, setContactVisible] = useState(false);
 
   // ✅ Fetch user profile
-  const { data, isLoading, refetch } = useGetUserProfileQuery(userId, {
+  const { data, isLoading, refetch } = useGetUserProfileQuery({ id: Number(userId), viewerUserId: userId }, {
     skip: !userId,
     refetchOnMountOrArgChange: false,
   });
@@ -107,8 +138,8 @@ const ViewProfilePopup = () => {
   }, [lockedState, selectedState, setValue]);
 
   useEffect(() => {
-    setContactVisible(false);
-  }, [showPopup, data?.id]);
+    setContactVisible(Boolean(data?.contactUnlocked));
+  }, [showPopup, data?.id, data?.contactUnlocked]);
 
   const handleUnlockContact = async () => {
     if (!userId) {
@@ -186,14 +217,13 @@ const ViewProfilePopup = () => {
     try {
       dispatch(startEdit());
 
-      const { password, confirmPassword, imageData, hasPayments, paymentExpiryInfo, ...cleanedData } = formData;
-      cleanedData.phone_number = data?.phone_number || formData.phone_number;
+      const cleanedData = buildEditableProfilePayload(formData, data);
 
       await editForm({ id: userId, ...cleanedData }).unwrap();
 
       dispatch(editSuccess());
       toast.success(t('profile.popup.updateSuccess'));
-      refetch();
+      await refetch();
       setIsEditMode(false);
     } catch (error: any) {
       dispatch(editFailure(error?.data?.message || t('profile.popup.updateFailed')));
@@ -346,12 +376,17 @@ const ViewProfilePopup = () => {
               {/* Religion */}
               <div className="mb-3">
                 <label className="form-label">{t('profile.religionLabel')}</label>
-                <input
-                  type="text"
+                <select
                   className="form-control"
-                  placeholder={t('profile.religionPlaceholder')}
                   {...register("religion", { required: t('profile.religionLabel') + " is required" })}
-                />
+                >
+                  <option value="">{t('profile.religionPlaceholder')}</option>
+                  {RELIGION_OPTIONS.map((religion) => (
+                    <option key={religion} value={religion}>
+                      {religion}
+                    </option>
+                  ))}
+                </select>
                 {errors.religion && <small className="text-danger">{errors.religion.message}</small>}
               </div>
 

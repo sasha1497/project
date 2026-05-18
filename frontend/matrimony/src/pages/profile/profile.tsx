@@ -123,7 +123,9 @@ const Profile = () => {
   }, [userId, authUserId]);
 
   // RTK Query, skip if no userId yet
-  const { data, isLoading, refetch } = useGetUserProfileQuery(finalUserId ?? skipToken);
+  const { data, isLoading, refetch } = useGetUserProfileQuery(
+    finalUserId ? { id: Number(finalUserId), viewerUserId: finalUserId } : skipToken
+  );
 
   if (isLoading || !finalUserId) return <Loader />;
 

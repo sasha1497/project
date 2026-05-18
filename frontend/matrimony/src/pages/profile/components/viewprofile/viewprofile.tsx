@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import './viewprofile.css';
 import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
 import { closeViewPopup, openViewPopup } from "../../../../features/profileui/profileUISlice";
@@ -8,8 +8,8 @@ import { toast } from 'react-toastify';
 import { useDeleteUserAccountMutation } from '../../../../features/deleteaccount/deleteAccountApi';
 import { STATE_DISTRICT_MAP } from '../../../steps/step2';
 import { useAppLanguage } from '../../../../i18n/LanguageContext';
-import axios from 'axios';
-import { load } from '@cashfreepayments/cashfree-js';
+import { RELIGION_OPTIONS } from '../../../../constants/religionOptions';
+import { useNavigate } from 'react-router-dom';
 
 
 type ImageData = {
@@ -79,7 +79,6 @@ const countries = [
 ];
 
 const STATES = Object.keys(STATE_DISTRICT_MAP);
-const API_BASE_URL = String(process.env.REACT_APP_API_BASE_URL || 'https://usrapi.bajolmatrimony.com').replace(/\/+$/, '');
 const JOB_OPTIONS = [
   'Accountant',
   'Business',
@@ -95,14 +94,6 @@ const JOB_OPTIONS = [
   'Private Job',
   'Teacher',
 ];
-
-const maskContactValue = (value?: string | null) => {
-  const raw = String(value || '').trim();
-  if (!raw) return 'XXXXXXXXXX';
-
-  const visibleDigits = raw.replace(/\D/g, '').slice(-2);
-  return `XXXXXX${visibleDigits || 'XX'}`;
-};
 
 const clearClientStorage = () => {
   localStorage.clear();
@@ -120,12 +111,9 @@ const clearClientStorage = () => {
 
 
 const ViewProfile: React.FC = () => {
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [cashfree, setCashfree] = useState<any>(null);
-  const [unlockingProfileId, setUnlockingProfileId] = useState<number | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const { t } = useAppLanguage();
+  const navigate = useNavigate();
 
 
   const [step, setStep] = useState<number>(1);
@@ -136,6 +124,7 @@ const ViewProfile: React.FC = () => {
     state: "",
     district: "",
     gender: "",
+    religion: "",
     job: ""
   });
 
@@ -190,6 +179,7 @@ const ViewProfile: React.FC = () => {
       state: '',
       district: '',
       gender: '',
+      religion: '',
       job: ''
     },
     // search: ""
@@ -216,17 +206,10 @@ const ViewProfile: React.FC = () => {
 
   const [deleteUserAccount] = useDeleteUserAccountMutation();
 
-  const { data: users = [], isLoading, isFetching, error, refetch: refetchUsers } = useGetAllUsersQuery(payload);
+  const { data: users = [], isLoading, isFetching, error } = useGetAllUsersQuery(payload);
 
   const authUser = useSelector((state: any) => state.auth.user);
   const userId = authUser?.id;
-
-  useEffect(() => {
-    (async () => {
-      const cfInstance = await load({ mode: 'production' });
-      setCashfree(cfInstance);
-    })();
-  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -242,22 +225,7 @@ const ViewProfile: React.FC = () => {
   const visibleUsers = users.filter((user: any) => user?.userDetails?.imageData?.[0]);
 
   const openUserImages = (user: User) => {
-    setSelectedUser(user);
-    setCurrentIndex(0);
-  };
-
-  const nextImage = () => {
-    if (!selectedUser) return;
-    setCurrentIndex((prevIndex) =>
-      prevIndex === selectedUser.userDetails.imageData.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const prevImage = () => {
-    if (!selectedUser) return;
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? selectedUser.userDetails.imageData.length - 1 : prevIndex - 1
-    );
+    navigate(`/profile/${user.id}`);
   };
 
   // const handleDeleteAccount = async () => {
@@ -322,125 +290,6 @@ const ViewProfile: React.FC = () => {
     }
   };
 
-  const normalizeUnlockedProfile = (profile: any) => ({
-    ...profile,
-    userDetails: {
-      imageData: profile?.imageData || [],
-    },
-  });
-
-  const handleUnlockContact = async () => {
-    console.log('Initiating contact unlock for user:', selectedUser);
-  
-    if (!selectedUser?.id || !userId) {
-      toast.error('Unable to start payment');
-      return;
-    }
-
-    if (!cashfree) {
-      toast.error('Payment is loading. Please wait a moment.');
-      return;
-    }
-
-    try {
-      setUnlockingProfileId(Number(selectedUser.id));
-
-      const orderResponse = await axios.post(
-        `${API_BASE_URL}/cashfree/create-profile-access-order`,
-        {
-          // viewer_user_id: userId,
-          viewer_user_id: selectedUser?.id,
-          target_user_id: selectedUser?.id,
-          order_amount: 1,
-          order_currency: 'INR',
-          receipt: `profile_${userId}_${selectedUser.id}_${Date.now()}`,
-          // customer_phone: authUser?.phone_number || authUser?.mobile || '',
-          // customer_email: authUser?.email || '',
-           customer_phone: '7200979798',
-          customer_email:'jobnatti@gmail.com'
-        }
-      );
-
-      const sessionId = orderResponse?.data?.cashfree_order?.payment_session_id;
-      const cashfreeOrderId = orderResponse?.data?.cashfree_order?.order_id;
-
-      if (!sessionId || !cashfreeOrderId) {
-        throw new Error('Failed to create payment order');
-      }
-
-      let contactConfirmed = false;
-      const confirmContactUnlock = async () => {
-        if (contactConfirmed) return;
-        contactConfirmed = true;
-
-        const confirmResponse = await axios.post(
-          `${API_BASE_URL}/cashfree/confirm-profile-access-order`,
-          {
-            cashfree_order_id: cashfreeOrderId,
-          }
-        );
-
-        const unlockedProfile = confirmResponse?.data?.unlockedProfile;
-
-        if (unlockedProfile) {
-          setSelectedUser(normalizeUnlockedProfile(unlockedProfile));
-        }
-
-        await refetchUsers();
-        toast.success('Contact unlocked successfully');
-      };
-
-      const checkoutResult = await cashfree.checkout({
-        paymentSessionId: sessionId,
-        redirectTarget: '_modal',
-        onSuccess: async () => {
-          try {
-            await confirmContactUnlock();
-          } catch (confirmError) {
-            console.error(confirmError);
-            toast.error('Payment succeeded but contact unlock failed');
-          } finally {
-            setUnlockingProfileId(null);
-          }
-        },
-        onFailure: () => {
-          toast.error('Payment failed, please try again');
-          setUnlockingProfileId(null);
-        },
-        onClose: () => {
-          setUnlockingProfileId(null);
-        },
-      });
-
-      const checkoutSucceeded =
-        checkoutResult?.paymentDetails ||
-        checkoutResult?.order?.status === 'PAID' ||
-        checkoutResult?.order?.status === 'ACTIVE' ||
-        checkoutResult?.txStatus === 'SUCCESS';
-
-      if (checkoutSucceeded) {
-        try {
-          await confirmContactUnlock();
-        } catch (confirmError) {
-          console.error(confirmError);
-          toast.error('Payment succeeded but contact unlock failed');
-        } finally {
-          setUnlockingProfileId(null);
-        }
-      } else if (!contactConfirmed) {
-        setUnlockingProfileId(null);
-      }
-    } catch (paymentError: any) {
-      console.error(paymentError);
-      toast.error(
-        paymentError?.response?.data?.message ||
-        paymentError?.message ||
-        'Unable to start profile payment'
-      );
-      setUnlockingProfileId(null);
-    }
-  };
-
   return (
     <div className="gallery-container">
 
@@ -459,8 +308,8 @@ const ViewProfile: React.FC = () => {
               <div
                 className="progress-bar bg-primary"
                 role="progressbar"
-                style={{ width: `${(step / 5) * 100}%` }}
-                aria-valuenow={(step / 5) * 100}
+                style={{ width: `${(step / 6) * 100}%` }}
+                aria-valuenow={(step / 6) * 100}
                 aria-valuemin={0}
                 aria-valuemax={100}
               ></div>
@@ -690,8 +539,46 @@ const ViewProfile: React.FC = () => {
               </div>
             )}
 
-            {/* Step 5: Job */}
+            {/* Step 5: Religion */}
             {step === 5 && (
+              <div className="mb-3">
+                <motion.h4
+                  className="form-label fw-bold mb-5 text-primary jump-heading"
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                  {t('profile.religionLabel')}
+                </motion.h4>
+                <select
+                  value={formValues.religion}
+                  onChange={(e) => setFormValues({ ...formValues, religion: e.target.value })}
+                  className="form-select"
+                >
+                  <option value="">{t('profile.religionPlaceholder')}</option>
+                  {RELIGION_OPTIONS.map((religion) => (
+                    <option key={religion} value={religion}>
+                      {religion}
+                    </option>
+                  ))}
+                </select>
+                <div className="d-flex justify-content-between mt-3">
+                  <button onClick={handlePrevStep} className="btn btn-outline-secondary">
+                    {t('profile.view.back')}
+                  </button>
+                  <button
+                    disabled={!formValues.religion}
+                    onClick={handleNextStep}
+                    className="btn btn-primary blinking-btn"
+                  >
+                    {t('profile.view.next')}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 6: Job */}
+            {step === 6 && (
               <div className="mb-3">
                 <motion.h4
                   className="form-label fw-bold mb-5 text-primary jump-heading"
@@ -826,139 +713,6 @@ const ViewProfile: React.FC = () => {
           </div>
         )}
       </>
-
-
-
-      <AnimatePresence>
-        {selectedUser && (
-          <motion.div
-            className="popup-overlay mt-5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedUser(null)}
-          >
-            <motion.div
-              className="popup-content"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }}
-              exit={{ scale: 0.8 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}
-            >
-              <div className="close-icon" onClick={() => setSelectedUser(null)}>
-                &times;
-              </div>
-
-              <img
-                src={selectedUser.userDetails.imageData[currentIndex].url}
-                alt={selectedUser.userDetails.imageData[currentIndex].name}
-                className="popup-image"
-                style={{ maxWidth: '50vh', maxHeight: '50vh', borderRadius: '8px' }}
-              />
-
-              <div className="view-profile-content">
-                <p><strong>{t('profile.view.label.name')} :</strong> {selectedUser?.name}</p>
-                <p><strong>{t('profile.view.label.age')} :</strong> {selectedUser?.age}</p>
-                <p><strong>{t('profile.view.label.gender')} :</strong> {selectedUser?.gender}</p>
-                {/* <p><strong>Height:</strong> {selectedUser?.height}</p>
-                <p><strong>Weight:</strong> {selectedUser?.weight}</p> */}
-                <p><strong>{t('profile.view.label.caste')}:</strong> {selectedUser?.caste}</p>
-                <p><strong>{t('profile.view.label.religion')}:</strong> {selectedUser?.religion}</p>
-                <p><strong>{t('profile.view.label.district')}:</strong> {selectedUser?.district || selectedUser?.userDetails?.district || t('profile.view.notAvailable')}</p>
-                <p><strong>{t('profile.view.label.state')}:</strong> {selectedUser?.state || selectedUser?.userDetails?.state || t('profile.view.notAvailable')}</p>
-                <p><strong>{t('profile.view.label.country')}:</strong> {selectedUser?.country}</p>
-                {/* <div
-                  className="contact-unlock-card mt-3 mb-3 p-3 border rounded"
-                  style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
-                >
-                  <h6 className="mb-3" style={{ color: '#8a5a00' }}>Contact Details</h6>
-                  <div className="mb-2">
-                    <strong>{t('profile.view.label.mobile')}:</strong>{' '}
-                    {selectedUser?.contactUnlocked
-                      ? (selectedUser?.phone_number || t('profile.view.notAvailable'))
-                      : maskContactValue(selectedUser?.phone_number)}
-                  </div>
-                  <div className="mb-3">
-                    <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
-                    {selectedUser?.contactUnlocked
-                      ? (selectedUser?.whatsapp || t('profile.view.notAvailable'))
-                      : maskContactValue(selectedUser?.whatsapp)}
-                  </div>
-
-                  {!selectedUser?.contactUnlocked && (
-                    <>
-                      <p className="mb-3">Pay now to unlock this profile mobile number and WhatsApp number.</p>
-                      <button
-                        type="button"
-                        className="btn btn-warning"
-                        disabled={unlockingProfileId === Number(selectedUser?.id)}
-                        onClick={handleUnlockContact}
-                      >
-                        {unlockingProfileId === Number(selectedUser?.id) ? 'Processing...' : 'Pay Now'}
-                      </button>
-                    </>
-                  )}
-                </div> */}
-                <div className="contact-unlock-card mt-3 mb-3 p-3 border rounded"
-                  style={{ background: '#fff8e6', borderColor: '#f0c36d' }}
-                >
-                  <h6 className="mb-3" style={{ color: '#8a5a00' }}>
-                    Contact Details
-                  </h6>
-
-                  {/* hasPayment true na details show pannum */}
-                  {selectedUser?.hasPayments ? (
-                    <>
-                      <div className="mb-2">
-                        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
-                        {selectedUser?.phone_number || t('profile.view.notAvailable')}
-                      </div>
-
-                      <div className="mb-3">
-                        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
-                        {selectedUser?.whatsapp || t('profile.view.notAvailable')}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Payment illa na masked number + pay button */}
-                      <div className="mb-2">
-                        <strong>{t('profile.view.label.mobile')}:</strong>{' '}
-                        {maskContactValue(selectedUser?.phone_number)}
-                      </div>
-
-                      <div className="mb-3">
-                        <strong>{t('profile.view.label.whatsapp')}:</strong>{' '}
-                        {maskContactValue(selectedUser?.whatsapp)}
-                      </div>
-
-                      <p className="mb-3">
-                        Pay 49 RS to Bajol for this mobile number and WhatsApp number. We use Cashfree for secure payments.
-                      </p>
-
-                      <button
-                        type="button"
-                        className="btn btn-warning fs-5"
-                        disabled={unlockingProfileId === Number(selectedUser?.id)}
-                        onClick={handleUnlockContact}
-                      >
-                        {unlockingProfileId === Number(selectedUser?.id)
-                          ? 'Processing...'
-                          : 'Pay Now'}
-                      </button>
-                    </>
-                  )}
-                </div>
-                <p><strong>{t('profile.view.label.job')}:</strong> {selectedUser?.job}</p>
-                <p><strong>{t('profile.view.label.salary')}:</strong> {selectedUser?.monthlySalary}</p>
-                <p><strong>{t('profile.view.label.marriageStatus')}:</strong> {selectedUser?.count || selectedUser?.userDetails?.count || t('profile.view.notAvailable')}</p>
-                <p><strong>{t('profile.view.label.whoseMarriage')}:</strong> {selectedUser?.person}</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

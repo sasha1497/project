@@ -1,0 +1,74 @@
+.delete-account-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #f9f9f9;
+}
+
+.delete-account-card {
+  width: 100%;
+  max-width: 720px;
+  padding: 2rem;
+  border: 1px solid #d8dee8;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #263238;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.delete-account-eyebrow {
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.delete-account-card h1 {
+  margin-bottom: 1rem;
+  color: #b42318;
+  font-size: 2rem;
+}
+
+.delete-account-card p {
+  line-height: 1.7;
+}
+
+.delete-account-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid #f1b8b8;
+  border-radius: 4px;
+  background: #fff5f5;
+  color: #7a271a;
+}
+
+.delete-account-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 576px) {
+  .delete-account-page {
+    padding: 1rem;
+  }
+
+  .delete-account-card {
+    padding: 1.25rem;
+  }
+
+  .delete-account-actions {
+    flex-direction: column-reverse;
+  }
+
+  .delete-account-actions .btn {
+    width: 100%;
+  }
+}

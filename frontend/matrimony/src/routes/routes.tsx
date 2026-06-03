@@ -37,10 +37,12 @@ import PrivateRoute from '../routes/components/privateroute';
 import About from '../pages/about/about';
 import Rule from '../pages/rules/rules';
 import Conclusion from '../pages/conclusion/conclusion';
+import PrivacyPolicy from '../pages/privacyPolicy/privacyPolicy';
+import DeleteAccount from '../pages/deleteAccount/deleteAccount';
 
 const AppRoutes = () => {
   const { pathname } = useLocation();
-  const showLayout = ['/', '/dashboard', '/signup', '/profile' ].includes(pathname) || pathname.startsWith('/profile/');
+  const showLayout = ['/', '/dashboard', '/signup', '/profile', '/delete-account' ].includes(pathname) || pathname.startsWith('/profile/');
   const showLayoutFooter = ['/', '/dashboard', '/signup' ].includes(pathname);
 
 
@@ -54,6 +56,15 @@ const AppRoutes = () => {
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Rule />} />
         <Route path="/conclusion" element={< Conclusion />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route
+          path="/delete-account"
+          element={
+            <PrivateRoute>
+              <DeleteAccount />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/profile"

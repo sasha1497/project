@@ -29,6 +29,8 @@ const Footer = () => {
               <li><Link to="/terms" className="text-light text-decoration-none">{t('footer.rules')}</Link></li>
               <li><a href="#" className="text-light text-decoration-none">{t('footer.contact')}</a></li>
               <li><Link to="/conclusion"  className="text-light text-decoration-none">{t('footer.conclusion')}</Link></li>
+              <li><Link to="/privacy-policy" className="text-light text-decoration-none">{t('footer.privacyPolicy')}</Link></li>
+              <li><Link to="/delete-account" className="text-light text-decoration-none">{t('footer.deleteAccount')}</Link></li>
             </ul>
           </div>
 

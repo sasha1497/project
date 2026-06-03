@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import './viewprofile.css';
 import { useGetAllUsersQuery } from '../../../../features/view/viewApi';
-import { closeViewPopup, openViewPopup } from "../../../../features/profileui/profileUISlice";
+import { openViewPopup } from "../../../../features/profileui/profileUISlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { useDeleteUserAccountMutation } from '../../../../features/deleteaccount/deleteAccountApi';
 import { STATE_DISTRICT_MAP } from '../../../steps/step2';
 import { useAppLanguage } from '../../../../i18n/LanguageContext';
 import { RELIGION_OPTIONS } from '../../../../constants/religionOptions';
@@ -94,21 +93,6 @@ const JOB_OPTIONS = [
   'Private Job',
   'Teacher',
 ];
-
-const clearClientStorage = () => {
-  localStorage.clear();
-  sessionStorage.clear();
-
-  document.cookie.split(';').forEach((cookie) => {
-    const cookieName = cookie.split('=')[0]?.trim();
-    if (!cookieName) return;
-
-    document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-    document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`;
-  });
-};
-
-
 
 const ViewProfile: React.FC = () => {
   const [hasSearched, setHasSearched] = useState(false);
@@ -204,8 +188,6 @@ const ViewProfile: React.FC = () => {
   const dispatch = useDispatch();
   const districts = formValues.state ? STATE_DISTRICT_MAP[formValues.state] || [] : [];
 
-  const [deleteUserAccount] = useDeleteUserAccountMutation();
-
   const { data: users = [], isLoading, isFetching, error } = useGetAllUsersQuery(payload);
 
   const authUser = useSelector((state: any) => state.auth.user);
@@ -228,66 +210,8 @@ const ViewProfile: React.FC = () => {
     navigate(`/profile/${user.id}`);
   };
 
-  // const handleDeleteAccount = async () => {
-  //   if (!userId) {
-  //     toast.error("User ID not found");
-  //     return;
-  //   }
-
-  //   const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-  //   if (!confirmDelete) return;
-
-  //   try {
-  //     const response = await fetch(`http://localhost:3002/user/delete/${userId}`, {
-  //       method: "DELETE",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${localStorage.getItem("token")}`, // optional if auth is needed
-  //       },
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to delete account");
-  //     }
-
-  //     toast.success("Account deleted successfully!");
-
-  //     // Optional: clear local storage and redirect to login
-  //     localStorage.removeItem("token");
-  //     localStorage.removeItem("user");
-
-  //     // Close popup or redirect
-  //     dispatch(closeViewPopup());
-  //     window.location.href = "/dashboard"; // redirect to login page
-
-  //   } catch (error) {
-  //     console.error("Delete failed:", error);
-  //     toast.error("Something went wrong while deleting your account.");
-  //   }
-  // };
-
-  const handleDeleteAccount = async () => {
-
-    if (!userId) {
-      toast.error(t('profile.view.userIdMissing'));
-      return;
-    }
-
-    const confirmDelete = window.confirm(t('profile.view.confirmDelete'));
-    if (!confirmDelete) return;
-
-    try {
-      await deleteUserAccount(userId).unwrap();
-      toast.success(t('profile.view.deleteSuccess'));
-
-      clearClientStorage();
-
-      dispatch(closeViewPopup());
-      window.location.href = "/dashboard"; // redirect
-    } catch (err: any) {
-      toast.error(t('profile.view.deleteFailed'));
-      console.error(err);
-    }
+  const goToDeleteAccountPage = () => {
+    navigate('/delete-account');
   };
 
   return (
@@ -658,7 +582,7 @@ const ViewProfile: React.FC = () => {
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                onClick={handleDeleteAccount}
+                onClick={goToDeleteAccountPage}
               >
                 {t('profile.view.deleteMyAccount')}
               </button>

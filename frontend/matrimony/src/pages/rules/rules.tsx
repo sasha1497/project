@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Typewriter } from 'react-simple-typewriter';
 import './rule.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,16 +30,7 @@ const Rule = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, type: 'spring', stiffness: 120 }}
             >
-                <p className="typewriter-text">
-                    <Typewriter
-                        words={[aboutText]}
-                        cursor
-                        typeSpeed={30} // adjust speed as you like
-                        deleteSpeed={0}
-                        delaySpeed={1000}
-                        loop={1} // type only once
-                    />
-                </p>
+                <p className="content-text">{aboutText}</p>
             </motion.div>
             <button
                 type="button"

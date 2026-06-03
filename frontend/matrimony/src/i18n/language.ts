@@ -106,6 +106,8 @@ type TranslationKey =
   | 'footer.rules'
   | 'footer.contact'
   | 'footer.conclusion'
+  | 'footer.privacyPolicy'
+  | 'footer.deleteAccount'
   | 'footer.subscribe'
   | 'footer.getStarted'
   | 'navbar.signupWelcome'
@@ -2405,6 +2407,8 @@ const ENGLISH_FALLBACKS: any = {
   'footer.rules': 'The rules and directions',
   'footer.contact': 'Contact',
   'footer.conclusion': 'Conclusion',
+  'footer.privacyPolicy': 'Privacy Policy',
+  'footer.deleteAccount': 'Delete Account',
   'footer.subscribe': 'Subscribe',
   'footer.getStarted': 'Get started',
   'navbar.signupWelcome': 'Welcome to Signup Page',
